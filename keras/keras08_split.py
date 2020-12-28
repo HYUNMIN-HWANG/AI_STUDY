@@ -8,12 +8,12 @@ from numpy import array
 # array() : 위, 아래 같은 것
 
 #1. DATA
-
 x = np.array(range(1,101)) # 1 ~ 100
 # x = np.array(range(100))    # 0 ~ 99
 y = np.array(range(101, 201))
 
-#리스트의 슬라이싱 (train : validation : test = 6 : 2 : 2)
+# 리스트의 슬라이싱 (train : validation : test = 6 : 2 : 2)  >>>>  좀 더 편한 슬라이싱 keras09_split2.py
+# 데이터를 어떻게 처리하느냐에 따라 성능 차이가 달라진다.
 x_train = x[:60] # 0번째부터 59번째까지 : 1 ~ 60
 x_val = x[60:80] # 60번째부터 79번째까지 : 61 ~ 80
 x_test = x[80:]  # 81 ~ 100
