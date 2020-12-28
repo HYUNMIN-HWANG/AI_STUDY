@@ -37,6 +37,7 @@ y_predict = model.predict(x_test)
 #참고 : np.sqrt(results[0]) : result에 나오는 첫 번째 값이 mse이므로 루트를 씌우면 RMSE와 같다.
 
 # 사이킷런(sklearn) 설치
+# RMSE : 낮아야 좋다.
 from sklearn.metrics import mean_squared_error #mse
 def RMSE (y_test, y_predict) :
     return np.sqrt(mean_squared_error(y_test, y_predict)) #RMSE = mse에 루트를 씌운다.

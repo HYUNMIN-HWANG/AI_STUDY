@@ -25,7 +25,8 @@ model.add(Dense(1))
 
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2) #데이터를 20% 를 쪼개서 사용하겠다. (=10개 중에서 2개만 검증하겠다.) - validation data를 따로 지정하지 않아도 됨
+model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2) 
+#데이터를 20% 를 쪼개서 사용하겠다. (=10개 중에서 2개만 검증하겠다.) - validation data를 따로 지정하지 않아도 됨
 
 #4. evaluate
 results = model.evaluate(x_test, y_test, batch_size=1) #loss = 'mse', metrics='mae' 값이 들어간다
@@ -45,6 +46,7 @@ print("RMSE :", RMSE(y_test, y_predict))
 # print("mse :", mean_squared_error(y_test, y_predict))
 print("mse :", mean_squared_error(y_predict,y_test))
 
+# accuracy 대신 사용, 1이 나올수록 좋다.
 from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)

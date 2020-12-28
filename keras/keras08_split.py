@@ -9,17 +9,17 @@ from numpy import array
 
 #1. DATA
 
-x = np.array(range(1,101)) #0 ~ 100
-# x = np.array(range(100))    #0 ~ 99
+x = np.array(range(1,101)) # 1 ~ 100
+# x = np.array(range(100))    # 0 ~ 99
 y = np.array(range(101, 201))
 
 #리스트의 슬라이싱 (train : validation : test = 6 : 2 : 2)
 x_train = x[:60] # 0번째부터 59번째까지 : 1 ~ 60
-x_val = x[60:80] # 60번째부터 80번째까지 : 61 ~ 80
+x_val = x[60:80] # 60번째부터 79번째까지 : 61 ~ 80
 x_test = x[80:]  # 81 ~ 100
 
 y_train = y[:60] # 0번째부터 59번째까지 : 1 ~ 60
-y_val = y[60:80] # 60번째부터 80번째까지 : 61 ~ 80
+y_val = y[60:80] # 60번째부터 79번째까지 : 61 ~ 80
 y_test = y[80:]  # 81 ~ 100
 
 #2. Modeling
@@ -54,4 +54,3 @@ print("mse :", mean_squared_error(y_predict,y_test))
 from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
-

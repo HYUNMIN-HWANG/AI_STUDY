@@ -38,7 +38,7 @@ model.fit(x_train, y_train, epochs=200, batch_size=1)
 
 #4. evaluate, predict
 loss = model.evaluate(x_test, y_test, batch_size=1)
-print('loss : ', loss)
+print('loss : ', loss) #loss 값을 줄여라
 
 result = model.predict(x_predict)
 print("result : ", result)

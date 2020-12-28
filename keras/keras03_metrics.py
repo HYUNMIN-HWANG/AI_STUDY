@@ -54,7 +54,7 @@ model.fit(x_train, y_train, epochs=100, batch_size=1)
 
 #4. evaluate, predict
 loss = model.evaluate(x_test, y_test, batch_size=1)
-print('loss : ', loss)
+print('loss : ', loss)  #loss 'mse' 와 metrics 'mae' 출력됨
 
 # result = model.predict([9])
 result = model.predict(x_train)
