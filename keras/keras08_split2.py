@@ -1,3 +1,8 @@
+# 수동으로 train data, test data, validation data 구분하기 귀찮다.
+# train_test_split를 사용해서 나눈다.
+# from sklearn.model_selection import train_test_split
+
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 

@@ -1,4 +1,7 @@
 # 실습 : train_size, test_size를 구분 : 1을 넘어간 경우, 1이 안되는 경우
+# 각 파라미터 별로 어떤 결과가 나오는지 확인한다.
+
+#1이 넘어가는 경우 에러 발생
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense

@@ -1,3 +1,6 @@
+# 리스트 슬라이싱
+# 슬라이싱을 활용해서 train data, test data, validation data로 구분한다.
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
