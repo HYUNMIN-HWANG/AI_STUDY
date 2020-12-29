@@ -1,3 +1,6 @@
+#deep learning 기초 모델
+#1. 데이터 준비 #2. 모델구성 #3. 컴파일 & 훈련 #4. 평가 & 예측
+
 import numpy as np
 import tensorflow as tf 
 

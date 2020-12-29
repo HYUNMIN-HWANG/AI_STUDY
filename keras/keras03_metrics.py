@@ -1,8 +1,4 @@
-"""
-(암묵적인) 네이밍 룰
-JAVA : 카멜케이스 - 의미가 시작되는 부분이 대문자로 시작함
-python : 의미가 시작되는 부분에 _(언더바)로 구분한다.
-"""
+# metrics = ['accuracy'] ['mae'] ['mse']
 
 #import는 통상적으로 맨 위에 몰아서 넣어준다.
 import numpy as np

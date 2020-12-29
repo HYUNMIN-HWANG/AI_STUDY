@@ -1,3 +1,7 @@
+# RMSE
+# y_predict와 y_test간의 RMSE를 통해서 얼마나 정확한 예측을 했는지 평가한다.
+# sklearn 사용
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 

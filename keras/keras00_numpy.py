@@ -1,3 +1,5 @@
+#numpy 사용하기
+
 import numpy as np 
 x = np.array([1,2,3])
 y = np.array([1,2,3])
