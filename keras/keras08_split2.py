@@ -15,6 +15,7 @@ y = np.array(range(1,101)) #101부터 200까지
 # y_val = y[60:80] # 60번째부터 79번째까지 : 61 ~ 80
 # y_test = y[80:]  # 81 ~ 100
 
+#train, test 데이터 구분을 train_test_split를 사용해서 나눈다.
 # sklearn을 활용한다.
 from sklearn.model_selection import train_test_split
 x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True) #x, y 데이터 중 80%를 train으로 준다. / 20% 는 테스트로 준다.
