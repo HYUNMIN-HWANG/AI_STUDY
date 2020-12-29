@@ -1,4 +1,5 @@
 # 함수형 모델
+# dense 이름 aaa로 통일하면?
 # model.summary
 
 import numpy as np

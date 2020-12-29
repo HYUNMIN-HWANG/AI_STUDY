@@ -1,5 +1,5 @@
 # 모델
-#[1] Model()
+#[**1] Model()
 #[2] Sequential()
 
 

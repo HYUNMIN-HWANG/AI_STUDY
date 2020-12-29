@@ -1,8 +1,6 @@
 # Multi Layer Percemtron (MLP)
-
 # [1] 인풋을 1개가 아닌 2개 이상을 받는 경우
 # input_dim = 2
-
 # [2] 행렬의 행과 렬을 교환한다.
 # x = np.transpose(x)
 

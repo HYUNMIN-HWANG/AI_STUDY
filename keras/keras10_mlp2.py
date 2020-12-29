@@ -38,7 +38,7 @@ model.add(Dense(1))
 
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.6)  # 첫 번째 컬럼에서 20%, 두 번쩨 컬럼에서 20%, y 컬럼에서 20% # 이때 batch_size=1는 (1,3)을 의미함
+model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.6)  
 
 #4. Predict, Evaluate
 loss, mae = model.evaluate(x_test, y_test)

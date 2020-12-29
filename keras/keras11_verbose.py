@@ -48,10 +48,10 @@ model.add(Dense(2)) # output= 2
 
 #3. Compile, Train
 # validation default == None
-# verbose = 0 : 훈련되는 과정 보여주지 않는다. > 장점 : 시간이 절약된다. 단점 : 과정이 안 보인다.
 # (default) verbose = 1 : 훈련되는 과정을 보여준다. > 단점 : 훈련과정을 보여주느라 딜레이가 된다. 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2, verbose=7)  # 첫 번째 컬럼에서 20%, 두 번쩨 컬럼에서 20%, y 컬럼에서 20% # 이때 batch_size=1는 (1,3)을 의미함
+model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2, verbose=0) 
+# verbose = 0 : 훈련되는 과정 보여주지 않는다. > 장점 : 시간이 절약된다. 단점 : 과정이 안 보인다.
 
 """
 verbose=0
