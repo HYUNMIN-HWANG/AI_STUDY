@@ -38,13 +38,13 @@ from tensorflow.keras.layers import Dense, Input
 
 # [Model 1]
 input1 = Input(shape=(3,)) #input = 3
-dense1 = Dense(4, activation = 'relu')(input1)
-dense1 = Dense(5, activation = 'relu')(dense1)
+dense1 = Dense(4, activation = 'relu', name='layer1')(input1)
+dense1 = Dense(5, activation = 'relu',name='layer2')(dense1)
 
 # [Model 2]
 input2 = Input(shape=(3,))  #input = 3
-dense2 = Dense(6, activation = 'relu')(input2)
-dense2 = Dense(7, activation = 'relu')(dense2)
+dense2 = Dense(6, activation = 'relu',  name='layera')(input2)
+dense2 = Dense(7, activation = 'relu',  name='layerb')(dense2)
 
 # 모델 병합 : concatenate
 from tensorflow.keras.layers import concatenate, Concatenate

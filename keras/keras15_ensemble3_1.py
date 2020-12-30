@@ -55,19 +55,12 @@ dense2 = Dense(10, activation = 'relu')(dense2)
 # output2 = Dense(3)(dense2)
 
 # 모델 병합 : concatenate
-# model1과 model2가 merge하면서 서로의 가중치를 공유한다. (각 모델이 서로에게 영향을 미친다.)
 
 from tensorflow.keras.layers import concatenate, Concatenate
-# from keras.layers.merge import concatenate, Concatenate
-# from keras.layers import concatenate, Concatenate
 
-# merge도 layers에 속해있으므로 layer를 구성한다.
 merge1 = concatenate([dense1, dense2]) # 두 모델의 마지막 층에 있는 레이어를 합친다.
 middle1 = Dense(100)(merge1)
 middle1 = Dense(100)(middle1)
-middle1 = Dense(50)(middle1)
-middle1 = Dense(20)(middle1)
-middle1 = Dense(10)(middle1)
 middle1 = Dense(10)(middle1)
 middle1 = Dense(10)(middle1)
 
@@ -98,12 +91,10 @@ output3 = Dense(3)(output3) # y3 :output = 3
 
 # 모델 선언 (뒤에서 한다.)
 # 최종적인 input, output을 넣어서 모델 구성
-# 두 개 이상은 리스트로 묶는다.
 model = Model(inputs = [input1, input2], outputs = [output1, output2, output3])
 model.summary()
 
 #3. Compile, Train
-# 두 개 이상은 리스트로 묶는다.
 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 print("please wait....")

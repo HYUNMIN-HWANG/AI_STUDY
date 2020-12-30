@@ -1,4 +1,4 @@
-# ensemble (2 - 1 - 2)
+# ensemble (1 - 2)
 # 모델 병합 : concatenate
 # 모델 분기
 

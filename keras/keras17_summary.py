@@ -16,11 +16,9 @@ from tensorflow.keras.layers import Dense # y=ax+b를 구성하는 가장 기본
 model = Sequential() #순차적인 모델을 만들 것이다. #윗단의 아웃풋은 아래의 인풋이 됨
 model.add(Dense(6, input_dim=1, activation='linear')) # add 모델을 더해나간다. (노드 개수 아웃풋 다섯개 , 인풋 한 개, 선형)
 model.add(Dense(7, activation='linear'))   #(위 레이어 노드가 인풋이 된다.)
-model.add(Dense(8))
 model.add(Dense(9))
-model.add(Dense(8))
-model.add(Dense(10))
-model.add(Dense(10, name='aaaa'))
+model.add(Dense(10, name='layer1'))
+model.add(Dense(10, name='layer2'))
 model.add(Dense(1)) #아웃풋 1개
 
 model.summary()

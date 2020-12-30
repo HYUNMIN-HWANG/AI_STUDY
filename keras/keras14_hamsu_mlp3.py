@@ -11,7 +11,7 @@ print(x.shape)          #(100, )
 print(y.shape)          #(3, 100)
 x = np.transpose(x)     
 # print(x)
-# print(x.shape)          #(100, 3)
+print(x.shape)          #(100, )
 y = np.transpose(y)     
 print(y.shape)          #(100, 3)
 

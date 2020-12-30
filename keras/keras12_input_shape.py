@@ -42,6 +42,7 @@ model.add(Dense(5))
 model.add(Dense(5))
 model.add(Dense(2)) # output= 2
 
+model.summary()
 #3. Compile, Train
 # validation default == None
 # verbose = 0 : 훈련되는 과정 보여주지 않는다. > 장점 : 시간이 절약된다. 단점 : 과정이 안 보인다.

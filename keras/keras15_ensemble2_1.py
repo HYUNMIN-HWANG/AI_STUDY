@@ -1,5 +1,5 @@
 # ensemble ( 2 - 1 - 1)
-# 모델 병합 : concatenate
+
 # 실습 
 # 다 : 1 앙상블을 구현하시오 (y2 제거, 분기하는 부분을 뺀다.)
 
@@ -24,7 +24,7 @@ from sklearn.model_selection import train_test_split
 # # [2]
 # x1_train, x1_test, y1_train, y1_test = train_test_split (x1, y1, shuffle=False, train_size=0.8)
 # x2_train, x2_test, y1_train, y1_test = train_test_split (x2, y1, shuffle=False, train_size=0.8)
-#[3]
+# [3]
 x1_train, x1_test, x2_train, x2_test, y1_train, y1_test = train_test_split (x1, x2, y1, shuffle=False, train_size=0.8)
 
 print(x1_train.shape)   #(80, 3)
@@ -36,7 +36,6 @@ print(y1_train.shape)   #(80, 3)
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input
 
-# 두 모델을 합쳤다가 다시 분리하는 과정
 
 # [Model 1]
 input1 = Input(shape=(3,)) #input = 3
@@ -53,11 +52,8 @@ dense2 = Dense(5, activation = 'relu')(dense2)
 # output2 = Dense(3)(dense2)
 
 # 모델 병합 : concatenate
-# model1과 model2가 merge하면서 서로의 가중치를 공유한다. (각 모델이 서로에게 영향을 미친다.)
 
 from tensorflow.keras.layers import concatenate, Concatenate
-# from keras.layers.merge import concatenate, Concatenate
-# from keras.layers import concatenate, Concatenate
 
 # merge도 layers에 속해있으므로 layer를 구성한다.
 merge1 = concatenate([dense1, dense2]) # 두 모델의 마지막 층에 있는 레이어를 합친다.
@@ -67,10 +63,10 @@ middle1 = Dense(10)(middle1)
 middle1 = Dense(10)(middle1)
 
 # merge의 마지막 층을 가져온다. (둘로 나누지 않는다.)
-# 모델 분기 1 
+
 output1 = Dense(30)(middle1)
 output1 = Dense(7)(output1)
-output1 = Dense(3)(output1) # y1 :output = 3 (마지막 아웃푸ㅛ)
+output1 = Dense(3)(output1) # y1 :output = 3 (마지막 아웃풋)
 
 # 걍 위 머지랑 아웃풋이랑 하나로 합쳐도 됨
 
@@ -83,15 +79,11 @@ output1 = Dense(3)(output1) # y1 :output = 3 (마지막 아웃푸ㅛ)
 
 # 모델 선언 (뒤에서 한다.)
 # 최종적인 input, output을 넣어서 모델 구성
-# 두 개 이상은 리스트로 묶는다.
 model = Model(inputs = [input1, input2], outputs = output1)
-
 model.summary()
 
 
 #3. Compile, Train
-# 두 개 이상은 리스트로 묶는다.
-
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 model.fit ([x1_train, x2_train], y1_train, \
             epochs=10, batch_size=1, validation_split=0.2, verbose=1)
