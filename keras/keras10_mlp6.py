@@ -1,30 +1,32 @@
-# 입력받는 잇풋 데이터도 다수, 아웃풋도 다수일 때
-# 예측하고자 하는 y 값이 여러개일 때
-# 주의 : 행렬의 형태(shape)를 통일시켜야 한다. - 특히 '열 ' 중요
+# input = 1 , output = 3 일 때, 모델 형성 가능하다.
+# mlp4 처럼 x_predict만들어서 예측
 
-# 다 : 다 mlp
-# input = 3 , output = 3
+# 1 : 다 mlp
+# input = 1 , output = 3
 
 import numpy as np
 
 #1 DATA
-x = np.array( [range(100), range(301, 401), range(1, 101)] ) # 0 ~ 99 / 301 ~ 400 / 1 ~ 100 --->  (3, 100)
+x = np.array( range(100) )
 y = np.array( [range(711, 811), range(1, 101), range(201, 301)] )  
 
-print(x.shape)          #(3, 100)
+print(x.shape)          #(100, )
 print(y.shape)          #(3, 100)
 x = np.transpose(x)     
 # print(x)
 # print(x.shape)          #(100, 3)
 y = np.transpose(y)     
-print(y)
-print(y.shape)          #(100, 3)
-'''
+print(y.shape)            #(100, 3)
+
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66) #3개 행 모두를 행을 기준으로 자른다. #random_state : 랜덤 난수 고정
-print(x_train.shape)      #(80, 3)
-print(y_train.shape)      #(80, 3)
-print(x_test.shape)       #(20, 3)
+print(x_train.shape)     #(80,) 
+print(y_train.shape)     #(80,3)
+print(x_test.shape)      #(20,)
+
+x_pred2 = np.array([100])
+x_pred2 = x_pred2.reshape(1,1) 
+print("x_pred2.shape_transpose : ", x_pred2.shape)  #(1, 1) 2차원
 
 
 #2. Modeling
@@ -33,9 +35,10 @@ from tensorflow.keras.layers import Dense
 # from keras.layers import Dense (tesnsorflow 설치가 필요함, 조금 느려짐)
 
 model = Sequential()
-model.add(Dense(100, input_dim = 3)) #input 3개
+model.add(Dense(100, input_dim = 1)) #input 1개
+model.add(Dense(100))
 model.add(Dense(10))
-model.add(Dense(5))
+model.add(Dense(10))
 model.add(Dense(5))
 model.add(Dense(3)) # output= 3 
 
@@ -48,8 +51,11 @@ loss, mae = model.evaluate(x_test, y_test)
 print('loss : ', loss)
 print('mae : : ', mae)
 
-y_predict = model.predict(x_test)
+# y_predict = model.predict(x_test)
 # print(y_predict)
+
+y_predict = model.predict(x_test)
+print(y_predict) 
 
 from sklearn.metrics import mean_squared_error #mse
 def RMSE (y_test, y_predict) :                 # y_test, y_predict의 shpae 를 맞춰야 함 (20,3)
@@ -59,4 +65,7 @@ print("RMSE :", RMSE(y_test, y_predict))
 from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
-'''
+
+y_predict2 = model.predict(x_pred2)
+print(y_predict2) 
+print(y_predict2.shape) #(1,3)

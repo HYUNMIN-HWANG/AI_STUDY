@@ -4,6 +4,10 @@
 # [2] 행렬의 행과 렬을 교환한다.
 # x = np.transpose(x)
 
+
+# 다 : 1 mlp
+# input = 2 , output = 1
+
 import numpy as np
 
 #1 DATA

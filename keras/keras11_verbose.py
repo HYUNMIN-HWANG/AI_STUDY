@@ -50,6 +50,7 @@ model.add(Dense(2)) # output= 2
 # validation default == None
 # (default) verbose = 1 : 훈련되는 과정을 보여준다. > 단점 : 훈련과정을 보여주느라 딜레이가 된다. 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+print("wait....") #훈련이 돌아가고 있음을 알려주면 마음이 편함
 model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2, verbose=0) 
 # verbose = 0 : 훈련되는 과정 보여주지 않는다. > 장점 : 시간이 절약된다. 단점 : 과정이 안 보인다.
 

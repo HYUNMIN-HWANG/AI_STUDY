@@ -6,6 +6,9 @@
 
 # [2] predict 의 일부값을 출력하세요.
 
+# 다 : 다 mlp
+# input = 5 , output = 3
+
 import numpy as np
 
 #1 DATA
