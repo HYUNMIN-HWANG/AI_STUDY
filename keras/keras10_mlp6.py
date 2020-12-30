@@ -13,26 +13,24 @@ y = np.array( [range(711, 811), range(1, 101), range(201, 301)] )
 print(x.shape)          #(100, )
 print(y.shape)          #(3, 100)
 x = np.transpose(x)     
-# print(x)
-# print(x.shape)          #(100, 3)
+# print(x.shape)          #(100, )
 y = np.transpose(y)     
-print(y.shape)            #(100, 3)
+# print(y.shape)            #(100, 3)
 
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66) #3개 행 모두를 행을 기준으로 자른다. #random_state : 랜덤 난수 고정
-print(x_train.shape)     #(80,) 
-print(y_train.shape)     #(80,3)
-print(x_test.shape)      #(20,)
+# print(x_train.shape)     #(80,) 
+# print(y_train.shape)     #(80,3)
+# print(x_test.shape)      #(20,)
 
 x_pred2 = np.array([100])
 x_pred2 = x_pred2.reshape(1,1) 
-print("x_pred2.shape_transpose : ", x_pred2.shape)  #(1, 1) 2차원
+# print("x_pred2.shape_transpose : ", x_pred2.shape)  #(1, 1) 2차원
 
 
 #2. Modeling
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-# from keras.layers import Dense (tesnsorflow 설치가 필요함, 조금 느려짐)
 
 model = Sequential()
 model.add(Dense(100, input_dim = 1)) #input 1개
@@ -51,9 +49,6 @@ loss, mae = model.evaluate(x_test, y_test)
 print('loss : ', loss)
 print('mae : : ', mae)
 
-# y_predict = model.predict(x_test)
-# print(y_predict)
-
 y_predict = model.predict(x_test)
 print(y_predict) 
 
@@ -67,5 +62,5 @@ r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
 
 y_predict2 = model.predict(x_pred2)
-print(y_predict2) 
+print(y_predict2)       #[[810.65704 100.70104 301.36755]]
 print(y_predict2.shape) #(1,3)
