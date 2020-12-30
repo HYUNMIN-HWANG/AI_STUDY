@@ -1,4 +1,5 @@
-#validation_split
+#훈련하면서 검증할 수 있는 데이터 설정하기 : validation
+# validation_split
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -26,7 +27,9 @@ model.add(Dense(1))
 
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
-model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2) #데이터를 20% 를 쪼개서 사용하겠다. (=10개 중에서 2개만 검증하겠다.) - validation data를 따로 지정하지 않아도 됨 << 하이퍼파라미터 튜닝
+model.fit(x_train, y_train, epochs=100, batch_size=1, validation_split=0.2) 
+# validation_split : 데이터를 20% 를 쪼개서 사용하겠다. (=10개 중에서 2개만 검증하겠다.) 
+# validation data를 따로 지정하지 않아도 됨 << 하이퍼파라미터 튜닝
 
 #4. evaluate
 results = model.evaluate(x_test, y_test, batch_size=1) #loss = 'mse', metrics='mse' 값이 들어간다

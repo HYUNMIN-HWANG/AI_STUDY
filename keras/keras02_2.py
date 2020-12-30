@@ -1,4 +1,5 @@
-#import는 통상적으로 맨 위에 몰아서 넣어준다.
+# x >>> x_train, x_test, x_predict
+
 import numpy as np
 import tensorflow as tf
 
@@ -10,7 +11,7 @@ from tensorflow.keras.layers import Dense
 
 
 #1. Data 
-#원래의 데이터를 훈련시키는 데이터와 평가 데이터를 구분한다. 1,2,3,4,5,6,7,8을 둘로 나눈 것
+#원래의 데이터 > 분리 > 훈련 데이터, 테스트 데이터, 예측 데이터
 x_train = np.array([1,2,3,4,5,6,7,8,9,10])
 y_train = np.array([2,4,6,8,10,12,14,16,18,20])
 

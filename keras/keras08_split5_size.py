@@ -9,24 +9,13 @@ from tensorflow.keras.layers import Dense
 import numpy as np
 
 #1. DATA
-# x = np.array(range(1,101)) #1부터 100까지
-# y = np.array(range(1,101)) #101부터 200까지
+
 x = np.array(range(1,11)) #1부터 10까지
 y = np.array(range(1,11)) #1부터 10까지
 
-# x_train = x[:60] # 0번째부터 59번째까지 : 1 ~ 60
-# x_val = x[60:80] # 60번째부터 79번째까지 : 61 ~ 80
-# x_test = x[80:]  # 81 ~ 100
-
-# y_train = y[:60] # 0번째부터 59번째까지 : 1 ~ 60
-# y_val = y[60:80] # 60번째부터 79번째까지 : 61 ~ 80
-# y_test = y[80:]  # 81 ~ 100
 
 # sklearn을 활용한다.
 from sklearn.model_selection import train_test_split
-# [1] x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=False) #x, y 데이터 중 80%를 train으로 준다. / 20% 는 테스트로 준다.
-# [2] x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, test_size=0.2, shuffle=False) 
-# [3] x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, test_size=0.2, shuffle=False) 
 
 # [1] x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=False) #x, y 데이터 중 80%를 train으로 준다. / 20% 는 테스트로 준다.
 # [2] 
@@ -41,30 +30,6 @@ print("x_test 크기 : ", x_test.shape)  #(20,)
 print("y_train 크기 : ", y_train.shape) #(80,)
 print("y_test 크기 : ", y_test.shape)  #(20,)
 
-
-"""
-# [1] train_size=0.8
-[ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
- 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
- 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72
- 73 74 75 76 77 78 79 80]
-(80,)
-(20,)
-(80,)
-(20,)
-
-# [2] train_size=0.9, test_size=0.2
-ValueError: The sum of test_size and train_size = 1.1, should be in the (0, 1) range. Reduce test_size and/or train_size.
-
-# [3] train_size=0.7, test_size=0.2
-[ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
- 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
- 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70]
-(70,)
-(20,)
-(70,)
-(20,)
-"""
 
 """
 [1] x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=False)

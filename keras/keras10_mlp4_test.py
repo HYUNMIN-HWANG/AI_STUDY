@@ -41,7 +41,6 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffl
 #2. Modeling
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-# from keras.layers import Dense (tesnsorflow 설치가 필요함, 조금 느려짐)
 
 model = Sequential()
 model.add(Dense(100, input_dim = 5)) #input 5개
@@ -64,7 +63,7 @@ print(y_predict)
 print(y_predict.shape)  #(20,2)
 
 from sklearn.metrics import mean_squared_error #mse
-def RMSE (y_test, y_predict) :                 # y_test, y_predict의 shpae 를 맞춰야 함 (20,3)
+def RMSE (y_test, y_predict) :                 # y_test, y_predict의 shpae 를 맞춰야 함 (20,2)
       return np.sqrt(mean_squared_error(y_test, y_predict)) #RMSE = mse에 루트를 씌운다.
 print("RMSE :", RMSE(y_test, y_predict))
 

@@ -9,18 +9,10 @@ import numpy as np
 x = np.array(range(1,101)) #1부터 100까지
 y = np.array(range(1,101)) #101부터 200까지
 
-# x_train = x[:60] # 0번째부터 59번째까지 : 1 ~ 60
-# x_val = x[60:80] # 60번째부터 79번째까지 : 61 ~ 80
-# x_test = x[80:]  # 81 ~ 100
-
-# y_train = y[:60] # 0번째부터 59번째까지 : 1 ~ 60
-# y_val = y[60:80] # 60번째부터 79번째까지 : 61 ~ 80
-# y_test = y[80:]  # 81 ~ 100
-
 # sklearn을 활용한다.
 from sklearn.model_selection import train_test_split
-x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True) #x, y 데이터 중 80%를 train으로 준다. / 20% 는 테스트로 준다.
-#shuffle=False : 순서대로 출력된다.
+x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True) 
+
 print(x_train) 
 """ x_train 출력결과 (무작위 출력)
 [ 13   7  83  89  38  61   5  55  31  46  97  50  29  17  85  67  37 100

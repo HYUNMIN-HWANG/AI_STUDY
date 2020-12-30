@@ -26,6 +26,7 @@ from sklearn.model_selection import train_test_split
 x_train , x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True) #x, y 데이터 중 80%를 train으로 준다. / 20% 는 테스트로 준다.
 #shuffle=True : 랜덤으로 출력된다.
 #shuffle=False : 순서대로 출력된다.
+
 print(x_train) 
 """ x_train 출력결과 (무작위 출력)
 [ 13   7  83  89  38  61   5  55  31  46  97  50  29  17  85  67  37 100

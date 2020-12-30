@@ -19,7 +19,7 @@ x = np.transpose(x)
 y = np.transpose(y)     
 print(y)
 print(y.shape)          #(100, 3)
-'''
+
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66) #3개 행 모두를 행을 기준으로 자른다. #random_state : 랜덤 난수 고정
 print(x_train.shape)      #(80, 3)
@@ -59,4 +59,3 @@ print("RMSE :", RMSE(y_test, y_predict))
 from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
-'''

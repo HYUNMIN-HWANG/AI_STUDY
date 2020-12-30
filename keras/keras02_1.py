@@ -3,7 +3,7 @@
 JAVA : 카멜케이스 - 의미가 시작되는 부분이 대문자로 시작함
 python : 의미가 시작되는 부분에 _(언더바)로 구분한다.
 """
-#원래의 데이터를 훈련시키는 데이터와 평가 데이터를 구분한다.
+# x >> x_train, x_test
 
 
 
@@ -51,8 +51,7 @@ model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
-
-model.add(Dense(1))
+model.add(Dense(1)) # output = 1
 
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam')
