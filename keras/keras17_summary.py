@@ -19,6 +19,7 @@ model.add(Dense(7, activation='linear'))   #(위 레이어 노드가 인풋이 �
 model.add(Dense(9))
 model.add(Dense(10, name='layer1'))
 model.add(Dense(10, name='layer2'))
+model.add(Dense(10, name='layer1'))  # ValueError: All layers added to a Sequential model should have unique names.
 model.add(Dense(1)) #아웃풋 1개
 
 model.summary()
