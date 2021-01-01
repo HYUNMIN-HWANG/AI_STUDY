@@ -5,12 +5,15 @@ import numpy as np
 
 #1. DATA
 from tensorflow.keras.datasets import boston_housing
+from sklearn.model_selection import train_test_split
+
 # sklearn의 x와 y를 가져오는 방식이 다르다.
 (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
 x_train, x_validation, y_train, y_validation = train_test_split(x_train, y_train, train_size = 0.8, shuffle = True, random_state=66)
 
-# print(x_train.shape) #(404, 13)
-# print(np.min(x_train), np.max(x_train)) # 0.0 ~ 711.0
+print(x_train.shape)    #(323, 13)
+print(x_test.shape)     #(102, 13)
+print(np.min(x_train), np.max(x_train)) # 0.0 ~ 711.0
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
@@ -25,18 +28,24 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 model = Sequential()
-model.add(Dense(10, input_dim=13, activation='relu'))
-model.add(Dense(10))
-model.add(Dense(10))
-model.add(Dense(10))
+model.add(Dense(65, input_dim=13, activation='relu'))
+model.add(Dense(65))
+model.add(Dense(52))
+model.add(Dense(26))
+model.add(Dense(26))
+model.add(Dense(26))
+model.add(Dense(26))
+model.add(Dense(26))
+model.add(Dense(13))
+model.add(Dense(13))
 model.add(Dense(1))
 
 #3. Compile, Train
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
-model.fit(x_train, y_train, epochs=10, batch_size=10, validation_data=(x_validation, y_validation),verbose=1)
+model.fit(x_train, y_train, epochs=455, batch_size=13, validation_data=(x_validation, y_validation),verbose=1)
 
 #4. Evaluate, Predcit
-loss, mae = model.evaluate(x_test, y_test, batch_size=10)
+loss, mae = model.evaluate(x_test, y_test, batch_size=13)
 print("loss : ", loss)
 print("mae : ", mae)
 
@@ -52,3 +61,9 @@ print("RMSE : ", RMSE(y_test, y_predict))
 from sklearn.metrics import r2_score
 r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
+
+
+# loss :  12.12118911743164
+# mae :  2.522080898284912
+# RMSE :  3.481549789738567
+# R2 :  0.8543893734616852
