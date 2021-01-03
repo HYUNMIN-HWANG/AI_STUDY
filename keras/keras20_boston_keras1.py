@@ -42,7 +42,7 @@ model.add(Dense(1))
 
 #3. Compile, Train
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
-model.fit(x_train, y_train, epochs=455, batch_size=13, validation_data=(x_validation, y_validation),verbose=1)
+model.fit(x_train, y_train, epochs=520, batch_size=13, validation_data=(x_validation, y_validation),verbose=1)
 
 #4. Evaluate, Predcit
 loss, mae = model.evaluate(x_test, y_test, batch_size=13)
@@ -63,7 +63,7 @@ r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
 
 
-# loss :  12.12118911743164
-# mae :  2.522080898284912
-# RMSE :  3.481549789738567
-# R2 :  0.8543893734616852
+# loss :  9.641185760498047
+# mae :  2.226606845855713
+# RMSE :  3.1050262503944763
+# R2 :  0.8841813757163622
