@@ -42,25 +42,22 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 model = Sequential()
-model.add(Dense(128, input_shape=(10,), activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(64))
-model.add(Dense(64))
-model.add(Dense(32))
-model.add(Dense(32))
-model.add(Dense(32))
+model.add(Dense(100, input_dim=10, activation='linear'))
+model.add(Dense(100, activation='linear'))
+model.add(Dense(10))
+model.add(Dense(10))
 model.add(Dense(1))
 
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam',metrics=['mae'] )
 
 from tensorflow.keras.callbacks import EarlyStopping
-early_stopping = EarlyStopping(monitor='loss', patience=10, mode='min') 
+early_stopping = EarlyStopping(monitor='loss', patience=20, mode='min') 
 
-model.fit(x_train, y_train, epochs=5000, batch_size=6, validation_data=(x_validation, y_validation), verbose=1,callbacks=[early_stopping] )
+model.fit(x_train, y_train, epochs=5000, batch_size=5, validation_data=(x_validation, y_validation), verbose=1,callbacks=[early_stopping] )
 
 #4. Evaluate, Predict
-loss, mae = model.evaluate(x_test, y_test, batch_size=6)
+loss, mae = model.evaluate(x_test, y_test, batch_size=5)
 print("loss : ", loss)
 print("mae : ", mae)
 
@@ -77,39 +74,8 @@ from sklearn.metrics import r2_score
 r2 = r2_score (y_test, y_predict)
 print("R2 : ", r2)
 
-# 전처리 전
-# loss :  12.414031028747559
-# mae :  2.9277210235595703
-# RMSE :  3.5233551474988123
-# R2 :  0.8514764868082232
-
-# 전처리 후 (전체 x)
-# loss :  4415.61376953125
-# mae :  51.35456848144531
-# RMSE :  66.4500844041374
-# R2 :  0.19858893084380513
-
-# MinMaxscler 전처리 후 
-# loss :  3455.354248046875
-# mae :  46.128021240234375
-# RMSE :  58.78226050631079
-# R2 :  0.36575261138882453
-
-
-# x_train 만 MinMaxScaler 전처리 후 (validation_split)
-# loss :  4511.89453125
-# mae :  50.58407211303711
-# RMSE :  67.17063568731487
-# R2 :  0.2168597888988395
-
-# x_train 만 MinMaxScaler 전처리 후 (validation_data)
-# loss :  4529.0439453125
-# mae :  52.34434127807617
-# RMSE :  67.29817427871185
-# R2 :  0.03891388103623972
-
 # Early Stopping
-# loss :  2971.172119140625
-# mae :  41.7967643737793
-# RMSE :  54.50845955210591
-# R2 :  0.5056353211595979
+# loss :  2305.467529296875
+# mae :  39.62618637084961
+# RMSE :  48.01528725236817
+# R2 :  0.5981309295781687
