@@ -27,13 +27,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 model = Sequential()
-model.add(Dense(52, input_dim=13, activation='relu'))
-model.add(Dense(52, activation='relu'))
-model.add(Dense(52, activation='relu'))
-model.add(Dense(26))
-model.add(Dense(26))
-model.add(Dense(26))
-model.add(Dense(26))
+model.add(Dense(169, input_dim=13, activation='relu'))
+model.add(Dense(169, activation='relu'))
 model.add(Dense(13))
 model.add(Dense(13))
 model.add(Dense(13))
@@ -45,12 +40,12 @@ model.add(Dense(1))
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
 
 from tensorflow.keras.callbacks import EarlyStopping
-ealy_stopping = EarlyStopping(monitor='loss',patience=20,mode='min')
+ealy_stopping = EarlyStopping(monitor='loss',patience=30,mode='min')
 
-model.fit(x_train, y_train, epochs=26000, batch_size=26, validation_data=(x_validation, y_validation),verbose=1, callbacks=[ealy_stopping])
+model.fit(x_train, y_train, epochs=2600, batch_size=13, validation_data=(x_validation, y_validation),verbose=1, callbacks=[ealy_stopping])
 
 #4. Evaluate, Predcit
-loss, mae = model.evaluate(x_test, y_test, batch_size=26)
+loss, mae = model.evaluate(x_test, y_test, batch_size=13)
 print("loss : ", loss)
 print("mae : ", mae)
 
@@ -68,7 +63,7 @@ r2 = r2_score(y_test, y_predict)
 print("R2 : ", r2)
 
 
-# loss :  9.860695838928223
-# mae :  2.284193515777588
-# RMSE :  3.1401745874598483
-# R2 :  0.8815444430421403
+# loss :  9.107584953308105
+# mae :  2.0973618030548096
+# RMSE :  3.017877734702501
+# R2 :  0.8905914829316571
