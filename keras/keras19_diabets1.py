@@ -9,6 +9,7 @@ from sklearn.datasets import load_diabetes
 
 dataset = load_diabetes()
 
+
 #1. DATA
 x = dataset.data
 y = dataset.target
