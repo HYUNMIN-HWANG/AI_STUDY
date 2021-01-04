@@ -37,7 +37,7 @@ from tensorflow.keras.layers import Dense, Input
 #[1] 과 [2] 동일함
 
 #[1] Model() 함수형 구성 : 재사용하는데 용이하다.
-input1 = Input(shape = (5,)) #input layer 
+input1 = Input(shape = (5,)) #input layer 명시함
 dense1 = Dense(5, activation='relu')(input1)
 dense2 = Dense(3)(dense1)
 dense3 = Dense(4)(dense2)
