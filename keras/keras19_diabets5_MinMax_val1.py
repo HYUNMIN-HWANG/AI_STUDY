@@ -44,21 +44,20 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
 model = Sequential()
-model.add(Dense(128, input_shape=(10,), activation='relu'))
-model.add(Dense(64))
-model.add(Dense(64))
-model.add(Dense(64))
-model.add(Dense(32))
-model.add(Dense(32))
-model.add(Dense(32))
+model.add(Dense(100, input_dim=10, activation='linear'))
+model.add(Dense(100, activation='linear'))
+model.add(Dense(100, activation='linear'))
+model.add(Dense(10))
+model.add(Dense(10))
 model.add(Dense(1))
+
 
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam',metrics=['mae'] )
-model.fit(x_train, y_train, epochs=2000, batch_size=6, validation_data=(x_validation, y_validation), verbose=1)
+model.fit(x_train, y_train, epochs=100, batch_size=5, validation_data=(x_validation, y_validation), verbose=1)
 
 #4. Evaluate, Predict
-loss, mae = model.evaluate(x_test, y_test, batch_size=6)
+loss, mae = model.evaluate(x_test, y_test, batch_size=5)
 print("loss : ", loss)
 print("mae : ", mae)
 
@@ -75,33 +74,10 @@ from sklearn.metrics import r2_score
 r2 = r2_score (y_test, y_predict)
 print("R2 : ", r2)
 
-# 전처리 전
-# loss :  4666.92919921875
-# mae :  52.11721420288086
-# RMSE :  68.31492531690576
-# R2 :  0.31249270445756727
 
-# 전처리 후 (전체 x)
-# loss :  4415.61376953125
-# mae :  51.35456848144531
-# RMSE :  66.4500844041374
-# R2 :  0.19858893084380513
-
-# MinMaxscler 전처리 후 
-# loss :  3455.354248046875
-# mae :  46.128021240234375
-# RMSE :  58.78226050631079
-# R2 :  0.36575261138882453
-
-
-# x_train 만 MinMaxScaler 전처리 후 (validation_split)
-# loss :  4511.89453125
-# mae :  50.58407211303711
-# RMSE :  67.17063568731487
-# R2 :  0.2168597888988395
 
 # x_train 만 MinMaxScaler 전처리 후 (validation_data)
-# loss :  4529.0439453125
-# mae :  52.34434127807617
-# RMSE :  67.29817427871185
-# R2 :  0.03891388103623972
+# loss :  3148.104736328125
+# mae :  46.095863342285156
+# RMSE :  56.10797402681173
+# R2 :  0.5149329502004671
