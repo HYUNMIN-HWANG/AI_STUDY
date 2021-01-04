@@ -1,6 +1,6 @@
 # 다중 분류
 # activation = 'softmax'
-# y데이터 전처리 >>>> 원핫인코딩 : from tensorflow.keras.utils import to_categorical
+# y데이터 전처리 >>>> 원핫인코딩 (2) from sklearn.preprocessing import OneHotEncoder
 # loss='categorical_crossentropy'
 # argmax : 가장 큰 값을 찾아준다.
 
@@ -12,8 +12,7 @@ from sklearn.datasets import load_iris
 # 아래 3 줄과 동일함
 dataset = load_iris()
 x = dataset.data 
-y = dataset.target #(150, ) 
-
+y = dataset.target 
 # print(dataset.DESCR)
 # print(dataset.feature_names)
 
@@ -44,10 +43,10 @@ y_test = y_test.reshape(-1,1)
 
 encoder = OneHotEncoder()
 encoder.fit(y_train)
-y_train = encoder.transform(y_train).toarray()
+y_train = encoder.transform(y_train).toarray()  #toarray() : list 를 array로 바꿔준다.
 y_test = encoder.transform(y_test).toarray()
 
-print(y_train.shape)    # (120, 3)
+print(y_train.shape)    # (120, 3)  #output = 3
 print(y_test.shape)     # (30, 3)
 
 #2. Modeling
@@ -58,15 +57,15 @@ model = Sequential()
 model.add(Dense(16, activation='relu', input_shape=(4,)))   #input = 4
 model.add(Dense(16, activation='relu'))
 model.add(Dense(16, activation='relu'))
-model.add(Dense(3, activation='softmax'))                   # output = 3 (다중분류모델에서는 분류하는 수만큼 노드개수를 정한다.)
-                                                            # 마지막 노드를 다 합치면 1이 된다. > 그 중에서 가장 큰 값이 선택된다.
+model.add(Dense(3, activation='softmax'))                   #output = 3           
+            # output = 3 (다중분류모델에서는 분류하는 수만큼 노드개수를 정한다.)
+            # 마지막 노드를 다 합치면 1이 된다. > 그 중에서 가장 큰 값이 선택된다.
 
 #3. Compile, Train
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc','mae'])  # acc == accuracy
 from tensorflow.keras.callbacks import EarlyStopping
 early_stopping = EarlyStopping(monitor='loss', patience=20, mode='min') 
 model.fit(x_train, y_train, epochs=3000, batch_size=5, validation_split=0.2, verbose=1,callbacks=[early_stopping])
-
 
 #4. Evaluate, Predict
 loss, acc,mae  = model.evaluate(x_test, y_test,batch_size=5)

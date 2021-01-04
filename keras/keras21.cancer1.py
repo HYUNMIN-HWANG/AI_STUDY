@@ -26,7 +26,7 @@ print(y.shape)  #(568, ) # 유방암에 걸렸는지 안 걸렸는지 , output =
 
 # preprocessing
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, shuffle=True, random_state=55)
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
@@ -34,36 +34,31 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-
 #2. Modeling
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input
 
-# model = Sequential()
-# model.add(Dense(450, activation='relu', input_shape=(30,)))
-# model.add(Dense(300, activation='relu'))
-# model.add(Dense(150, activation='relu'))
-# model.add(Dense(90, activation='relu'))
-# model.add(Dense(30, activation='relu'))
-# model.add(Dense(1, activation='sigmoid')) #(히든 레이어 없어도 된다.) # sigmoid : 마지막 결과값은 0과 1사이로 나와야 한다.
-
 model = Sequential()
-model.add(Dense(300, activation='relu', input_shape=(30,)))
+model.add(Dense(30, activation='relu', input_shape=(30,)))
 model.add(Dense(90, activation='relu'))
-model.add(Dense(90, activation='relu'))
-model.add(Dense(1, activation='sigmoid')) #(히든 레이어 없어도 된다.) # sigmoid : 마지막 결과값은 0과 1사이로 나와야 한다.
+model.add(Dense(150, activation='relu'))    
+model.add(Dense(90, activation='relu'))    
+model.add(Dense(30, activation='relu'))    
+model.add(Dense(30, activation='relu'))    
+model.add(Dense(1, activation='sigmoid'))  # sigmoid : 마지막 결과값이 0과 1사이로 나온다.
 
 
 #3. Compile, Train
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])  # acc == accuracy
-# model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy']) # mse == mean_squared_error (풀 네임으로 적어도 된다.)
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])  # 이진탐색에서는 무조건 loss='binary_crossentropy'
+# model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy']) 
+# # mse == mean_squared_error / acc == accuracy (풀 네임으로 적어도 된다.)
 
 from tensorflow.keras.callbacks import EarlyStopping
-early_stopping = EarlyStopping(monitor='loss', patience=20, mode='min') 
-model.fit(x_train, y_train, epochs=2000, batch_size=30, validation_split=0.2, verbose=1,callbacks=[early_stopping])
+early_stopping = EarlyStopping(monitor='loss', patience=30, mode='min') 
+model.fit(x_train, y_train, epochs=2000, batch_size=10, validation_split=0.1, verbose=1,callbacks=[early_stopping])
 
 #4. Evalutate Predcit
-loss, acc = model.evaluate(x_test, y_test,batch_size=30)
+loss, acc = model.evaluate(x_test, y_test,batch_size=5 )
 print("loss : ",loss)
 print("accuracy : ", acc)
 
@@ -77,17 +72,17 @@ for i in y_predict :
         y_binary.append(0)  # y_preedict < 0.5 이면 0
 
 print("y_test_data : ", y_test[-5 : -1])
-print("y_predict :\n", y_predict)
+print("y_predict :\n", y_predict) 
+# 결과값으로 원했던 0과 1이 아닌 소수가 나온다. > sigmoid는 0과 1사이의 값이 나오기 때문 > 원하는 결과값이 나올 수 있도록 정제해야 함
 print("result :", y_binary)
 # print(np.round(y_predict,0)) # 반올림
 
-
-# loss :  0.16068382561206818
-# accuracy :  0.9736841917037964
-# y_test_data :  [1 0 1 1]
+# loss :  0.125028595328331
+# accuracy :  0.9824561476707458
+# y_test_data :  [1 1 1 0]
 # y_predict :
-#  [[9.9996269e-01]
-#  [2.5476367e-04]
-#  [9.9966586e-01]
-#  [9.9954069e-01]]
-# result : [1, 0, 1, 1]
+#  [[9.997799e-01]
+#  [9.999999e-01]
+#  [9.996482e-01]
+#  [3.975321e-27]]
+# result : [1, 1, 1, 0]

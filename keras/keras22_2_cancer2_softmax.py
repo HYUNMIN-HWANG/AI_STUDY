@@ -20,7 +20,7 @@ y = datasets.target
 
 # x > preprocessing
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, shuffle=True, random_state=55)
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
@@ -41,18 +41,21 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input
 
 model = Sequential()
-model.add(Dense(120, activation='relu', input_shape=(30,)))
-model.add(Dense(120, activation='relu'))
-model.add(Dense(30, activation='relu'))
-model.add(Dense(30, activation='relu'))
-model.add(Dense(2, activation='softmax')) # sigmoid >> softmax
-
+model.add(Dense(30, activation='relu', input_shape=(30,)))  # input = 30
+model.add(Dense(90, activation='relu'))
+model.add(Dense(150, activation='relu'))    
+model.add(Dense(90, activation='relu'))    
+model.add(Dense(30, activation='relu'))    
+model.add(Dense(30, activation='relu'))    
+model.add(Dense(2, activation='softmax'))                   # output = 2
+            # output=2 : 결과 값이 나오는 숫자만큼 마지막 노드를 정한다.
+            # 다중 분류 : softmax 
 
 #3. Compile, Train
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'mae'])  # acc == accuracy
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'mae'])  # 다중 분류 : categorical_crossentropy 
 from tensorflow.keras.callbacks import EarlyStopping
 early_stopping = EarlyStopping(monitor='loss', patience=30, mode='min') 
-model.fit(x_train, y_train, epochs=4500, batch_size=10, validation_split=0.2, verbose=1,callbacks=[early_stopping])
+model.fit(x_train, y_train, epochs=4500, batch_size=10, validation_split=0.1, verbose=1,callbacks=[early_stopping])
 
 #4. Evalutate Predcit
 loss, acc, mae = model.evaluate(x_test, y_test,batch_size=10)
@@ -67,17 +70,17 @@ print("y_predict :\n", y_predict)
 
 print("result : ", np.argmax(y_predict,axis=1))
 
-# loss :  0.5559095740318298
-# accuracy :  0.9736841917037964
-# mae :  0.041522957384586334
+# loss :  0.4608054459095001
+# accuracy :  0.9824561476707458
+# mae :  0.020499642938375473
 # y_test_data :
 #  [[0. 1.]
-#  [1. 0.]
 #  [0. 1.]
-#  [0. 1.]]
+#  [0. 1.]
+#  [1. 0.]]
 # y_predict :
-#  [[3.6245937e-12 1.0000000e+00]
-#  [1.0000000e+00 5.6693203e-15]
-#  [4.5523027e-10 1.0000000e+00]
-#  [3.3059730e-10 1.0000000e+00]]
-# result :  [1 0 1 1]
+#  [[3.7276200e-21 1.0000000e+00]
+#  [3.8367564e-30 1.0000000e+00]
+#  [1.9589033e-25 1.0000000e+00]
+#  [1.0000000e+00 0.0000000e+00]]
+# result :  [1 1 1 0]
