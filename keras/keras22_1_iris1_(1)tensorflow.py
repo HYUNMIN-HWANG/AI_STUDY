@@ -58,7 +58,9 @@ model.add(Dense(3, activation='softmax'))                   # output = 3 (다중
 
 #3. Compile, Train
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc','mae'])  # acc == accuracy
-model.fit(x_train, y_train, epochs=300, batch_size=5, validation_split=0.2, verbose=1)
+from tensorflow.keras.callbacks import EarlyStopping
+early_stopping = EarlyStopping(monitor='loss', patience=20, mode='min') 
+model.fit(x_train, y_train, epochs=300, batch_size=5, validation_split=0.2, verbose=1,callbacks=[early_stopping])
 
 
 #4. Evaluate, Predict

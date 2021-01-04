@@ -39,35 +39,31 @@ x_test = scaler.transform(x_test)
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input
 
+# model = Sequential()
+# model.add(Dense(450, activation='relu', input_shape=(30,)))
+# model.add(Dense(300, activation='relu'))
+# model.add(Dense(150, activation='relu'))
+# model.add(Dense(90, activation='relu'))
+# model.add(Dense(30, activation='relu'))
+# model.add(Dense(1, activation='sigmoid')) #(히든 레이어 없어도 된다.) # sigmoid : 마지막 결과값은 0과 1사이로 나와야 한다.
+
 model = Sequential()
-model.add(Dense(120, activation='relu', input_shape=(30,)))
+model.add(Dense(300, activation='relu', input_shape=(30,)))
 model.add(Dense(90, activation='relu'))
 model.add(Dense(90, activation='relu'))
-model.add(Dense(30, activation='relu'))
-model.add(Dense(30, activation='relu'))
 model.add(Dense(1, activation='sigmoid')) #(히든 레이어 없어도 된다.) # sigmoid : 마지막 결과값은 0과 1사이로 나와야 한다.
 
-# 함수형 왜 안되는 건지 다시 확인하기
-# input1 = Input(shape=(30,))
-# dense1 = Dense(30, activation='relu')(input1)
-# dense1 = Dense(30, activation='relu')(dense1)
-# dense1 = Dense(30, activation='relu')(dense1)
-# dense1 = Dense(30, activation='relu')(dense1)
-# output1 = Dense(30, activation='sigmoid')(dense1)
-# model = Model(inputs = input1, outputs = output1)
 
 #3. Compile, Train
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])  # acc == accuracy
 # model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy']) # mse == mean_squared_error (풀 네임으로 적어도 된다.)
 
-# from tensorflow.keras.callbacks import EarlyStopping
-# early_stopping = EarlyStopping(monitor='loss', patience=10, mode='min') 
-# model.fit(x_train, y_train, epochs=200, batch_size=10, validation_split=0.2, verbose=1,callbacks=[early_stopping])
-
-model.fit(x_train, y_train, epochs=450, batch_size=15, validation_split=0.2, verbose=1)
+from tensorflow.keras.callbacks import EarlyStopping
+early_stopping = EarlyStopping(monitor='loss', patience=20, mode='min') 
+model.fit(x_train, y_train, epochs=2000, batch_size=30, validation_split=0.2, verbose=1,callbacks=[early_stopping])
 
 #4. Evalutate Predcit
-loss, acc = model.evaluate(x_test, y_test,batch_size=15)
+loss, acc = model.evaluate(x_test, y_test,batch_size=30)
 print("loss : ",loss)
 print("accuracy : ", acc)
 
@@ -83,14 +79,15 @@ for i in y_predict :
 print("y_test_data : ", y_test[-5 : -1])
 print("y_predict :\n", y_predict)
 print("result :", y_binary)
+# print(np.round(y_predict,0)) # 반올림
 
 
-# loss :  0.6069278120994568
+# loss :  0.16068382561206818
 # accuracy :  0.9736841917037964
 # y_test_data :  [1 0 1 1]
 # y_predict :
-#  [[1.00000000e+00]
-#  [1.30554526e-11]
-#  [1.00000000e+00]
-#  [1.00000000e+00]]
+#  [[9.9996269e-01]
+#  [2.5476367e-04]
+#  [9.9966586e-01]
+#  [9.9954069e-01]]
 # result : [1, 0, 1, 1]

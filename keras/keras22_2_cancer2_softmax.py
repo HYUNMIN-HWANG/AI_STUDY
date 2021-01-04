@@ -41,10 +41,8 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Input
 
 model = Sequential()
-model.add(Dense(150, activation='relu', input_shape=(30,)))
-model.add(Dense(90, activation='relu'))
-model.add(Dense(90, activation='relu'))
-model.add(Dense(60, activation='relu'))
+model.add(Dense(120, activation='relu', input_shape=(30,)))
+model.add(Dense(120, activation='relu'))
 model.add(Dense(30, activation='relu'))
 model.add(Dense(30, activation='relu'))
 model.add(Dense(2, activation='softmax')) # sigmoid >> softmax
@@ -52,10 +50,12 @@ model.add(Dense(2, activation='softmax')) # sigmoid >> softmax
 
 #3. Compile, Train
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'mae'])  # acc == accuracy
-model.fit(x_train, y_train, epochs=450, batch_size=15, validation_split=0.2, verbose=1)
+from tensorflow.keras.callbacks import EarlyStopping
+early_stopping = EarlyStopping(monitor='loss', patience=30, mode='min') 
+model.fit(x_train, y_train, epochs=4500, batch_size=10, validation_split=0.2, verbose=1,callbacks=[early_stopping])
 
 #4. Evalutate Predcit
-loss, acc, mae = model.evaluate(x_test, y_test,batch_size=15)
+loss, acc, mae = model.evaluate(x_test, y_test,batch_size=10)
 print("loss : ",loss)
 print("accuracy : ", acc)
 print("mae : ", mae)
