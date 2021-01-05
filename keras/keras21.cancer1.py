@@ -55,7 +55,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])  # 
 
 from tensorflow.keras.callbacks import EarlyStopping
 early_stopping = EarlyStopping(monitor='loss', patience=30, mode='min') 
-model.fit(x_train, y_train, epochs=2000, batch_size=10, validation_split=0.1, verbose=1,callbacks=[early_stopping])
+model.fit(x_train, y_train, epochs=2, batch_size=10, validation_split=0.1, verbose=1,callbacks=[early_stopping])
 
 #4. Evalutate Predcit
 loss, acc = model.evaluate(x_test, y_test,batch_size=5 )
@@ -64,18 +64,26 @@ print("accuracy : ", acc)
 
 y_predict = model.predict(x_test[-5:-1])
 
+'''
 y_binary = list()           # y_preedict 값을 0과 1로 변환한 데이터 저장할 리스트
 for i in y_predict :
     if i >= 0.5 :
         y_binary.append(1)  # y_preedict >= 0.5 이면 1
     else : 
         y_binary.append(0)  # y_preedict < 0.5 이면 0
+'''
 
 print("y_test_data : ", y_test[-5 : -1])
 print("y_predict :\n", y_predict) 
 # 결과값으로 원했던 0과 1이 아닌 소수가 나온다. > sigmoid는 0과 1사이의 값이 나오기 때문 > 원하는 결과값이 나올 수 있도록 정제해야 함
-print("result :", y_binary)
+
+# 1) if 문 사용
+# print("result :", y_binary)
+# 2) 반올림 사용
 # print(np.round(y_predict,0)) # 반올림
+# 3) np.where 사용
+print(np.where(y_predict> 0.5, 1, 0))
+
 
 # loss :  0.125028595328331
 # accuracy :  0.9824561476707458
