@@ -34,7 +34,7 @@ Model: "sequential"
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #
 =================================================================
-gru (GRU)                    (None, 10)                390           <- 3 X (input_dim + bias(1) + output) X output
+gru (GRU)                    (None, 10)                390           
 _________________________________________________________________
 dense (Dense)                (None, 20)                220
 _________________________________________________________________
@@ -47,8 +47,10 @@ Trainable params: 831
 Non-trainable params: 0
 _________________________________________________________________
 * GRU의 activation default는? : tanh (-1과 1 사이에 값이 있다.)
-* GRU의 gate 개수 : 3개 >> LSTM에서 cell state 제거
+* GRU의 gate 개수 : 3개 >> reset gate, update gate, hidden state >> LSTM에서 cell state 제거
 * 최종으로 나가는 activation : tanh
+* param # : 3 X (input_dim + bias(1) + output +1) X output
+    ** reset_after=True 이기 때문에 마지막에 +1이 추가된다. (잘 모르겠음,,,,)
 """
 
 

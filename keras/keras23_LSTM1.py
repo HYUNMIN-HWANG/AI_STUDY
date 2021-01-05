@@ -7,7 +7,7 @@ x = np.array([[1,2,3],[2,3,4],[3,4,5],[4,5,6]])
 y = np.array([4,5,6,7])
 
 print("x.shape : ", x.shape)  #(4, 3)
-print("y.shape : ", y.shape)  #(4, )
+print("y.shape : ", y.shape)  #(4, )    # output = 1
 
 # LSTM을 사용해서 계산하기 위해서 x 모양을 변경  >> ***3차원 데이터로 만들어준다.***
 # 행 / 렬 / 몇 개씩 자르는지 (batch_size / time_steps / input_dim)
@@ -25,7 +25,7 @@ model = Sequential()
 model.add(LSTM(10, activation='relu', input_shape=(3,1)))   # x : 행을 무시한 데이터를 인풋
 model.add(Dense(20))
 model.add(Dense(10))
-model.add(Dense(1))
+model.add(Dense(1)) # output = 1
 
 model.summary()
 
@@ -34,7 +34,7 @@ Model: "sequential"
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #
 =================================================================
-lstm (LSTM)                  (None, 10)                480          <- 4 X (input_dim + bias(1) + output) X output
+lstm (LSTM)                  (None, 10)                480          
 _________________________________________________________________
 dense (Dense)                (None, 20)                220
 _________________________________________________________________
@@ -47,8 +47,9 @@ Trainable params: 921
 Non-trainable params: 0
 _________________________________________________________________
 * LSTM의 activation default는? : tanh (-1과 1 사이에 값이 있다.)
-* LSTM의 gate 개수 : 4개 >> 망각, input, cell output
+* LSTM의 gate 개수 : 4개 >> 망각, input, cell, output
 * 최종으로 나가는 activation : tanh
+* LSTM - Param # = 4 X (input_dim + bias(1) + output) X output
 """
 
 #3. Compile, Train

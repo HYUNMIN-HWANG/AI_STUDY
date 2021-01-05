@@ -13,10 +13,13 @@ print(y.shape)  #(13, )
 
 x_pred = np.array([50,60,70])   # 목표 예상값 80
 x_pred = x_pred.reshape(1, 3)
+
+# 전처리
+# LSTM에서 Minmaxscaler : 
+# Minmaxscaler는 3차원을 처리할 수 없기 때문에 전처리를 한 후에 3차원으로 reshape를 한다.
+
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, shuffle=True, random_state=88)  
-
-# Minmaxscaler : 전처리를 한 후에 reshape를 한다.
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()

@@ -34,7 +34,7 @@ Model: "sequential"
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #
 =================================================================
-simple_rnn (SimpleRNN)       (None, 10)                120      <- output X (output + input_dim + 1) << gate 곱하는 게 없다.
+simple_rnn (SimpleRNN)       (None, 10)                120      
 _________________________________________________________________
 dense (Dense)                (None, 20)                220
 _________________________________________________________________
@@ -48,10 +48,11 @@ Non-trainable params: 0
 _________________________________________________________________
 * SimpleRNN의 activation default는? : tanh (-1과 1 사이에 값이 있다.)
 * SimpleRNN의 gate 개수 : None 
-* 문제점 : 
+* 문제점 : 초반에 연산한 것들이 뒤까지 영향을 주지 못함
+* SimpleRNN Param # = output X (output + input_dim + 1) << gate 곱하는 게 없다.
 """
 
-'''
+
 #3. Compile, Train
 model.compile(loss='mse', optimizer='adam')
 model.fit(x, y, epochs=100, batch_size=1)
@@ -61,7 +62,7 @@ loss = model.evaluate(x, y)
 print(loss)
 
 x_pred = np.array([5,6,7])          # (3, )
-x_pred = x_pred.reshape(1, 3, 1)    # LSTM에 쓸 수 있는 3차원 데이터로 만들어준다
+x_pred = x_pred.reshape(1, 3, 1)    # SimpleRNN에 쓸 수 있는 3차원 데이터로 만들어준다
 
 result = model.predict(x_pred)
 print(result)                       # 결과값 8 예상
@@ -73,4 +74,3 @@ print(result)                       # 결과값 8 예상
 # SimpleRNN
 # 0.014181404374539852
 # [[8.232526]]
-'''
