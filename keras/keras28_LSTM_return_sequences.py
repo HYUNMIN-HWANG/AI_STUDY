@@ -52,6 +52,8 @@ from tensorflow.keras.layers import Dense, LSTM
 
 model = Sequential()
 # return_sequences = True
+# LSTM은 3차원을 입력하면 자동으로 2차원 결과가 나오기 때문에 LSTM으로 다시 입력시킬 수 없다.
+# return_sequences = True >> LSTM을 입력했을 때의 차원과 동일한 아웃풋이 나오도록 한다.
 model.add(LSTM(65, activation='relu', input_shape=(3,1), return_sequences = True))
 model.add(LSTM(65, activation='relu'))
 model.add(Dense(39))
@@ -59,16 +61,6 @@ model.add(Dense(39))
 model.add(Dense(26))
 model.add(Dense(13))
 model.add(Dense(1))
-
-# model.add(LSTM(65, activation='relu', input_shape=(3,1), return_sequences = True))
-# model.add(LSTM(65, activation='relu', return_sequences = True))
-# model.add(LSTM(39))
-# model.add(Dense(39))
-# model.add(Dense(26))
-# model.add(Dense(26))
-# model.add(Dense(13))
-# model.add(Dense(13))
-# model.add(Dense(1))
 
 model.summary()
 

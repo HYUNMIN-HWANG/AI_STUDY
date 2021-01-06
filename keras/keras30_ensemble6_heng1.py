@@ -4,14 +4,6 @@
     # (혹은 이상치를 이상적으로 수정한다.) 
     # (혹은 비워있는 부분을 채운다.) - 위, 아래 있는 값을 참고해서 채운다. / 모델을 돌려서 나온 y=ax+b를 기준으로 비워있는 값을 채운다. 
 
-'''
-ValueError: Data cardinality is ambiguous:
-  x sizes: 10, 13
-  y sizes: 10, 13
-Please provide data which shares the same first dimension.
-이 오류 나오도록 다시 하기
-'''
-
 import numpy as np
 
 #1. DATA
@@ -72,7 +64,7 @@ x2_predict = x2_predict.reshape(1, 3)
 # x2_predict = x2_predict.reshape(1, 3, 1)
 
 x1 = x1.reshape(10, 3, 1)
-x2 = x2n.reshape(13, 3, 1)
+x2 = x2.reshape(13, 3, 1)
 
 #2. Modeling
 from tensorflow.keras.models import Sequential, Model
@@ -117,19 +109,18 @@ model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 # from tensorflow.keras.callbacks import EarlyStopping
 # early_stopping = EarlyStopping(monitor='loss',patience=6,mode='min')
 # model.fit([x1_train,x2_train], y1_train, epochs=1300, batch_size=5, validation_split=0.1, callbacks=[early_stopping])
-model.fit([x1_train,x2_train], [y1_train, y2_train], epochs=12, batch_size=5, validation_split=0.1)
+model.fit([x1,x2], [y1, y2], epochs=12, batch_size=5, validation_split=0.1)
 
 #4. Evaluate, Predict
-loss = model.evaluate([x1_test,x2_test], [y1_test, y2_test], batch_size=1)
+loss = model.evaluate([x1,x2], [y1, y2], batch_size=1)
 print("loss, mae : ", loss)
 
 '''
 ValueError: Data cardinality is ambiguous:
-  x sizes: 1, 2
-  y sizes: 1, 2
+  x sizes: 10, 13
+  y sizes: 10, 13
 Please provide data which shares the same first dimension.
 '''
-
 
 y_pred1, y_pred2 = model.predict([x1_predict, x2_predict])
 
