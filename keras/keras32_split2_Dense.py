@@ -13,10 +13,11 @@ def split_x(seq, size) :
     print(type(aaa))
     return np.array(aaa)
 
-dataset = split_x(a, size)  # (6, 5)
+dataset = split_x(a, size)  
 
 '''
 dataset
+======================
         X     |  Y
 ======================
 [[ 1  2  3  4 | 5]

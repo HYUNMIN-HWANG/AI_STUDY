@@ -4,6 +4,13 @@
     # (혹은 이상치를 이상적으로 수정한다.) 
     # (혹은 비워있는 부분을 채운다.) - 위, 아래 있는 값을 참고해서 채운다. / 모델을 돌려서 나온 y=ax+b를 기준으로 비워있는 값을 채운다. 
 
+'''
+ValueError: Data cardinality is ambiguous:
+  x sizes: 10, 13
+  y sizes: 10, 13
+Please provide data which shares the same first dimension.
+'''
+
 import numpy as np
 
 #1. DATA
@@ -28,43 +35,14 @@ x2_predict = np.array([65,75,85])
 x1_predict = x1_predict.reshape(1, 3)
 x2_predict = x2_predict.reshape(1, 3)
 
-# preprocessing
-
-# from sklearn.model_selection import train_test_split
-# x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y1, train_size=0.9, shuffle=True, random_state=44)  
-# x2_train, x2_test, y2_train, y2_test = train_test_split(x2, y2, train_size=0.9, shuffle=True, random_state=44)
-
-# from sklearn.preprocessing import MinMaxScaler
-# scaler = MinMaxScaler()
-# scaler.fit(x1_train)
-# scaler.fit(x2_train)
-# x1_train = scaler.transform(x1_train)
-# x2_train = scaler.transform(x2_train)
-# x1_test = scaler.transform(x1_test)
-# x2_test = scaler.transform(x2_test)
-# x1_predict = scaler.transform(x1_predict)
-# x2_predict = scaler.transform(x2_predict)
-
-# print(x1_train.shape)             # (9, 3)
-# print(x2_train.shape)             # (11, 3)
-# print(x1_test.shape)              # (1, 3)
-# print(x2_test.shape)              # (2, 3)
-
-# print(y1_test.shape)              # (1, )
-# print(y2_test.shape)              # (2, )
 
 # *** LSTM 모델을 사용하기 위해서 데이터를 3차원으로 만들어준다. ***
-# x1_train = x1_train.reshape(9, 3, 1)
-# x2_train = x2_train.reshape(11, 3, 1)
 
-# x1_test = x1_test.reshape(1, 3, 1)
-# x2_test = x2_test.reshape(2, 3, 1)
+# x1 = x1.reshape(10, 3, 1)
+# x2 = x2.reshape(13, 3, 1)
 
-# x1_predict = x1_predict.reshape(1, 3, 1)
-# x2_predict = x2_predict.reshape(1, 3, 1)
-
-x1 = x1.reshape(10, 3, 1)
-x2 = x2.reshape(13, 3, 1)
+x1 = x1.reshape(x1.shape[0], x1.shape[1],1)
+x2 = x2.reshape(x2.shape[0], x2.shape[1],1)
 
 #2. Modeling
 from tensorflow.keras.models import Sequential, Model

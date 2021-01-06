@@ -1,4 +1,5 @@
 # LSTM 두 개가 들어간 ensemble 다 : 1 모델 (예측값을 85 근사치로 만들어라)
+# 2개의 모델 중 하나는 LSTM, 하나는 Dense로 앙상블 구현
 
 import numpy as np
 
@@ -65,8 +66,8 @@ dense1 = Dense(10, activation='relu')(dense1)
 dense1 = Dense(10, activation='relu')(dense1)
 
 # 2 Model
-input2 = Input(shape=(3, 1))
-dense2 = LSTM(10, activation='relu')(input2)
+input2 = Input(shape=(3, ))
+dense2 = Dense(10, activation='relu')(input2)
 dense2 = Dense(10, activation='relu')(dense2)
 dense2 = Dense(10, activation='relu')(dense2)
 

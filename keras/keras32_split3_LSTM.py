@@ -3,16 +3,19 @@
 # 전처리, earlystopping 등등 배운 거 다 넣는다.
 
 데이터 1 ~ 100 / 6개씩 자른다.
-     x            y
-1, 2, 3, 4, 5     6
+======================
+     x         |   y
+======================
+1, 2, 3, 4, 5  |  6
     ...          ...
-95,96,97,98,99    100
+95,96,97,98,99 |  100
+======================
 
 predict 를 만들 것 (5,5)
-96,97,98,99,100  --> 101
-    ...               ...
+96,97,98,99,100     ---> 101
+    ~                     ~
 100,101,102,103,104 ---> 105
-예상 predict는 (101,102,103,104,105)
+>>> 예상 predict는 (101,102,103,104,105)
 """
 
 import numpy  as np
@@ -30,7 +33,7 @@ def split_x(seq, size) :
     # print(type(aaa))
     return np.array(aaa)
 
-dataset = split_x(a, size)  # (6, 5)
+dataset = split_x(a, size) 
 # print(dataset)
 
 '''
@@ -59,6 +62,7 @@ y = dataset[:,-1:]
 # print(y)
 # print(y.shape)      # (95, 1)
 
+# predict data
 pred = np.array(range(96, 106))
 size_pred = 6
 dataset_pred = split_x(pred, size_pred)  # (6, 5)
@@ -84,6 +88,10 @@ x_pred = scaler.transform(x_pred)
 x_train = x_train.reshape(76, 5, 1)
 x_test = x_test.reshape(19, 5, 1)
 x_pred = x_pred.reshape(5, 5, 1)
+
+# x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], 1)
+# x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], 1)
+# x_pred = x_pred.reshape(x_pred.shape[0], x_pred.shape[1], 1)
 
 #2. Modeling
 from tensorflow.keras.models import Sequential

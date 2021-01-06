@@ -25,8 +25,8 @@ x2_predict = x2_predict.reshape(1, 3)
 # preprocessing
 
 from sklearn.model_selection import train_test_split
-x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y, train_size=0.9, shuffle=True, random_state=311)
-x2_train, x2_test = train_test_split(x2, train_size=0.9, shuffle=True, random_state=311)
+x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y, train_size=0.8, shuffle=True, random_state=311)
+x2_train, x2_test = train_test_split(x2, train_size=0.8, shuffle=True, random_state=311)
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
@@ -100,8 +100,8 @@ model = Model(inputs=[input1, input2], outputs=output1)
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
 from tensorflow.keras.callbacks import EarlyStopping
-early_stopping = EarlyStopping(monitor='loss', patience=15, mode='min')
-model.fit([x1_train,x2_train], y1_train, epochs=1000, batch_size=3, validation_split=0.1, verbose = 2, callbacks=[early_stopping])
+early_stopping = EarlyStopping(monitor='loss', patience=10, mode='min')
+model.fit([x1_train,x2_train], y1_train, epochs=2000, batch_size=3, validation_split=0.1, verbose = 2, callbacks=[early_stopping])
 # model.fit([x1_train,x2_train], y1_train, epochs=120, batch_size=1, validation_split=0.1)
 
 #4. Evaluate, Predict
