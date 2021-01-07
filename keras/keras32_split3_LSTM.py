@@ -58,7 +58,7 @@ x = dataset[:,:5]
 # print(x) 
 # print(x.shape)      # (95, 5) -> (95, 5, 1) -> (5, 1)
 
-y = dataset[:,-1:]  
+y = dataset[:,-1:]  # [ :, -1], [:,6]
 # print(y)
 # print(y.shape)      # (95, 1)
 
