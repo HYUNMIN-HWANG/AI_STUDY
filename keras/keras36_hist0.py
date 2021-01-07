@@ -67,14 +67,14 @@ print(hist.history['loss'])
 # 그래프 그리기
 import matplotlib.pyplot as plt 
 
-plt.plot(hist.history['loss'])
+plt.plot(hist.history['loss'])          # ← loss의 이력 순서대로 그래프를 그림
 plt.plot(hist.history['val_loss'])
 plt.plot(hist.history['acc'])
 plt.plot(hist.history['val_acc'])
 
-plt.title('loss & acc')
-plt.ylabel('loss, acc')
-plt.xlabel('epochs')
-plt.legend(['train loss','val loss','train acc','val acc'])
+plt.title('loss & acc')                 # ← 그래프의 이름
+plt.ylabel('loss, acc')                 # ← y축 라벨링
+plt.xlabel('epochs')                    # ← x축 라벨링
+plt.legend(['train loss','val loss','train acc','val acc']) # ← 그래프 빈 공간에 선에 대한 설명을 해준다.
 plt.show()
 
