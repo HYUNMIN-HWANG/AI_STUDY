@@ -1,16 +1,3 @@
-import numpy as np
-a = np.array(range(1, 11))
-size = 5
-
-def split_x(seq, size) :
-    aaa = []
-    for i in range (len(seq)-size+1) :
-        subset = seq[i:(i+size)]
-        aaa.append(subset)
-    print(type(aaa))
-    return np.array(aaa)
-
-# [1,2,3,4,5,6,7,8,9,10] / size = 5
-dataset = split_x(a, size)
-
-print(dataset)
+version https://git-lfs.github.com/spec/v1
+oid sha256:21d98ed9c223600e6f6bb814a3e6bc773591c694ad236ca57e438e8f192bca47
+size 333
