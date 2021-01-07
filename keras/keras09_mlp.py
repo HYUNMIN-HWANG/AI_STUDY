@@ -1,3 +1,7 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:44a34a54f7b58de131b65a62b0171dc28417ffe69a27ea5095308f9b5ea83aff
-size 345
+import numpy as np
+# x = np.array([1,2,3,4,5,6,7,8,9,10]) # 스칼라가 10개인 벡터 x
+x = np.array([[1,2,3,4,5,6,7,8,9,10],
+            [1,2,3,4,5,6,7,8,9,10]]) # 스칼라가 10개인 벡터가 두 개인 행렬 
+y = np.array([1,2,3,4,5,6,7,8,9,10]) 
+
+print(x.shape)          #(10,) - 스칼라가 10개라는 의미  ----> (2, 10)

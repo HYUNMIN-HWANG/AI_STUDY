@@ -1,3 +1,7 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:d313b1f3f07bb90fda5bc67561243ff6569cceb5e0f42e0c883d6c4227e639f9
-size 192
+# load model
+
+from tensorflow.keras.models import load_model
+model = load_model("./mode/save_keras35.h5")
+model.add(Dense(10, name='aaa'))
+model.add(Dense(1, name='bbb'))
+model.summary()

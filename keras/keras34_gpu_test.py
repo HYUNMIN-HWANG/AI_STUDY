@@ -1,3 +1,58 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:9c6b3eee3c6f46633654ab676d0d9b5ce09774be939f689c5709f3f56e3b5191
-size 1543
+# Xception
+
+import tensorflow as tf
+from keras.applications import Xception
+from keras.utils import multi_gpu_model
+import numpy as np
+import datetime
+
+'''
+GPU 처리시간 :  0:00:11.741350
+CPU 처리시간 :  0:00:17.707955
+'''
+
+num_samples =100
+height = 71
+width = 71
+num_classes = 100
+
+print("GPU 시간 측정 시작 !!!")
+start1 = datetime.datetime.now()
+with tf.device('/gpu:0'):
+    model = Xception(weights=None,
+                     input_shape=(height, width, 3), classes=num_classes)
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+
+    # Generate dummy data.
+    x = np.random.random((num_samples, height, width, 3))
+    y = np.random.random((num_samples, num_classes))
+
+    model.fit(x, y, epochs=3, batch_size=16) 
+
+    model.save('./model/time_check1.h5')
+
+end1 = datetime.datetime.now()
+time_delta1 = end1 - start1
+
+print("GPU 시간 측정 끝 !!!")
+print("CPU 시간 측정 시작 !!!")
+start2 = datetime.datetime.now()
+with tf.device('/cpu:0'):
+    model = Xception(weights=None,
+                     input_shape=(height, width, 3), classes=num_classes)
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+
+    # Generate dummy data.
+    x = np.random.random((num_samples, height, width, 3))
+    y = np.random.random((num_samples, num_classes))
+
+    model.fit(x, y, epochs=3, batch_size=16) 
+
+    model.save('./model/time_check2.h5')
+
+end2 = datetime.datetime.now()
+time_delta2 = end2 - start2
+
+
+print('GPU 처리시간 : ', time_delta1)
+print('CPU 처리시간 : ', time_delta2)
