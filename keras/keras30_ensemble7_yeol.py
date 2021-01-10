@@ -90,13 +90,6 @@ model.fit([x1, x2], [y1, y2], epochs=12, batch_size=5, validation_split=0.1)
 loss = model.evaluate([x1,x2], [y1, y2], batch_size=1)
 print("loss, mae : ", loss)
 
-'''
-ValueError: Data cardinality is ambiguous:
-  x sizes: 1, 2
-  y sizes: 1, 2
-Please provide data which shares the same first dimension.
-'''
-
 
 y_pred1, y_pred2 = model.predict([x1_predict, x2_predict])
 
