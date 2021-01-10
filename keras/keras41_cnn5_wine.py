@@ -73,21 +73,12 @@ print("y_test :",np.argmax(y_test[-5 : -1],axis=1))
 y_predict = model.predict(x_test[-5:-1])
 print("y_predict :", np.argmax(y_predict,axis=1))
 
-# Dropout
+# Dense
 # loss :  0.028161056339740753
 # accuracy :  1.0
 # mae :  0.01674073189496994
-# y_test_data :
-#  [[1. 0. 0.]
-#  [0. 1. 0.]
-#  [0. 0. 1.]
-#  [1. 0. 0.]]
-# y_predict :
-#  [[9.9903333e-01 9.0184662e-04 6.4793065e-05]
-#  [4.2299906e-04 9.9957305e-01 3.8741309e-06]
-#  [2.3380478e-07 2.4176154e-07 9.9999952e-01]
-#  [9.9871445e-01 1.2303371e-03 5.5225402e-05]]
-# result :  [0 1 2 0]
+# y_test_data : [0 1 2 0]
+# y_predict : [0 1 2 0]
 
 # loss :  0.02343757078051567
 # accuracy :  1.0
