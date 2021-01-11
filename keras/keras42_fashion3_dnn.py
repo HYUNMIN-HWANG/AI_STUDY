@@ -1,4 +1,4 @@
-# fashion_mnist (dnn)
+# fashion_mnist (dnn 구성)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,27 +37,26 @@ print(y_test.shape)     # (10000, 10)
 
 #2. Modeling
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Dropout
+from tensorflow.keras.layers import Dense, Dropout
 
 model = Sequential()
-model.add(Dense(252, input_shape=(x_train.shape[1],), activation='relu'))
+model.add(Dense(256,input_shape=(x_train.shape[1],), activation='relu'))
 model.add(Dropout(0.2))
-model.add(Dense(112))
-# model.add(Dropout(0.2))
-model.add(Dense(28))
-# model.add(Dropout(0.2))
-model.add(Dense(28))
-# model.add(Dropout(0.2))
+model.add(Dense(128,input_shape=(x_train.shape[1],), activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(64,input_shape=(x_train.shape[1],), activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(10,activation='softmax'))
-
 # model.summary()
 
 #3. Compile, Train
+from tensorflow.keras.callbacks import EarlyStopping
+es = EarlyStopping(monitor='loss', patience=10, mode='min')
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-model.fit(x_train, y_train, epochs=50, batch_size=16, validation_split=0.2,verbose=1)
+model.fit(x_train, y_train, epochs=70, batch_size=32, validation_split=0.2,verbose=1,callbacks=[es])
 
 #4. Evaluate, predict
-loss, acc = model.evaluate(x_test, y_test, batch_size=16)
+loss, acc = model.evaluate(x_test, y_test, batch_size=32)
 print("loss : ", loss)
 print("acc : ", acc)
 
@@ -72,7 +71,7 @@ print("y_pred : ", np.argmax(y_pred,axis=1))
 # y_pred :  [9 1 8 1]
 
 # DNN
-# loss :  0.3914884626865387
-# acc :  0.8877999782562256
+# loss :  0.3806992769241333
+# acc :  0.8955000042915344
 # y_test :  [9 1 8 1]
 # y_pred :  [9 1 8 1]

@@ -1,4 +1,4 @@
-# fashion_mnist
+# fashion_mnist (CNN 구성)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,23 +39,33 @@ print(y_test.shape)     # (10000, 10)
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Dropout
 
+
+
 model = Sequential()
-model.add(Conv2D(filters=28, kernel_size=(2,2),padding='same',strides=1,input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
-model.add(MaxPool2D(pool_size=2))
+model.add(Conv2D(filters=32, kernel_size=(3,3),padding='same',strides=1,\
+    activation='relu', input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
 model.add(Dropout(0.2))
-model.add(Conv2D(filters=28,kernel_size=(2,2)))
+model.add(Conv2D(filters=32,kernel_size=(3,3),padding='same',activation='relu'))
 model.add(MaxPool2D(pool_size=2))
+model.add(Dropout(0.25))
+
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
 model.add(Dropout(0.2))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
+model.add(MaxPool2D(pool_size=2))
+model.add(Dropout(0.25))
+
 model.add(Flatten())
-model.add(Dense(20, activation='relu'))
-model.add(Dense(10, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.5))
+
 model.add(Dense(10,activation='softmax'))
 
 # model.summary()
 
 #3. Compile, Train
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-model.fit(x_train, y_train, epochs=30, batch_size=32, validation_split=0.2,verbose=1)
+model.fit(x_train, y_train, epochs=25, batch_size=32, validation_split=0.2,verbose=1)
 
 #4. Evaluate, predict
 loss, acc = model.evaluate(x_test, y_test, batch_size=32)
@@ -67,7 +77,7 @@ y_pred = model.predict(x_test[-5:-1])
 print("y_pred : ", np.argmax(y_pred,axis=1))
 
 # CNN
-# loss :  0.3053586483001709
-# acc :  0.8960000276565552
+# loss :  0.23155026137828827
+# acc :  0.9233999848365784
 # y_test :  [9 1 8 1]
 # y_pred :  [9 1 8 1]

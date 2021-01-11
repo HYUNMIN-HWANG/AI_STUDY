@@ -32,29 +32,16 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPool2D
 
 model = Sequential()
-model.add(Conv2D(filters=32, kernel_size=(3,3),padding='same',\
-    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
-model.add(Dropout(0.3))
-model.add(Conv2D(filters=32,kernel_size=(3,3),padding='same',activation='relu'))
-model.add(Dropout(0.3))
-model.add(MaxPool2D(pool_size=2))
-
-model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
-model.add(Dropout(0.4))
-model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
-model.add(Dropout(0.4))
-model.add(MaxPool2D(pool_size=2))
-
-model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
-model.add(Dropout(0.5))
-model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
-model.add(Dropout(0.5))
-model.add(MaxPool2D(pool_size=2))
-
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(MaxPool2D(pool_size=(2, 2)))
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPool2D(pool_size=(2, 2)))
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPool2D(pool_size=(2, 2)))
 model.add(Flatten())
-model.add(Dense(256,activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(100,activation='softmax'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(100, activation='softmax'))
 
 # model.summary()
 
@@ -63,11 +50,11 @@ from tensorflow.keras.callbacks import EarlyStopping
 es = EarlyStopping(monitor='loss', patience=10, mode='min')
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-model.fit(x_train, y_train, epochs=100, batch_size=32,validation_split=0.2, verbose=1, callbacks=[es])
+model.fit(x_train, y_train, epochs=50, batch_size=50,validation_split=0.2, verbose=1, callbacks=[es])
 # model.fit(x_train, y_train, epochs=100, batch_size=32,validation_split=0.2, verbose=1)
 
 #4. predict, Evaluate
-loss, acc = model.evaluate(x_test, y_test, batch_size=32)
+loss, acc = model.evaluate(x_test, y_test, batch_size=50)
 print("loss : ", loss)
 print("acc : ", acc)
 
@@ -76,7 +63,7 @@ y_pred = model.predict(x_test[-5:-1])
 print("y_pred : ", np.argmax(y_pred,axis=1))
 
 # CNN
-# loss :  3.3521780967712402
-# acc :  0.20520000159740448
+# loss :  4.324522018432617
+# acc :  0.2232999950647354
 # y_test :  [83 14 51 42]
-# y_pred :  [51 63 27 74]
+# y_pred :  [88 80 51 44]

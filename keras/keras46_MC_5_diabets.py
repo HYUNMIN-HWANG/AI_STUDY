@@ -1,6 +1,5 @@
 # Dropout
-# model.add(Dropout(0.2))
-# Dropout 하기 전과 성능 비교
+# from tensorflow.keras.callbacks import ModelCheckpoint
 
 import numpy as np
 from sklearn.datasets import load_diabetes

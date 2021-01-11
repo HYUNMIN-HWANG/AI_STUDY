@@ -1,4 +1,5 @@
-# cifar10 (컬러)
+# cifar10 (컬러) - CNN
+# from tensorflow.keras.callbacks import ModelCheckpoint
 
 from tensorflow.keras.datasets import cifar10
 import matplotlib.pyplot as plt
@@ -38,18 +39,26 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Dropout
 
 model = Sequential()
-model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
 model.add(Dropout(0.2))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same'))
+model.add(Dropout(0.3))
 model.add(MaxPool2D(pool_size=2))
-model.add(Conv2D(filters=128,kernel_size=(2,2)))
-model.add(Dropout(0.2))
+
+model.add(Conv2D(filters=128,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Dropout(0.4))
 model.add(MaxPool2D(pool_size=2))
-model.add(Conv2D(filters=32,kernel_size=(2,2)))
-# model.add(Conv2D(filters=16,kernel_size=(2,2)))
+
+model.add(Conv2D(filters=256,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Dropout(0.5))
+model.add(MaxPool2D(pool_size=2))
 
 model.add(Flatten())
-model.add(Dense(28, activation='relu'))
-model.add(Dense(28, activation='relu'))
+model.add(Dense(512,activation='relu'))
+model.add(Dense(512,activation='relu'))
 model.add(Dense(10, activation='softmax'))
 
 # model.summary()
@@ -61,17 +70,17 @@ modelpath='./modelCheckpoint/k46_2_cifar10_{epoch:02d}-{val_loss:.4f}.hdf5'
                                         # 02d : 정수 두 자리만 적겠다. / .4f : 소수점 아래 4째자리까지 적겠다.
                                         # 저장 예시) k45_mnist_37-0.0100.hdf5
                                         # 저장된 파일 중에 가장 마지막에 생성된게 가장 좋은 것이 됨
-es = EarlyStopping(monitor='val_loss', patience=8, mode='max')
-cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss', save_best_only=True, mode='auto')
+es = EarlyStopping(monitor='val_loss', patience=10, mode='max')
+cp = ModelCheckpoint(filepath=modelpath, monitor='val_loss', save_best_only=True, mode='auto')
                     # filepath : 최저점이 찍힐 때마다 가중치가 세이브된 파일이 생성된다. 
                     # 궁극의 목적 : 최적의 weight를 구하기 위해서
                     # predict할 때 혹은 evaluate 할 때 이 weight를 넣기만 하면된다.
                     
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-hist = model.fit(x_train, y_train, epochs=50, batch_size=16, validation_split=0.2, callbacks=[es, cp])
+hist = model.fit(x_train, y_train, epochs=70, batch_size=32, validation_split=0.2, callbacks=[es, cp])
 
 #4. predict, Evaluate
-loss, acc = model.evaluate(x_test, y_test, batch_size=16)
+loss, acc = model.evaluate(x_test, y_test, batch_size=32)
 print("loss : ", loss)
 print("acc : ", acc)
 
@@ -115,7 +124,7 @@ plt.show()
 # acc :  0.10000000149011612
 
 # ModelCheckPoint
-# loss :  1.2418560981750488
-# acc :  0.6216999888420105
+# loss :  1.1197590827941895
+# acc :  0.6021000146865845
 # y_test :  [8 3 5 1]
-# y_pred :  [5 5 5 4]
+# y_pred :  [3 3 3 0]

@@ -1,4 +1,4 @@
-# cifar10 (컬러) - LSTM
+# cifar10 (컬러) - CNN 
 
 from tensorflow.keras.datasets import cifar10
 import matplotlib.pyplot as plt
@@ -21,8 +21,8 @@ print(x_test.shape, y_test.shape)   # (10000, 32, 32, 3) (10000, 1)
 # print(np.min(x_train),np.max(x_train))  # 0 ~ 255
 
 # x > preprocessing
-x_train = x_train.reshape(x_train.shape[0], 64, 48) / 255.
-x_test = x_test.reshape(x_test.shape[0], 64, 48) / 255.
+x_train = x_train.reshape(x_train.shape[0],x_train.shape[1],x_train.shape[2],x_train.shape[3]) / 255.
+x_test = x_test.reshape(x_test.shape[0],x_test.shape[1],x_test.shape[2],x_test.shape[3]) / 255.
 
 # y > preprocessing
 from tensorflow.keras.utils import to_categorical
@@ -32,19 +32,33 @@ y_test = to_categorical(y_test)
 print(y_train.shape)    # (50000, 10)
 print(y_test.shape)     # (10000, 10)
 
+
 #2. Modeling
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, LSTM
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Dropout
 
 model = Sequential()
-model.add(LSTM(256,input_shape=(x_train.shape[1],x_train.shape[2]), activation='relu'))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
 model.add(Dropout(0.2))
-model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(56, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(26))
-model.add(Dense(10,activation='softmax'))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same'))
+model.add(Dropout(0.3))
+model.add(MaxPool2D(pool_size=2))
+
+model.add(Conv2D(filters=128,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Dropout(0.4))
+model.add(MaxPool2D(pool_size=2))
+
+model.add(Conv2D(filters=256,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Dropout(0.5))
+model.add(MaxPool2D(pool_size=2))
+
+model.add(Flatten())
+model.add(Dense(512,activation='relu'))
+model.add(Dense(512,activation='relu'))
+model.add(Dense(10, activation='softmax'))
 
 # model.summary()
 
@@ -53,7 +67,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 es = EarlyStopping(monitor='loss',patience=10,mode='min')
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-model.fit(x_train, y_train, epochs=1000, batch_size=32,validation_split=0.2, verbose=1,callbacks=[es])
+model.fit(x_train, y_train, epochs=70, batch_size=32,validation_split=0.2, verbose=1,callbacks=[es])
 
 #4. predict, Evaluate
 loss, acc = model.evaluate(x_test, y_test, batch_size=32)
@@ -65,8 +79,7 @@ y_pred = model.predict(x_test[-5:-1])
 print("y_pred : ", np.argmax(y_pred,axis=1))
 
 
-# LSTM
-# loss :  1.566633701324463
-# acc :  0.42559999227523804
+# loss :  1.7849451303482056
+# acc :  0.5971999764442444
 # y_test :  [8 3 5 1]
-# y_pred :  [5 5 5 7]
+# y_pred :  [5 5 5 3]

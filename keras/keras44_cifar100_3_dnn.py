@@ -32,11 +32,12 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 
 model = Sequential()
-model.add(Dense(100, input_shape=(x_train.shape[1],),activation='relu'))
+model.add(Dense(256, input_shape=(x_train.shape[1],),activation='relu'))
 model.add(Dropout(0.2))
-model.add(Dense(50))
+model.add(Dense(128,activation='relu'))
 model.add(Dropout(0.2))
-model.add(Dense(50))
+model.add(Dense(64,activation='relu'))
+model.add(Dense(32,activation='relu'))
 model.add(Dense(100,activation='softmax'))
 
 # model.summary()
@@ -58,7 +59,7 @@ y_pred = model.predict(x_test[-5:-1])
 print("y_pred : ", np.argmax(y_pred,axis=1))
 
 # DNN
-# loss :  3.9284613132476807
-# acc :  0.09160000085830688
+# loss :  3.715918779373169
+# acc :  0.12680000066757202
 # y_test :  [83 14 51 42]
-# y_pred :  [38 75 33 74]
+# y_pred :  [31 74 18  4]

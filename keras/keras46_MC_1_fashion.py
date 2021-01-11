@@ -1,6 +1,6 @@
 # CNN
-
 # fashion_mnist
+# from tensorflow.keras.callbacks import ModelCheckpoint
 
 import numpy as np
 import matplotlib.pyplot as plt

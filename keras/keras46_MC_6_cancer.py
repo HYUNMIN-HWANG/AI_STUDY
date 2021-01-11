@@ -1,5 +1,5 @@
-# CNN 으로 구성
-# 2차원 데이터를 4차원으로 늘려서 하시오.
+# CNN
+# from tensorflow.keras.callbacks import ModelCheckpoint
 
 import numpy as np
 from sklearn.datasets import load_breast_cancer

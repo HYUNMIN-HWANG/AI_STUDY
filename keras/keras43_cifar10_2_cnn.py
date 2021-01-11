@@ -1,4 +1,4 @@
-# cifar10 (컬러)
+# cifar10 (컬러) - CNN 
 
 from tensorflow.keras.datasets import cifar10
 import matplotlib.pyplot as plt
@@ -38,16 +38,26 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPool2D, Dropout
 
 model = Sequential()
-model.add(Conv2D(filters=252,kernel_size=(2,2),padding='same',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
 model.add(Dropout(0.2))
+model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same'))
+model.add(Dropout(0.3))
 model.add(MaxPool2D(pool_size=2))
-model.add(Conv2D(filters=252,kernel_size=(2,2)))
-model.add(Dropout(0.2))
+
+model.add(Conv2D(filters=128,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Dropout(0.4))
 model.add(MaxPool2D(pool_size=2))
+
+model.add(Conv2D(filters=256,kernel_size=(3,3),padding='same',\
+    activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
+model.add(Dropout(0.5))
+model.add(MaxPool2D(pool_size=2))
+
 model.add(Flatten())
-model.add(Dense(56))
-model.add(Dense(56))
-model.add(Dense(28))
+model.add(Dense(512,activation='relu'))
+model.add(Dense(512,activation='relu'))
 model.add(Dense(10, activation='softmax'))
 
 # model.summary()
@@ -68,7 +78,8 @@ print("y_test : ", np.argmax(y_test[-5:-1],axis=1))
 y_pred = model.predict(x_test[-5:-1])
 print("y_pred : ", np.argmax(y_pred,axis=1))
 
-# loss :  9.670855522155762
-# acc :  0.10000000149011612
-# y_test :  8
-# y_pred :  6
+
+# loss :  1.7849451303482056
+# acc :  0.5971999764442444
+# y_test :  [8 3 5 1]
+# y_pred :  [5 5 5 3]

@@ -35,25 +35,22 @@ model = Sequential()
 model.add(LSTM(32, input_shape=(x_train.shape[1],x_train.shape[2]),activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(64,activation='relu'))
-model.add(Dropout(0.2))
+model.add(Dropout(0.4))
 model.add(Dense(128,activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(64,activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(16,activation='relu'))
+model.add(Dropout(0.5))
 model.add(Dense(100,activation='softmax'))
 
 # model.summary()
 
 #3. Compile, Train
 from tensorflow.keras.callbacks import EarlyStopping
-es = EarlyStopping(monitor='loss', patience=10, mode='min')
+es = EarlyStopping(monitor='loss', patience=8, mode='min')
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-model.fit(x_train, y_train, epochs=100, batch_size=32,validation_split=0.2, verbose=1, callbacks=[es])
+model.fit(x_train, y_train, epochs=100, batch_size=50,validation_split=0.2, verbose=1, callbacks=[es])
 
 #4. predict, Evaluate
-loss, acc = model.evaluate(x_test, y_test, batch_size=32)
+loss, acc = model.evaluate(x_test, y_test, batch_size=50)
 print("loss : ", loss)
 print("acc : ", acc)
 
