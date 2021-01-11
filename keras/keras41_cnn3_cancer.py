@@ -46,10 +46,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Conv2D, Flatten, MaxPool2D
 
 model = Sequential()
-model.add(Conv2D(filters=30, kernel_size=(2,2),padding='same',input_shape=(5, 6, 1)))
+model.add(Conv2D(filters=60, kernel_size=(2,2),padding='same',input_shape=(5, 6, 1)))
 # model.add(MaxPool2D(pool_size=(2,2)))
 model.add(Dropout(0.1))
-model.add(Conv2D(filters=30,kernel_size=(2,2),padding='same'))
+model.add(Conv2D(filters=40,kernel_size=(2,2),padding='same'))
 model.add(Dropout(0.1))
 model.add(Flatten())
 model.add(Dense(10, activation='relu'))
@@ -86,8 +86,8 @@ print("result : ", np.argmax(y_predict,axis=1))
 # y_predict : [1 1 1 0]
 
 # CNN
-# loss :  0.05749168619513512
-# accuracy :  0.9649122953414917
-# mae :  0.08164088428020477
+# loss :  0.05619863420724869
+# accuracy :  0.9824561476707458
+# mae :  0.20988914370536804
 # y_test : [1 1 1 0]
 # result :  [1 1 1 0]

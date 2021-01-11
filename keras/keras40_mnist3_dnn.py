@@ -44,10 +44,11 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropou
 model = Sequential()
 model.add(Dense(196, input_shape=(x_train.shape[1],), activation='relu'))
 model.add(Dropout(0.2))
-model.add(Dense(56))
+model.add(Dense(84, activation='relu'))
 model.add(Dropout(0.2))
-model.add(Dense(56))
-model.add(Dense(28))
+model.add(Dense(56, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(28, activation='relu'))
 model.add(Dense(10, activation='softmax'))
 model.summary()
 
@@ -56,7 +57,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 es = EarlyStopping(monitor='acc', patience=5, mode='max')
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
-model.fit(x_train, y_train, epochs=100, batch_size=32, validation_split=0.2, callbacks=[es])
+model.fit(x_train, y_train, epochs=120, batch_size=32, validation_split=0.2, callbacks=[es])
 # model.fit(x_train, y_train, epochs=9, batch_size=64, validation_split=0.3)
 
 # Evaluate, Predict
@@ -69,12 +70,10 @@ print("acc : ",acc)
 # y_test 10개와 y_test 10개를 출력하시오
 
 # print("y_test[:10] :\n", y_test[:10])
-print("y_test[:10] :")
-print(np.argmax(y_test[:10],axis=1))
+print("y_test[:10] :",np.argmax(y_test[:10],axis=1))
 
 y_predict = model.predict(x_test[:10])
-print("y_pred[:10] :")  
-print(np.argmax(y_predict,axis=1))
+print("y_pred[:10] :",np.argmax(y_predict,axis=1))  
 
 # CNN
 # loss :  0.034563612192869186
@@ -83,7 +82,7 @@ print(np.argmax(y_predict,axis=1))
 # y_pred[:10] : [7 2 1 0 4 1 4 9 5 9]
 
 # DNN
-# loss :  0.11503560841083527
-# acc :  0.9812999963760376
+# loss :  0.10550455003976822
+# acc :  0.9828000068664551
 # y_test[:10] : [7 2 1 0 4 1 4 9 5 9]
-# y_pred[:10] : [7 2 1 0 4 1 4 9 6 9]
+# y_pred[:10] : [7 2 1 0 4 1 4 9 5 9]
