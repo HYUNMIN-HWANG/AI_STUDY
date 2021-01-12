@@ -40,32 +40,22 @@ model.add(Conv2D(filters=32,kernel_size=(3,3),padding='same',activation='relu'))
 model.add(Dropout(0.2))
 model.add(MaxPool2D(pool_size=2))
 
-model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
-model.add(Dropout(0.4))
-model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
+model.add(Conv2D(filters=64,kernel_size=(3,3),activation='relu'))
 model.add(Dropout(0.4))
 model.add(MaxPool2D(pool_size=2))
-
-# model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(MaxPool2D(pool_size=2))
 
 model.add(Flatten())
 model.add(Dense(256,activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(128,activation='relu'))
 model.add(Dropout(0.4))
-model.add(Dense(64,activation='relu'))
-model.add(Dropout(0.5))
 model.add(Dense(100,activation='softmax'))
 
 # model.summary()
 
 #3. Compile, Train
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-modelpath='../data/modelcheckpoint/k46_3_cifar100_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='./modelCheckpoint/k46_3_cifar100_{epoch:02d}-{val_loss:.4f}.hdf5'
 es = EarlyStopping(monitor='loss', patience=10, mode='min')
 cp = ModelCheckpoint(filepath=modelpath, monitor='val_loss', save_best_only=True, mode='auto')
 
@@ -122,7 +112,7 @@ plt.show()
 
 
 # ModelCheckPoint
-# loss :  3.175769805908203
-# acc :  0.2134999930858612
+# loss :  2.7038049697875977
+# acc :  0.33719998598098755
 # y_test :  [83 14 51 42]
-# y_pred :  [18 38 18 66]
+# y_pred :  [70 63 33 74]

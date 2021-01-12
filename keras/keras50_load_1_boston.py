@@ -1,4 +1,4 @@
-# 저장한 numpy 불러오기 : load numpy
+# 저장한 numpy 불러오기 : np.load
 
 import numpy as np
 x_data = np.load('../data/npy/boston_x.npy')

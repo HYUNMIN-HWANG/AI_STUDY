@@ -1,6 +1,6 @@
 # boston, diabets, cancer, iris, wine
 # mnist, fashion mnist, cifar10, cifar100
-# save data
+# np.save
 
 import numpy as np
 from sklearn.datasets import load_boston, load_diabetes, load_breast_cancer, load_iris, load_wine

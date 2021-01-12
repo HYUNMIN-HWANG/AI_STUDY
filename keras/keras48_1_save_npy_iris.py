@@ -1,4 +1,4 @@
-# 딕셔너리
+# python 딕셔너리에 대해서
 # data를 numpy파일로 저장한다.
 
 from sklearn.datasets import load_iris

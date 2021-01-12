@@ -49,7 +49,7 @@ model.add(Flatten())
 model.add(Dense(8))
 model.add(Dense(10, activation='softmax'))
 
-# (1) 모델링 하고 난 직후 model.save
+# (1) 모델링 하고 난 직후 model.save : 모델만 저장됨
 model.save('../data/h5/k52_1_model1.h5')
 
 #3 Compile, Train
@@ -61,11 +61,13 @@ cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss', save_best_only=True,
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 hist = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[es, cp])
 
-# (2) 컴파일, 훈련한 후 model.save
+# (2) 컴파일, 훈련한 후 model.save : 모델과 가중치 저장됨
 model.save('../data/h5/k52_1_model2.h5')
 
 # ***** 가중치 저장하기 *****
 model.save_weights('../data/h5/k52_1_weight.h5')
+
+
 
 #4 Evaluate, Predict
 result = model.evaluate(x_test, y_test, batch_size=32)
@@ -73,54 +75,5 @@ print("loss : ", result[0])
 print("accuracy : ", result[1])
 
 
-# 응용
-# y_test 10개와 y_test 10개를 출력하시오
-
-# print("y_test[:10] :\n", y_test[:10])
-print("y_test[:10] :")
-print(np.argmax(y_test[:10],axis=1))
-
-y_predict = model.predict(x_test[:10])
-print("y_pred[:10] :")  
-print(np.argmax(y_predict,axis=1))
-
-# 시각화
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(10,6))  # 판 사이즈 (가로 10, 세로 6)
-
-plt.subplot(2, 1, 1)    # plot : 도화지 하나에 그림을 그리겠다.
-                        # 2행 1열 중 첫 번째
-                        # 만약 (3, 1, 1) 이라면 세 개의 plot이 있어야 한다. (3, 1, 1) (3, 1, 2) (3, 1, 3)
-plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
-plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
-plt.grid()
-
-# plt.title('손실비용') # 과제 : 한글 깨짐 오류 해결할 것
-plt.title('Cost Loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
-
-plt.subplot(2, 1, 2)    # 2행 1열 중 두 번째
-# plt.plot(hist.history['accuracy'], marker='.', c='red', label='accuracy')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
-# plt.plot(hist.history['val_accuracy'], marker='.', c='blue', label='val_accuracy')
-plt.plot(hist.history['accuracy'], marker='.', c='red')   
-plt.plot(hist.history['val_accuracy'], marker='.', c='blue')
-plt.grid()              # 모눈종이 격자위에 그리겠다.
-
-# plt.title('정확도')   # 과제 : 한글 깨짐 오류 해결할 것
-plt.title('Accuracy')
-plt.ylabel('accuracy')
-plt.xlabel('epoch')
-# plt.legend(loc='upper right')
-plt.legend(['accuracy','val_accuracy'])
-
-plt.show()
-
-# loss :  0.034563612192869186
-# acc :  0.9889000058174133
-# y_test[:10] :
-# [7 2 1 0 4 1 4 9 5 9]
-# y_pred[:10] :
-# [7 2 1 0 4 1 4 9 5 9]
+# loss :  0.05933385714888573
+# accuracy :  0.980400025844574
