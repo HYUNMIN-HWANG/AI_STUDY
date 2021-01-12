@@ -41,8 +41,9 @@ _________________________________________________________________
 """
 # model.save("모델을 저장할 경로지정")
 # . <-- 점의 의미 : 현재 작업하고 있는 폴더 위치
+# .. <-- 밑의 단계의 폴더로 간다.
 # h5 : 확장자
-model.save("./model/save_keras35.h5")       # 가능
-model.save(".//model//save_keras35_1.h5")   # 가능
-# model.save(".\model\save_keras35_2.h5")     # 가능. 단, \n ,\t 같은 예약문자가 있을 때는 \\ 두개를 사용해야 한다.
-model.save(".\\model\\save_keras35_3.h5")   # 가능
+model.save("../data/h5/save_keras35.h5")       # 가능
+model.save("..//data//h5//save_keras35_1.h5")   # 가능
+# model.save("..\data\h5\save_keras35_2.h5")     # 가능. 단, \n ,\t 같은 예약문자가 있을 때는 \\ 두개를 사용해야 한다.
+model.save("..\\data\\h5\\save_keras35_3.h5")   # 가능

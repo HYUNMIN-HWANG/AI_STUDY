@@ -53,7 +53,7 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam',metrics=['mae'] )
 
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-modelpath='./modelCheckpoint/k46_5_diabets_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='../data/modelcheckpoint/k46_5_diabets_{epoch:02d}-{val_loss:.4f}.hdf5'
 es = EarlyStopping(monitor='loss', patience=10, mode='min') 
 cp = ModelCheckpoint(filepath=modelpath, monitor='val_loss',save_best_only=True, mode='auto')
 

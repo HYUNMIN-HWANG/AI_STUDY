@@ -66,7 +66,7 @@ model.add(Dense(10, activation='softmax'))
 #3. Compile, Train
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 # 체크포인트의 가중치를 저장할 파일경로 지정
-modelpath='./modelCheckpoint/k46_2_cifar10_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='../data/modelcheckpoint/k46_2_cifar10_{epoch:02d}-{val_loss:.4f}.hdf5'
                                         # 02d : 정수 두 자리만 적겠다. / .4f : 소수점 아래 4째자리까지 적겠다.
                                         # 저장 예시) k45_mnist_37-0.0100.hdf5
                                         # 저장된 파일 중에 가장 마지막에 생성된게 가장 좋은 것이 됨

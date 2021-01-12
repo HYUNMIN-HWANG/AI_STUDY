@@ -68,7 +68,7 @@ model.summary()
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc','mae'])  # acc == accuracy
 
-modelpath='./modelCheckpoint/k46_7_iris_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='../data/modelcheckpoint/k46_7_iris_{epoch:02d}-{val_loss:.4f}.hdf5'
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(monitor='loss', patience=10, mode='min') 
 cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss',save_best_only=True, mode='auto')

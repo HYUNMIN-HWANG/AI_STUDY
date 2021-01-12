@@ -60,7 +60,7 @@ x_pred = x_pred.reshape(1, 4, 1)
 #2. Modeling
 # 저장한 모델 불러오기
 from tensorflow.keras.models import load_model
-model = load_model ('./model/save_keras35.h5')   # input_shape = (4, 1)
+model = load_model ('../data/h5/save_keras35.h5')   # input_shape = (4, 1)
 
 model.summary()
 

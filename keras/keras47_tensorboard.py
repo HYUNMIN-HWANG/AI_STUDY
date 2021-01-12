@@ -1,5 +1,5 @@
 # TensorBoard
-'''
+"""
 커맨드 창에서 >>
 
 C:\Users\ai>
@@ -16,7 +16,7 @@ TensorBoard 2.4.0 at http://localhost:6006/ (Press CTRL+C to quit)
 웹 검색창 : http://127.0.0.1:6006/
 127.0.0.1 : 내 컴퓨터 주소 (로컬호스트)
 6006 : 포트번호 , 텐서보드가 할당되어 있다.
-'''
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -86,7 +86,7 @@ model.add(Dense(10, activation='softmax'))
 
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 # 체크포인트의 가중치를 저장할 파일경로 지정
-modelpath='./modelCheckpoint/k45_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='../data/modelcheckpoint/k45_mnist_{epoch:02d}-{val_loss:.4f}.hdf5'
                                         # 02d : 정수 두 자리만 적겠다. / .4f : 소수점 아래 4째자리까지 적겠다.
                                         # 저장 예시) k45_mnist_37-0.0100.hdf5
                                         # 저장된 파일 중에 가장 마지막에 생성된게 가장 좋은 것이 됨
@@ -95,7 +95,7 @@ cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss', save_best_only=True,
                     # filepath : 최저점이 찍힐 때마다 가중치가 세이브된 파일이 생성된다. 
                     # 궁극의 목적 : 최적의 weight를 구하기 위해서
                     # predict할 때 혹은 evaluate 할 때 이 weight를 넣기만 하면된다.
-tb = TensorBoard(log_dir='./graph',histogram_freq=0, write_graph=True, write_images=True)
+tb = TensorBoard(log_dir='../data/graph',histogram_freq=0, write_graph=True, write_images=True)
 
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 hist = model.fit(x_train, y_train, epochs=15, batch_size=32, validation_split=0.2, callbacks=[es, cp, tb])

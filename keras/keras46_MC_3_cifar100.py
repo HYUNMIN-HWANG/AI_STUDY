@@ -35,9 +35,9 @@ from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPool2D
 model = Sequential()
 model.add(Conv2D(filters=32, kernel_size=(3,3),padding='same',\
     activation='relu',input_shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3])))
-model.add(Dropout(0.3))
+model.add(Dropout(0.2))
 model.add(Conv2D(filters=32,kernel_size=(3,3),padding='same',activation='relu'))
-model.add(Dropout(0.3))
+model.add(Dropout(0.2))
 model.add(MaxPool2D(pool_size=2))
 
 model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
@@ -46,14 +46,18 @@ model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
 model.add(Dropout(0.4))
 model.add(MaxPool2D(pool_size=2))
 
-model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
-model.add(Dropout(0.5))
-model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
-model.add(Dropout(0.5))
-model.add(MaxPool2D(pool_size=2))
+# model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Conv2D(filters=128,kernel_size=(2,2),padding='same',activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(MaxPool2D(pool_size=2))
 
 model.add(Flatten())
 model.add(Dense(256,activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(128,activation='relu'))
+model.add(Dropout(0.4))
+model.add(Dense(64,activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(100,activation='softmax'))
 
@@ -61,11 +65,11 @@ model.add(Dense(100,activation='softmax'))
 
 #3. Compile, Train
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-modelpath='./modelCheckpoint/k46_3_cifar100_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='../data/modelcheckpoint/k46_3_cifar100_{epoch:02d}-{val_loss:.4f}.hdf5'
 es = EarlyStopping(monitor='loss', patience=10, mode='min')
 cp = ModelCheckpoint(filepath=modelpath, monitor='val_loss', save_best_only=True, mode='auto')
 
-model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['acc'])
+model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 hist = model.fit(x_train, y_train, epochs=50, batch_size=32,validation_split=0.2, verbose=1, callbacks=[es,cp])
 # model.fit(x_train, y_train, epochs=100, batch_size=32,validation_split=0.2, verbose=1)
 
@@ -118,7 +122,7 @@ plt.show()
 
 
 # ModelCheckPoint
-# loss :  4.961197853088379
-# acc :  0.2004999965429306
+# loss :  3.175769805908203
+# acc :  0.2134999930858612
 # y_test :  [83 14 51 42]
-# y_pred :  [66 74 44 42]
+# y_pred :  [18 38 18 66]

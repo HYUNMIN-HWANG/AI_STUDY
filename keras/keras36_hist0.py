@@ -27,7 +27,7 @@ x = x.reshape(x.shape[0], x.shape[1],1)
 print(x.shape)  #(96, 4, 1)
 
 #2. Modeling
-model = load_model('./model/save_keras35.h5')    # input (4,1)
+model = load_model('../Data/h5/save_keras35.h5')    # input (4,1)
 model.add(Dense(5, name='keras1'))
 model.add(Dense(1, name='keras2'))
 

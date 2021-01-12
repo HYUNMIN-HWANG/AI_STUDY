@@ -106,7 +106,7 @@ plt.figure(figsize=(10,6))  # 판 사이즈 (가로 10, 세로 6)
 plt.subplot(2, 1, 1)    # plot : 도화지 하나에 그림을 그리겠다.
                         # 2행 1열 중 첫 번째
                         # 만약 (3, 1, 1) 이라면 세 개의 plot이 있어야 한다. (3, 1, 1) (3, 1, 2) (3, 1, 3)
-plt.plot(hist.history['loss'], marker='.', c='red', label='loss')
+plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
 plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
 plt.grid()
 
@@ -114,18 +114,21 @@ plt.grid()
 plt.title('Cost Loss')
 plt.ylabel('loss')
 plt.xlabel('epoch')
-plt.legend(loc='upper right')
+plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
 
 plt.subplot(2, 1, 2)    # 2행 1열 중 두 번째
-plt.plot(hist.history['accuracy'], marker='.', c='red', label='accuracy')
-plt.plot(hist.history['val_accuracy'], marker='.', c='blue', label='val_accuracy')
+# plt.plot(hist.history['accuracy'], marker='.', c='red', label='accuracy')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
+# plt.plot(hist.history['val_accuracy'], marker='.', c='blue', label='val_accuracy')
+plt.plot(hist.history['accuracy'], marker='.', c='red')   
+plt.plot(hist.history['val_accuracy'], marker='.', c='blue')
 plt.grid()              # 모눈종이 격자위에 그리겠다.
 
 # plt.title('정확도')   # 과제 : 한글 깨짐 오류 해결할 것
 plt.title('Accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('epoch')
-plt.legend(loc='upper right')
+# plt.legend(loc='upper right')
+plt.legend(['accuracy','val_accuracy'])
 
 plt.show()
 

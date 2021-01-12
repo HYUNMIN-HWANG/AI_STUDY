@@ -67,7 +67,7 @@ model.summary()
 #3. Compile, Train
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'mae'])  # 다중 분류 : categorical_crossentropy 
 
-modelpath='./modelCheckpoint/k46_8_wine_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath='../data/modelcheckpoint/k46_8_wine_{epoch:02d}-{val_loss:.4f}.hdf5'
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(monitor='loss', patience=5, mode='min') 
 cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss',save_best_only=True, mode='auto')
