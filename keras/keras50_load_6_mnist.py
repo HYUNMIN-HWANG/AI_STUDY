@@ -1,4 +1,4 @@
-# 저장한 numpy 불러오기 : load numpy
+# 저장한 numpy 불러오기 : np.load
 
 import numpy as np
 m_x_train = np.load('../data/npy/mnist_x_train.npy')

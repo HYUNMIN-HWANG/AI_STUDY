@@ -1,4 +1,4 @@
-# 저장한 numpy 불러오기 : load numpy
+# 저장한 numpy 불러오기 : np.load
 
 import numpy as np
 c10_x_train = np.load('../data/npy/c10_x_train.npy')
