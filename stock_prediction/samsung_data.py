@@ -34,7 +34,7 @@ for col in df.columns :
 df_sorted = df.sort_values(by='일자' ,ascending=True) 
 print(df_sorted)
 
-# 2. 예측하고자 하는 값을 맨 뒤로 보낸다.
+# 2. 예측하고자 하는 값을 맨 뒤에 추가한다.
 y = df_sorted.iloc[:,3:4]
 # print(y)
 del df_sorted['종가']
@@ -48,47 +48,94 @@ print(df_sorted.isnull().sum())
 df_dop_null = df_sorted.dropna(axis=0)
 print(df_dop_null.shape)    # (2397, 14)
 
-# 4. 2018-05-04부터 데이터 사용하기 (행 제거)
-df_slicing = df_dop_null.iloc[1735:,:]
-print(df_slicing)           # [662 rows x 14 columns]
-print(df_slicing.shape)   
+# 4. 액면가 조정 (시가, 고가, 저가, 종가, 거래량, 금액, 개인, 기관, 외인, 외국계, 프로그램)
+# # 시가
+a = df_dop_null.iloc[:1735,:1] / 50
+b = df_dop_null.iloc[1735:,:1]
+df_dop_null['시가'] = pd.concat([a,b])
+# print(df_dop_null['시가'])
+# print(df_dop_null['시가'].shape)    # (2397,)
 
-# 5. 분석하고자 하는 칼럼만 남기기 (열 제거)
+# # 고가
+a = df_dop_null.iloc[:1735,1:2] / 50
+b = df_dop_null.iloc[1735:,1:2]
+df_dop_null['고가'] = pd.concat([a,b])
+# print(df_dop_null['고가'])
+# print(df_dop_null['고가'].shape)    # (2397,)
+
+# # 저가
+a = df_dop_null.iloc[:1735,2:3] / 50
+b = df_dop_null.iloc[1735:,2:3]
+df_dop_null['저가'] = pd.concat([a,b])
+# print(df_dop_null['저가'])
+# print(df_dop_null['저가'].shape)    # (2397,)
+
+# # 거래량
+a = df_dop_null.iloc[:1735,4:5] * 50
+b = df_dop_null.iloc[1735:,4:5]
+df_dop_null['거래량'] = pd.concat([a,b])
+# print(df_dop_null['거래량'])
+# print(df_dop_null['거래량'].shape)    # (2397,)
+
+# # 종가
+a = df_dop_null.iloc[:1735,13:14] / 50
+b = df_dop_null.iloc[1735:,13:14]
+df_dop_null['종가'] = pd.concat([a,b])
+# print(df_dop_null['종가'])
+# print(df_dop_null['종가'].shape)    # (2397,)
+
+print(df_dop_null)
+
+# 5. 상관계수 확인
+print(df_dop_null.corr())
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(font_scale=1.2) # 폰트 크기
+sns.heatmap(data=df_dop_null.corr(),square=True, annot=True, cbar=True)
+# plt.show()
+# 상관계수 0.5 이상 : 시가, 고가, 저가, 종가, 금액, 기관, 외인비
+
+# 6. 분석하고자 하는 칼럼만 남기기 (열 제거)
 # 시가, 고가, 저가, 종가, 거래량, 금액, 신용비, 외인비 (음수 기호있는 칼럼들을 뺐다.)
-del df_slicing['등락률']
-del df_slicing['개인']
-del df_slicing['기관']
-del df_slicing['외인(수량)']
-del df_slicing['외국계']
-del df_slicing['프로그램']
+# 음수도 같이 계산해도 되는건가??
+del df_dop_null['등락률']
+del df_dop_null['거래량']
+del df_dop_null['금액(백만)']
+del df_dop_null['개인']
+del df_dop_null['기관']
+del df_dop_null['외인(수량)']
+del df_dop_null['외국계']
+del df_dop_null['프로그램']
 
-print(df_slicing)   # [662 rows x 8 columns]
+print(df_dop_null)   # [2397 rows x 6 columns]
 
-# 최종 데이터 확인 
-print(df_slicing.shape) # (662, 8)
-# print(df_slicing.info()) 
+# 7. 최종 데이터 확인 
+print(df_dop_null.shape) # (2397, 6)
+# print(df_dop_null.info()) 
+
 '''
 <class 'pandas.core.frame.DataFrame'>
-Index: 662 entries, 2018-05-04 to 2021-01-13
+Index: 2397 entries, 2011-04-18 to 2021-01-13
 Data columns (total 8 columns):
  #   Column  Non-Null Count  Dtype
 ---  ------  --------------  -----
- 0   시가      662 non-null    int64
- 1   고가      662 non-null    int64
- 2   저가      662 non-null    int64
- 3   거래량     662 non-null    float64
- 4   금액(백만)  662 non-null    float64
- 5   신용비     662 non-null    float64
- 6   외인비     662 non-null    float64
- 7   종가      662 non-null    int64
-dtypes: float64(4), int64(4)
-memory usage: 46.5+ KB
+ 0   시가      2397 non-null   float64
+ 1   고가      2397 non-null   float64
+ 2   저가      2397 non-null   float64
+ 3   거래량     2397 non-null   float64
+ 4   금액(백만)  2397 non-null   float64
+ 5   신용비     2397 non-null   float64
+ 6   외인비     2397 non-null   float64
+ 7   종가      2397 non-null   float64
+dtypes: float64(8)
+memory usage: 168.5+ KB
 None
 '''
 
 # numpy 저장 
-final_data = df_slicing.to_numpy()
+final_data = df_dop_null.to_numpy()
 print(final_data)
 print(type(final_data)) # <class 'numpy.ndarray'>
-print(final_data.shape) # (662, 8)
+print(final_data.shape) # (2397, 6)
 np.save('./stock_prediction/samsung_slicing_data1.npy', arr=final_data)
+

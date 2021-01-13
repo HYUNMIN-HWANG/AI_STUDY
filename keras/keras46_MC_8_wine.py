@@ -74,7 +74,6 @@ cp = ModelCheckpoint(filepath=modelpath,monitor='val_loss',save_best_only=True, 
 
 hist = model.fit(x_train, y_train, epochs=45, batch_size=13, validation_split=0.1, verbose=1,callbacks=[es, cp])
 
-
 #4. Evalutate Predcit
 loss, acc, mae = model.evaluate(x_test, y_test, batch_size=13)
 print("loss : ",loss)
