@@ -58,6 +58,7 @@ model.add(Dense(13))
 model.add(Dense(13))
 model.add(Dense(1))
 # model.summary()
+# conv1D layer의 파라미터 개수 : (input_dim * kernel_size + bias) * filters
 
 #3. Compile.Train
 model.compile(loss = 'mse', optimizer='adam', metrics=['mae'])

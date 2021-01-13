@@ -92,7 +92,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(font_scale=1.2) # 폰트 크기
 sns.heatmap(data=df_dop_null.corr(),square=True, annot=True, cbar=True)
-# plt.show()
+plt.show()
 # 상관계수 0.5 이상 : 시가, 고가, 저가, 종가, 금액, 기관, 외인비
 
 # 6. 분석하고자 하는 칼럼만 남기기 (열 제거)
