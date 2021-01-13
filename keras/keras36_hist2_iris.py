@@ -16,6 +16,8 @@ dataset = load_iris()
 x = dataset.data 
 y = dataset.target 
 
+print(y)
+
 # print(dataset.DESCR)
 # print(dataset.feature_names)
 # ['sepal length (cm)', 'sepal width (cm)', 'petal length (cm)', 'petal width (cm)']
