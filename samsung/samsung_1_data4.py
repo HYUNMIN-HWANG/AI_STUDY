@@ -1,0 +1,234 @@
+# csv
+# 1월 14일 데이터 추가하기
+
+import numpy as np
+import pandas as pd
+
+df = pd.read_csv('./samsung/삼성전자1_raw.csv', index_col=0, header=0, encoding='cp949')   
+# print(df.shape) # (2400, 14)
+# print(df.info())
+# print(df.columns)
+# Index(['시가', '고가', '저가', '종가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관',
+    #    '외인(수량)', '외국계', '프로그램', '외인비'],
+
+
+#############################################################
+
+# 추가데이터 정리
+df2 = pd.read_csv('./samsung/삼성전자2_raw.csv', index_col=0, header=0, encoding='cp949') 
+
+# # 열 삭제
+df2.drop(['전일비', 'Unnamed: 6'], axis=1, inplace=True)
+# print(df2.shape) # (60, 14)
+# print(df2.columns)
+# Index(['시가', '고가', '저가', '종가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관',
+#        '외인(수량)', '외국계', '프로그램', '외인비'],
+
+# # NULL 값 삭제
+# print(df2.isnull().sum())    
+df2 = df2.dropna(axis=0)
+# print(df2.shape)    # (2, 14)
+# print(df2.isnull().sum())  # null 제거 확인
+
+# # 데이터 13일 데이터 갱신 + 14일 데이터 추가
+df2_0114 = df2.iloc[:1,:]                      # 1월 14일 데이터
+df2_0113 = df2.iloc[1:2,:]                     # 1월 13일 데이터
+df = df.append(df2_0114, ignore_index=False)   # 14일 데이터 추가
+df[0:1] = df2_0113                             # 1월 13일 데이터 갱신
+# print(df[0:1])
+# print(df.shape)  # (2401, 14)
+
+#############################################################
+
+# 1. 특수기호 제거
+df.replace(',','',inplace=True, regex=True)
+# print(df)
+
+# 2. 문자형을 숫자로 변환
+for col in df.columns :
+    df[col] = pd.to_numeric(df[col])
+# print(df.info()) # dtypes: float64(5), int64(9)
+
+# 3. 일자를 기준으로 오름차순
+df_sorted = df.sort_values(by='일자' ,ascending=True) 
+# print(df_sorted)
+
+# 4. 예측하고자 하는 값을 맨 뒤에 추가한다.
+zonga = df_sorted.iloc[:,3]
+df_target = df_sorted.drop(['종가'], axis=1)
+df_target['종가'] = zonga 
+# print(df_target)    
+# print(df_target.columns)
+# Index(['시가', '고가', '저가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관', '외인(수량)',
+    #    '외국계', '프로그램', '외인비', '종가'],
+# [2401 rows x 14 columns]
+
+# 5. 결측값이 들어있는 행 전체 제거
+# print(df_target.isnull().sum())    
+# null : 2018-04-30, 2018-05-02, 2018-05-03 >> 거래량  3 / 금액(백만) 3
+df_drop_null = df_target.dropna(axis=0)
+# print(df_drop_null.shape)    # (2398, 14)
+# print(df_drop_null.isnull().sum())  # null 제거 확인
+
+
+# 6. 상관계수 확인
+# print(df_dop_null.corr())
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(font_scale=1.2, font='Malgun Gothic', rc={'axes.unicode_minus':False}) # 폰트 크기
+sns.heatmap(data=df_drop_null.corr(),square=True, annot=True, cbar=True)
+# plt.show()
+# 상관계수 0.5 이상 : 시가, 고가, 저가, 종가, 거래량, 외인비
+
+# 7. 분석하고자 하는 칼럼만 남기기 (열 제거)
+# 남길 열 : 시가, 고가, 저가, 거래량, 외인비, 종가
+# 열 제거 :  등락률, 금액, 신용비, 개인, 기관, 외인, 외국계, 프로그램
+delete_col = df_drop_null.drop(['등락률', '금액(백만)', '신용비', '개인', '기관', '외인(수량)', '외국계', '프로그램'], axis=1)
+# print(delete_col)
+# print(delete_col.columns)
+# Index(['시가', '고가', '저가', '거래량', '외인비', '종가'], dtype='object')
+# print(delete_col.shape) # [2398 rows x 6 columns]
+
+# 8. 액면가 조정 
+# 시가, 고가, 저가, 종가 : (1~1735) 50으로 나누기
+# 거래량 : (1~1735) 50으로 곱하기
+
+# # 시가
+a = delete_col.iloc[:1735,:1] / 50
+b = delete_col.iloc[1735:,:1]
+delete_col['시가'] = pd.concat([a,b])
+# print(delete_col['시가'])
+print(delete_col['시가'].shape)    # (2398,)
+
+# # 고가
+a = delete_col.iloc[:1735,1:2] / 50
+b = delete_col.iloc[1735:,1:2]
+delete_col['고가'] = pd.concat([a,b])
+# print(delete_col['고가'])
+# print(delete_col['고가'].shape)    # (2398,)
+
+# # 저가
+a = delete_col.iloc[:1735,2:3] / 50
+b = delete_col.iloc[1735:,2:3]
+delete_col['저가'] = pd.concat([a,b])
+# print(delete_col['저가'])
+# print(delete_col['저가'].shape)    # (2398,)
+
+# # 거래량
+a = delete_col.iloc[:1735,3:4] * 50
+b = delete_col.iloc[1735:,3:4]
+delete_col['거래량'] = pd.concat([a,b])
+# print(delete_col['거래량'])
+# print(delete_col['거래량'].shape)    # (2398,)
+
+# # 종가
+a = delete_col.iloc[:1735,5:6] / 50
+b = delete_col.iloc[1735:,5:6]
+delete_col['종가'] = pd.concat([a,b])
+# print(delete_col['종가'])
+# print(delete_col['종가'].shape)    # (2398,)
+
+# 9. 최종 데이터 확인 
+print(delete_col)
+print(delete_col.shape) # (2398, 6)
+print(delete_col.info()) 
+
+'''
+<class 'pandas.core.frame.DataFrame'>
+Index: 2398 entries, 2011-04-18 to 2021-01-14
+Data columns (total 6 columns):
+ #   Column  Non-Null Count  Dtype
+---  ------  --------------  -----
+ 0   시가      2398 non-null   float64
+ 1   고가      2398 non-null   float64
+ 2   저가      2398 non-null   float64
+ 3   거래량     2398 non-null   float64
+ 4   외인비     2398 non-null   float64
+ 5   종가      2398 non-null   float64
+dtypes: float64(6)
+memory usage: 131.1+ KB
+None
+'''
+# ================================================
+# 10. 데이터 분리 
+final_data = delete_col.to_numpy()
+# print(final_data)
+# print(type(final_data)) # <class 'numpy.ndarray'>
+# print(final_data.shape) # (2398, 6)
+
+# np.save('./samsung/samsung_slicing_data3.npy', arr=final_data)
+
+# size : 며칠씩 자를 것인지
+# col : 열의 개수
+
+def split_x(seq, col,size) :
+    dataset = []  
+    for i in range(len(seq) - size + 1) :
+        subset = seq[i:(i+size),0:col].astype('float32')
+        dataset.append(subset)
+    # print(type(dataset))
+    return np.array(dataset)
+
+size = 6
+col = 6
+dataset = split_x(final_data,col,size)
+print(dataset)
+print(dataset.shape) # (2393, 6, 6)
+
+
+#1. DATA
+x = dataset[:-1,:,:7]
+# print(x)
+# print(x.shape)  # (2392, 6, 6)
+
+y = dataset[1:,-1:,-1:]
+# print(y)
+# print(y.shape)  # (2392, 1, 1)
+
+x_pred = dataset[-1:,:,:]
+# print(x_pred)
+# print(x_pred.shape) # (1, 6, 6)
+
+# preprocessing
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8,\
+    shuffle=True, random_state=311)
+x_train, x_validation, y_train, y_validation = train_test_split(x_train, y_train, \
+    train_size=0.8, shuffle=True, random_state=311)
+# print(x_train.shape)        # (1530, 6, 6)
+# print(x_test.shape)         # (479, 6, 6)
+# print(x_validation.shape)   # (383, 6, 6)
+
+y_train = y_train.reshape(y_train.shape[0],1)
+y_test = y_test.reshape(y_test.shape[0],1)
+y_validation = y_validation.reshape(y_validation.shape[0],1)
+# print(y_train.shape)        # (1530, 1)
+# print(y_test.shape)         # (479, 1)
+# print(y_validation.shape)   # (383, 1)
+
+# MinMaxscaler를 하기 위해서 2차원으로 바꿔준다.
+x_train = x_train.reshape(x_train.shape[0],size*col)
+x_test = x_test.reshape(x_test.shape[0],size*col)
+x_validation = x_validation.reshape(x_validation.shape[0],size*col)
+x_pred = x_pred.reshape(x_pred.shape[0],size*col)
+
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+x_validation = scaler.transform(x_validation)
+x_pred = scaler.transform(x_pred)
+
+x_train = x_train.reshape(x_train.shape[0],size,col)
+x_test = x_test.reshape(x_test.shape[0],size,col)
+x_validation = x_validation.reshape(x_validation.shape[0],size,col)
+x_pred= x_pred.reshape(x_pred.shape[0], size,col)
+
+print(x_train.shape)        # (1530, 6, 6)
+print(x_test.shape)         # (479, 6, 6)
+print(x_validation.shape)   # (383, 6, 6)
+print(x_pred.shape)         # (1, 6, 6)
+
+# 넘파이 저장
+np.save('./samsung/samsung_slicing_data4.npy',arr=[x_train, x_test, x_validation, y_train, y_test, y_validation, x_pred])
