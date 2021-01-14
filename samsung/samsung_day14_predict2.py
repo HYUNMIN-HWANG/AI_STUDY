@@ -86,7 +86,7 @@ from tensorflow.keras.layers import Dense, Dropout, Conv1D, Flatten, MaxPool1D
 
 # model = load_model('./samsung/samsung_c_day14_133-638980.4375.h5')
 # model = load_model('./samsung/samsung_l_day14_17-2424388.5000.h5')
-model = load_model('./samsung/_samsung_l_day14_432-679153.7500.h5')
+model = load_model('./samsung/samsung_l_day14_432-679153.7500.h5')
 
 
 result = model.evaluate(x_test, y_test, batch_size=size)
