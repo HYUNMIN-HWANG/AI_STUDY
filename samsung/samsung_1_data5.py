@@ -11,32 +11,42 @@ df = pd.read_csv('./samsung/삼성전자1_raw.csv', index_col=0, header=0, encod
 # Index(['시가', '고가', '저가', '종가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관',
     #    '외인(수량)', '외국계', '프로그램', '외인비'],
 
+# 13일 데이터 삭제  
+df.drop(['2021-01-13'],axis=0,inplace=True)
+# print(df)   # [2399 rows x 14 columns]
 
 #############################################################
 
-# 추가데이터 정리
-df2 = pd.read_csv('./samsung/삼성전자2_raw.csv', index_col=0, header=0, encoding='cp949') 
+# 추가데이터 append
+df2 = pd.read_csv('./samsung/삼성전자0115.csv', index_col=0, header=0, encoding='cp949') 
+# print(df2.shape) # (80, 16)
+# print(df2.columns)
+# Index(['시가', '고가', '저가', '종가', '전일비', 'Unnamed: 6', '등락률', '거래량', '금액(백만)',
+    #    '신용비', '개인', '기관', '외인(수량)', '외국계', '프로그램', '외인비'],
 
 # # 열 삭제
 df2.drop(['전일비', 'Unnamed: 6'], axis=1, inplace=True)
-# print(df2.shape) # (60, 14)
+# print(df2.shape) # (80, 14)
 # print(df2.columns)
 # Index(['시가', '고가', '저가', '종가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관',
-#        '외인(수량)', '외국계', '프로그램', '외인비'],
+    #    '외인(수량)', '외국계', '프로그램', '외인비'],
 
-# # NULL 값 삭제
-# print(df2.isnull().sum())    
-df2 = df2.dropna(axis=0)
-# print(df2.shape)    # (2, 14)
-# print(df2.isnull().sum())  # null 제거 확인
+# # NULL 값 확인 > 널 없음
+# print(df2.isnull().sum())  
 
-# # 데이터 13일 데이터 갱신 + 14일 데이터 추가
-df2_0114 = df2.iloc[:1,:]                      # 1월 14일 데이터
-df2_0113 = df2.iloc[1:2,:]                     # 1월 13일 데이터
-df = df.append(df2_0114, ignore_index=False)   # 14일 데이터 추가
-df[0:1] = df2_0113                             # 1월 13일 데이터 갱신
-# print(df[0:1])
-# print(df.shape)  # (2401, 14)
+# # df2 index 이름 변경
+df2.rename(index = {'2021/01/13' : '2021-01-13'}, inplace=True)
+df2.rename(index = {'2021/01/14' : '2021-01-14'}, inplace=True)
+df2.rename(index = {'2021/01/15' : '2021-01-15'}, inplace=True)
+# print(df2)
+
+# # df에 13, 14, 15일 데이터 합치기
+df2_new = df2.iloc[:3,:]                      # 13, 14, 15일 데이터
+df = df.append(df2_new, ignore_index=False)   # 14일 데이터 추가
+
+# print(df)
+# print(df.shape)  # (2402, 14)
+
 
 #############################################################
 
@@ -54,20 +64,20 @@ df_sorted = df.sort_values(by='일자' ,ascending=True)
 # print(df_sorted)
 
 # 4. 예측하고자 하는 값을 맨 뒤에 추가한다.
-zonga = df_sorted.iloc[:,3]
-df_target = df_sorted.drop(['종가'], axis=1)
-df_target['종가'] = zonga 
-# print(df_target)    
-# print(df_target.columns)
-# Index(['시가', '고가', '저가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관', '외인(수량)',
-    #    '외국계', '프로그램', '외인비', '종가'],
-# [2401 rows x 14 columns]
+siga = df_sorted.iloc[:,0]      # 예측해야 하는 값 : 시가
+# print(siga)
+df_sorted['Target'] = siga      # 시가를 Target으로 잡고 열 추가함
+# print(df_sorted)    
+# print(df_sorted.columns)
+# Index(['시가', '고가', '저가', '종가', '등락률', '거래량', '금액(백만)', '신용비', '개인', '기관',
+#        '외인(수량)', '외국계', '프로그램', '외인비', 'Target'],
+# [2402 rows x 15 columns]
 
 # 5. 결측값이 들어있는 행 전체 제거
-# print(df_target.isnull().sum())    
-# null : 2018-04-30, 2018-05-02, 2018-05-03 >> 거래량  3 / 금액(백만) 3
-df_drop_null = df_target.dropna(axis=0)
-# print(df_drop_null.shape)    # (2398, 14)
+# print(df_sorted.isnull().sum())    
+# null : 2018-04-30, 2018-05-02, 2018-05-03 >> 거래량  3개 / 금액(백만) 3개
+df_drop_null = df_sorted.dropna(axis=0)
+# print(df_drop_null.shape)    # (2399, 15)
 # print(df_drop_null.isnull().sum())  # null 제거 확인
 
 
@@ -75,24 +85,30 @@ df_drop_null = df_target.dropna(axis=0)
 # print(df_dop_null.corr())
 import matplotlib.pyplot as plt
 import seaborn as sns
-sns.set(font_scale=1.2, font='Malgun Gothic', rc={'axes.unicode_minus':False}) # 폰트 크기
+sns.set(font_scale=1.0, font='Malgun Gothic', rc={'axes.unicode_minus':False}) 
 sns.heatmap(data=df_drop_null.corr(),square=True, annot=True, cbar=True)
 # plt.show()
 # 상관계수 0.5 이상 : 시가, 고가, 저가, 종가, 거래량, 외인비
 
 # 7. 분석하고자 하는 칼럼만 남기기 (열 제거)
-# 남길 열 : 시가, 고가, 저가, 거래량, 외인비, 종가
+# 남길 열 : 시가, 고가, 저가, 종가, 거래량, 외인비, Target
 # 열 제거 :  등락률, 금액, 신용비, 개인, 기관, 외인, 외국계, 프로그램
 delete_col = df_drop_null.drop(['등락률', '금액(백만)', '신용비', '개인', '기관', '외인(수량)', '외국계', '프로그램'], axis=1)
-# print(delete_col)
+# print(delete_col)           # [2399 rows x 7 columns]
 # print(delete_col.columns)
-# Index(['시가', '고가', '저가', '거래량', '외인비', '종가'], dtype='object')
-# print(delete_col.shape) # [2398 rows x 6 columns]
+# Index(['시가', '고가', '저가', '종가', '거래량', '외인비', 'Target'], dtype='object')
 
 # 8. 액면가 조정 
 # 시가, 고가, 저가, 종가 : (1~1735) 50으로 나누기
 # 거래량 : (1~1735) 50으로 곱하기
 
+delete_col.iloc[:1735,:3] = delete_col.iloc[:1735,:3] / 50
+b = delete_col.iloc[1735:,:3]
+# delete_col['시가'] = pd.concat([a,b])
+print(delete_col[:3])
+
+
+"""
 # # 시가
 a = delete_col.iloc[:1735,:1] / 50
 b = delete_col.iloc[1735:,:1]
@@ -133,6 +149,8 @@ delete_col['종가'] = pd.concat([a,b])
 # print(delete_col.shape) # (2398, 6)
 # print(delete_col.info()) 
 
+"""
+
 '''
 <class 'pandas.core.frame.DataFrame'>
 Index: 2398 entries, 2011-04-18 to 2021-01-14
@@ -149,6 +167,11 @@ dtypes: float64(6)
 memory usage: 131.1+ KB
 None
 '''
+
+
+
+
+"""
 # ================================================
 # 10. train, test, vali, pred 데이터 분리 
 final_data = delete_col.to_numpy()
@@ -235,6 +258,7 @@ print(y_test_sam.shape)         # (479, 1)
 print(y_val_sam.shape)          # (383, 1)
 
 
-넘파이 저장
+# 넘파이 저장
 np.save('./samsung/samsung_slicing_data5.npy',\
     arr=[x_train_sam, x_test_sam, x_val_sam, y_train_sam, y_test_sam, y_val_sam, x_pred_sam])
+"""
