@@ -28,14 +28,17 @@ from tensorflow.keras.layers import Dense, Input, LSTM, Dropout
 # input1 = samsung model
 
 input1 = Input(shape=(x_train_sam.shape[1],x_train_sam.shape[2]))
-lstm1 = LSTM(1024, activation='relu')(input1)
-drop1 = Dropout(0.3)(lstm1)
-dense1 = Dense(512, activation='relu')(drop1)
+lstm1 = LSTM(2048, activation='relu')(input1)
+drop1 = Dropout(0.2)(lstm1)
+dense1 = Dense(1024, activation='relu')(drop1)
 # drop1 = Dropout(0.2)(dense1)
+dense1 = Dense(256, activation='relu')(dense1)
+drop1 = Dropout(0.2)(dense1)
 dense1 = Dense(256, activation='relu')(drop1)
-# drop1 = Dropout(0.2)(dense1)
-dense1 = Dense(124, activation='relu')(dense1)
+drop1 = Dropout(0.2)(dense1)
+dense1 = Dense(128, activation='relu')(drop1)
 dense1 = Dense(64, activation='relu')(dense1)
+dense1 = Dense(32, activation='relu')(dense1)
 dense1 = Dense(32, activation='relu')(dense1)
 dense1 = Dense(16, activation='relu')(dense1)
 output1 = Dense(1)(dense1)
@@ -80,20 +83,20 @@ predict = model.predict(x_pred_sam)
 print("L_1월 15일 삼성주가 예측 : ", predict)
 
 # 시각화
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-plt.figure(figsize=(25,15))  # 판 사이즈
+# plt.figure(figsize=(25,15))  # 판 사이즈
 
-plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
-plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
-plt.grid()
+# plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
+# plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
+# plt.grid()
 
-plt.title('Cost Loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
+# plt.title('Cost Loss')
+# plt.ylabel('loss')
+# plt.xlabel('epoch')
+# plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
 
-plt.show()
+# plt.show()
 
 
 # loss :  1186119.875
@@ -108,8 +111,14 @@ plt.show()
 # R2 :  0.9641462570448077
 # L_1월 15일 삼성주가 예측 :  [[88025.38]]
 
-# loss :  2759532.0
-# mae :  1220.189453125
-# RMSE :  2759532.2
-# R2 :  0.9832706592159258
-# L_1월 15일 삼성주가 예측 :  [[91124.4]]
+# loss :  2337874.0
+# mae :  1119.6854248046875
+# RMSE :  2337874.0
+# R2 :  0.9858269134633335
+# L_1월 15일 삼성주가 예측 :  [[92292.69]]
+
+# loss :  2270913.25
+# mae :  1085.541015625
+# RMSE :  2270913.0
+# R2 :  0.9862328566556064
+# L_1월 15일 삼성주가 예측 :  [[93133.62]]

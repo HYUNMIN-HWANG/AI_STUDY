@@ -129,9 +129,9 @@ delete_col['종가'] = pd.concat([a,b])
 # print(delete_col['종가'].shape)    # (2398,)
 
 # 9. 최종 데이터 확인 
-print(delete_col)
-print(delete_col.shape) # (2398, 6)
-print(delete_col.info()) 
+# print(delete_col)
+# print(delete_col.shape) # (2398, 6)
+# print(delete_col.info()) 
 
 '''
 <class 'pandas.core.frame.DataFrame'>
@@ -170,8 +170,8 @@ def split_x(seq, col,size) :
 size = 6
 col = 6
 dataset = split_x(final_data,col,size)
-print(dataset)
-print(dataset.shape) # (2393, 6, 6)
+# print(dataset)
+# print(dataset.shape) # (2393, 6, 6)
 
 
 #1. DATA
@@ -183,9 +183,11 @@ y_sam = dataset[1:,-1:,-1:]
 # print(y)
 # print(y.shape)  # (2392, 1, 1)
 
+
 x_pred_sam = dataset[-1:,:,:]
 # print(x_pred)
 # print(x_pred.shape) # (1, 6, 6)
+
 
 # preprocessing
 from sklearn.model_selection import train_test_split
@@ -196,6 +198,7 @@ x_train_sam, x_val_sam, y_train_sam, y_val_sam = train_test_split(x_train_sam, y
 # print(x_train.shape)        # (1530, 6, 6)
 # print(x_test.shape)         # (479, 6, 6)
 # print(x_validation.shape)   # (383, 6, 6)
+
 
 y_train_sam = y_train_sam.reshape(y_train_sam.shape[0],1)
 y_test_sam = y_test_sam.reshape(y_test_sam.shape[0],1)
@@ -231,6 +234,7 @@ print(y_train_sam.shape)        # (1530, 1)
 print(y_test_sam.shape)         # (479, 1)
 print(y_val_sam.shape)          # (383, 1)
 
-# 넘파이 저장
+
+넘파이 저장
 np.save('./samsung/samsung_slicing_data5.npy',\
     arr=[x_train_sam, x_test_sam, x_val_sam, y_train_sam, y_test_sam, y_val_sam, x_pred_sam])

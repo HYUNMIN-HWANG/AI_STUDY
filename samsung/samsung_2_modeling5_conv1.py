@@ -28,15 +28,16 @@ from tensorflow.keras.layers import Dense,Input, Dropout, Conv1D, Flatten, MaxPo
 # input1 = samsung model
 
 input1 = Input(shape=(x_train_sam.shape[1],x_train_sam.shape[2]))
-conv1 = Conv1D(filters=64, kernel_size=6, activation='relu', padding='same')(input1)
-conv1 = Conv1D(filters=64, kernel_size=6, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=64, kernel_size=6, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=128, kernel_size=6, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=128, kernel_size=6, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=256, kernel_size=6, activation='relu', padding='same')(conv1)
-drop = Dropout(0.3)(conv1)
-flat = Flatten()(drop)
-dense1 = Dense(128, activation='relu')(flat)
+conv1 = Conv1D(filters=32, kernel_size=2, activation='relu', padding='same')(input1)
+conv1 = Conv1D(filters=32, kernel_size=2, activation='relu', padding='same')(conv1)
+# conv1 = Conv1D(filters=64, kernel_size=2, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=128, kernel_size=2, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=128, kernel_size=2, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=256, kernel_size=2, activation='relu', padding='same')(conv1)
+drop1 = Dropout(0.25)(conv1)
+flat1 = Flatten()(drop1)
+
+dense1 = Dense(128, activation='relu')(flat1)
 dense1 = Dense(64, activation='relu')(dense1)
 dense1 = Dense(32, activation='relu')(dense1)
 output1 = Dense(1)(dense1)
@@ -53,7 +54,7 @@ model = Model(inputs=input1, outputs=output1)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 savepath = './samsung/samsung_c_day15_{epoch:02d}-{val_loss:.4f}.h5'
 
-es = EarlyStopping(monitor='val_loss',patience=30,mode='min')
+es = EarlyStopping(monitor='val_loss',patience=20,mode='min')
 cp = ModelCheckpoint(filepath=savepath, monitor='val_loss',save_best_only=True,mode='min')
 
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
@@ -104,3 +105,16 @@ plt.show()
 # RMSE :  525004.44
 # R2 :  0.9969437112748942
 # C_1월 15일 삼성주가 예측 :  [[88172.336]]
+
+
+# loss :  699869.5
+# mae :  595.442138671875
+# RMSE :  699872.6
+# R2 :  0.9957571044936134
+# C_1월 15일 삼성주가 예측 :  [[91377.45]]
+
+# loss :  882246.25
+# mae :  693.8919067382812
+# RMSE :  882246.44
+# R2 :  0.9946514847854672
+# C_1월 15일 삼성주가 예측 :  [[89235.97]]

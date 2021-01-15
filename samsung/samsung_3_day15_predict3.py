@@ -29,13 +29,8 @@ from tensorflow.keras.layers import Dense, Dropout, Conv1D, Flatten, MaxPool1D
 # model = load_model('./samsung/cp/samsung_c_day15_157-530667.9375.h5')
 
 # Con
-# model = load_model('./samsung/cp/samsung_c_day15_103-438855.4375.h5')
-# model = load_model('./samsung/cp/samsung_c_day15_162-410737.6562.h5')
-
-# lstm
-# model = load_model('./samsung/cp/samsung_l_day15_1049-896712.6875.h5')
-# model = load_model('./samsung/cp/samsung_l_day15_1028-907605.0625.h5')
-model = load_model('./samsung/samsung_l_day15_93-2102927.7500.h5')
+model = load_model('./samsung/cp/samsung_c_day15_162-410737.6562.h5')
+# model = load_model('./samsung/cp/samsung_c_day15_222-433649.0000.h5')
 
 
 #4. Evaluate, Predict
@@ -65,28 +60,19 @@ print("1월 15일 삼성주가 예측 : ", predict)
 # 1월 15일 삼성주가 예측 :  [[88963.88]]
 
 # Conv ===============
-# loss :  636359.5
-# mae :  548.3731689453125
-# RMSE :  636359.2
-# R2 :  0.9961421468973183
-# 1월 15일 삼성주가 예측 :  [[89907.195]]
 
-# loss :  621533.9375
-# mae :  535.46875
-# RMSE :  621533.4
-# R2 :  0.9962320270286164
-# 1월 15일 삼성주가 예측 :  [[90066.055]]
+# loss :  641007.25
+# mae :  540.4014892578125
+# RMSE :  641007.44
+# R2 :  0.9961139678687045
+# 1월 15일 삼성주가 예측 :  [[88537.96]]
 
-# lstm ===============
-# loss :  1106404.75
-# mae :  738.9284057617188
-# RMSE :  1106405.5
-# R2 :  0.9932925465521363
-# 1월 15일 삼성주가 예측 :  [[88268.03]]
 
-# loss :  1102477.25
-# mae :  735.2380981445312
-# RMSE :  1102477.5
-# R2 :  0.9933163590159088
-# 1월 15일 삼성주가 예측 :  [[88592.57]]
+# loss :  572740.625
+# mae :  530.7218627929688
+# RMSE :  572740.44
+# R2 :  0.99652782851548
+# 1월 15일 삼성주가 예측 :  [[91529.734]]
+
+
 
