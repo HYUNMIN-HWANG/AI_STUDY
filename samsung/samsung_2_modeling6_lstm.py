@@ -37,23 +37,28 @@ from tensorflow.keras.layers import Dense, Input, LSTM, Dropout, concatenate
 
 # input1 = samsung model
 input1 = Input(shape=(x_train_sam.shape[1],x_train_sam.shape[2]))
-lstm1 = LSTM(512, activation='relu')(input1)
+lstm1 = LSTM(256, activation='relu')(input1)
 dense1 = Dense(256, activation='relu')(lstm1)
 dense1 = Dense(128, activation='relu')(dense1)
+dense1 = Dense(128, activation='relu')(dense1)
+dense1 = Dense(64, activation='relu')(dense1)
 dense1 = Dense(64, activation='relu')(dense1)
 
 # input2 = kodex model
 input2 = Input(shape=(x_train_kod.shape[1],x_train_kod.shape[2]))
-lstm2 = LSTM(512, activation='relu')(input2)
+lstm2 = LSTM(256, activation='relu')(input2)
 dense2 = Dense(256, activation='relu')(lstm2)
 dense2 = Dense(128, activation='relu')(dense2)
+dense2 = Dense(128, activation='relu')(dense2)
+dense2 = Dense(64, activation='relu')(dense2)
 dense2 = Dense(64, activation='relu')(dense2)
 
 # concatenate
 merge1 = concatenate([dense1, dense2])
 dense3 = Dense(128, activation='relu')(merge1)
 dense3 = Dense(64, activation='relu')(dense3)
-dense3 = Dense(32)(dense3)
+dense3 = Dense(32, activation='relu')(dense3)
+# dense3 = Dense(16, activation='relu')(dense3)
 
 # output
 output1 = Dense(2)(dense3)   # y1 :output =  2 (마지막 아웃풋)
@@ -70,11 +75,11 @@ es = EarlyStopping(monitor='val_loss',patience=60,mode='min')
 cp = ModelCheckpoint(filepath=savepath, monitor='val_loss',save_best_only=True,mode='min')
 
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
-hist = model.fit([x_train_sam,x_train_kod], y_train_sam, epochs=2000, batch_size=size, \
+hist = model.fit([x_train_sam,x_train_kod], y_train_sam, epochs=2000, batch_size=12, \
     validation_data=([x_val_sam,x_val_kod], y_val_sam),verbose=1,callbacks=[es, cp])
 
 #4. Evaluate, Predict
-result = model.evaluate([x_test_sam,x_test_kod], y_test_sam, batch_size=size)
+result = model.evaluate([x_test_sam,x_test_kod], y_test_sam, batch_size=12)
 print("loss : ", result[0])
 print("mae : ", result[1])
 
@@ -111,30 +116,23 @@ plt.legend(loc='upper right')
 
 plt.show()
 
-# loss :  1662954.125
-# mae :  947.4702758789062
-# RMSE :  1662954.6
-# R2 :  0.9773110802555567
-# L_1월 18일, 19일 :  [[84319.914 84288.87 ]]
-# L_1월 19일 삼성전자 시가 :  [84288.87]
+# loss :  1085955.5
+# mae :  768.1032104492188
+# RMSE :  1085955.2
+# R2 :  0.9852512321135947
+# L_1월 18일, 19일 :  [[86800.734 87908.2  ]]
+# L_1월 19일 삼성전자 시가 :  [87908.2]
 
-# loss :  2425706.75
-# mae :  1266.14208984375
-# RMSE :  2425708.5
-# R2 :  0.966884453734451
-# L_1월 18일, 19일 :  [[88665.195 88758.56 ]]
-# L_1월 19일 삼성전자 시가 :  [88758.56]
+# loss :  1176330.625
+# mae :  784.1006469726562
+# RMSE :  1176331.0
+# R2 :  0.9840085152464119
+# L_1월 18일, 19일 :  [[86430.09  86415.805]]
+# L_1월 19일 삼성전자 시가 :  [86415.805]
 
-# loss :  2498246.0
-# mae :  1287.2281494140625
-# RMSE :  2498245.5
-# R2 :  0.9659227999713391
-# L_1월 18일, 19일 :  [[91111.71  91309.516]]
-# L_1월 19일 삼성전자 시가 :  [91309.516]
-
-# loss :  1078221.125
-# mae :  756.5844116210938
-# RMSE :  1078222.2
-# R2 :  0.9853445469774161
-# L_1월 18일, 19일 :  [[87678.72 87115.57]]
-# L_1월 19일 삼성전자 시가 :  [87115.57]
+# loss :  3670907.25
+# mae :  1485.07763671875
+# RMSE :  3670908.5
+# R2 :  0.9498003600160805
+# L_1월 18일, 19일 :  [[95133.35 95882.93]]
+# L_1월 19일 삼성전자 시가 :  [95882.93]
