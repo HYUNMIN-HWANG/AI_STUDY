@@ -38,33 +38,42 @@ from tensorflow.keras.layers import Dense,Input, Dropout, Conv1D, Flatten, MaxPo
 # input1 = samsung model
 input1 = Input(shape=(x_train_sam.shape[1],x_train_sam.shape[2]))
 conv1 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(input1)
-# conv1 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv1)
-# drop1 = Dropout(0.2)(conv1)
-# flat1 = Flatten()(drop1)
-flat1 = Flatten()(conv1)
+conv1 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(conv1)
 
+conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
+
+conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv1)
+conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv1)
+
+conv1 = Conv1D(filters=512, kernel_size=3, activation='relu', padding='same')(conv1)
+
+flat1 = Flatten()(conv1)
 
 # input2 = kodex model
 input2 = Input(shape=(x_train_kod.shape[1],x_train_kod.shape[2]))
 conv2 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(input2)
-# conv2 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(conv2)
-conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
-conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
-conv2 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv2)
-conv2 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv2)
-# drop2 = Dropout(0.2)(conv2)
-flat2 = Flatten()(conv2)
+conv2 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(conv2)
+conv2 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(conv2)
 
+conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
+conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
+conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
+
+conv2 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv2)
+conv2 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv2)
+
+conv2 = Conv1D(filters=512, kernel_size=3, activation='relu', padding='same')(conv2)
+
+flat2 = Flatten()(conv2)
 
 # concatenate
 merge1 = concatenate([flat1, flat2])
 dense3 = Dense(128, activation='relu')(merge1)
 dense3 = Dense(64, activation='relu')(dense3)
-dense3 = Dense(32)(dense3)
+dense3 = Dense(32, activation='relu')(dense3)
 
 # output
 output1 = Dense(2)(dense3)   # y1 :output =  2 (마지막 아웃풋)
@@ -81,11 +90,11 @@ es = EarlyStopping(monitor='val_loss',patience=50,mode='min')
 cp = ModelCheckpoint(filepath=savepath, monitor='val_loss',save_best_only=True,mode='min')
 
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
-hist = model.fit([x_train_sam,x_train_kod], y_train_sam, epochs=2000, batch_size=size, \
+hist = model.fit([x_train_sam,x_train_kod], y_train_sam, epochs=2000, batch_size=6, \
     validation_data=([x_val_sam,x_val_kod], y_val_sam),verbose=1,callbacks=[es, cp])
 
 #4. Evaluate, Predict
-result = model.evaluate([x_test_sam,x_test_kod], y_test_sam, batch_size=size)
+result = model.evaluate([x_test_sam,x_test_kod], y_test_sam, batch_size=6)
 print("loss : ", result[0])
 print("mae : ", result[1])
 
@@ -131,9 +140,23 @@ plt.show()
 # C_1월 18일, 19일 :  [[89026.43 89231.51]]
 # C_1월 19일 삼성전자 시가 :  [89231.51]
 
-# loss :  916777.75
-# mae :  681.7394409179688
-# RMSE :  916778.1
-# R2 :  0.987573978314928
-# C_1월 18일, 19일 :  [[88605.64 88208.54]]
-# C_1월 19일 삼성전자 시가 :  [88208.54]
+# loss :  853939.5
+# mae :  650.3711547851562
+# RMSE :  853939.5
+# R2 :  0.9884292202278457
+# C_1월 18일, 19일 :  [[87645.82 86836.18]]
+# C_1월 19일 삼성전자 시가 :  [86836.18]
+
+# loss :  894166.8125
+# mae :  682.7576904296875
+# RMSE :  894167.06
+# R2 :  0.9878859615990782
+# C_1월 18일, 19일 :  [[88504.39 88834.78]]
+# C_1월 19일 삼성전자 시가 :  [88834.78]
+
+# loss :  1069524.875
+# mae :  770.2943725585938
+# RMSE :  1069524.8
+# R2 :  0.985518946880177
+# C_1월 18일, 19일 :  [[87261.62 87943.55]]
+# C_1월 19일 삼성전자 시가 :  [87943.55]
