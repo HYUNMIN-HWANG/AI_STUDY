@@ -75,15 +75,16 @@ model = Model(inputs=[input1,input2], outputs=output1)
 # model.summary()
 
 #3. Compile, Train
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-savepath = './samsung/cp/ensemble_c_day19_{epoch:02d}-{val_loss:.4f}.h5'
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+savepath = './samsung/ensemble_c_day19_{epoch:02d}-{val_loss:.4f}.h5'
 
 es = EarlyStopping(monitor='val_loss',patience=80,mode='min')
 cp = ModelCheckpoint(filepath=savepath, monitor='val_loss',save_best_only=True,mode='min')
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', patience=40, factor=0.5, verbose=1)
 
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
 hist = model.fit([x_train_sam,x_train_kod], y_train_sam, epochs=2000, batch_size=6, \
-    validation_data=([x_val_sam,x_val_kod], y_val_sam),verbose=1,callbacks=[es, cp])
+    validation_data=([x_val_sam,x_val_kod], y_val_sam),verbose=1,callbacks=[es, cp, reduce_lr])
 
 #4. Evaluate, Predict
 result = model.evaluate([x_test_sam,x_test_kod], y_test_sam, batch_size=6)
@@ -124,31 +125,18 @@ plt.legend(loc='upper right')
 
 plt.show()
 
+# ReduceLROnPlateau 하기 전
+# loss :  1123556.875
+# mae :  796.0589599609375
+# RMSE :  1123557.2
+# R2 :  0.9847200832680519
+# C_1월 18일, 19일 :  [[87572.36 87243.91]]
+# C_1월 19일 삼성전자 시가 :  [87243.91]
 
-# loss :  847671.0625
-# mae :  653.3145751953125
-# RMSE :  847671.25
-# R2 :  0.9885200561847298
-# C_1월 18일, 19일 :  [[89026.43 89231.51]]
-# C_1월 19일 삼성전자 시가 :  [89231.51]
-
-# loss :  915256.875
-# mae :  685.6292724609375
-# RMSE :  915256.8
-# R2 :  0.9876060671604254
-# C_1월 18일, 19일 :  [[88751.09 88254.2 ]]
-# C_1월 19일 삼성전자 시가 :  [88254.2]
-
-# loss :  955883.9375
-# mae :  703.3825073242188
-# RMSE :  955884.2
-# R2 :  0.9870399955413354
-# C_1월 18일, 19일 :  [[88359.336 88455.2  ]]
-# C_1월 19일 삼성전자 시가 :  [88455.2]
-
-# loss :  934618.375
-# mae :  694.1921997070312
-# RMSE :  934622.1
-# R2 :  0.9873253002075499
-# C_1월 18일, 19일 :  [[84339.83 84748.36]]
-# C_1월 19일 삼성전자 시가 :  [84748.36]
+# ReduceLROnPlateau 한 후
+# loss :  1028220.25
+# mae :  764.2801513671875
+# RMSE :  1028219.75
+# R2 :  0.9860154003983361
+# C_1월 18일, 19일 :  [[86732.46 85759.71]]
+# C_1월 19일 삼성전자 시가 :  [85759.71]
