@@ -88,7 +88,7 @@ from tensorflow.keras.optimizers import RMSprop, SGD, Nadam
 # loss :  42760409186304.0 결과물 :  [[13623061.]]
 # optimizer = Nadam(lr=0.01)  # learning rate 0.01
 # loss :  1.30739860669353e-13 결과물 :  [[10.999999]]
-# optimizer = Nadam(lr=0.001)  # learning rate 0.001
+optimizer = Nadam(lr=0.001)  # learning rate 0.001
 # loss :  7.176481631177012e-13 결과물 :  [[11.000002]]
 # optimizer = Nadam(lr=0.0001)  # learning rate 0.0001
 # loss :  8.203258516914502e-07 결과물 :  [[10.998085]]
