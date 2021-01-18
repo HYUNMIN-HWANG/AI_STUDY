@@ -2,31 +2,31 @@ import numpy as np
 
 #1. DATA
 # x1 >> x_sam : 삼성 데이터
-x_train_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[0]
-x_test_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[1]
-x_val_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[2]
-y_train_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[3]
-y_test_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[4]
-y_val_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[5]
-x_pred_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[6]
+x_train_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[0]
+x_test_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[1]
+x_val_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[2]
+y_train_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[3]
+y_test_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[4]
+y_val_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[5]
+x_pred_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[6]
 
-# print(x_train_sam.shape)        # (689, 6, 6)
-# print(x_test_sam.shape)         # (216, 6, 6)
-# print(x_val_sam.shape)          # (173, 6, 6)
-# print(y_train_sam.shape)        # (689, 2)
-# print(y_test_sam.shape)         # (216, 2)
-# print(x_pred_sam.shape)         # (1, 6, 6)
+print(x_train_sam.shape)        # (689, 6, 6)
+print(x_test_sam.shape)         # (216, 6, 6)
+print(x_val_sam.shape)          # (173, 6, 6)
+print(y_train_sam.shape)        # (689, 2)
+print(y_test_sam.shape)         # (216, 2)
+print(x_pred_sam.shape)         # (1, 6, 6)
 
 # x2 >> x_kod : KODEX 코스닥150 선물 인버스 데이터
-x_train_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[0]
-x_test_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[1]
-x_val_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[2]
-x_pred_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[3]
+x_train_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[0]
+x_test_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[1]
+x_val_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[2]
+x_pred_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[3]
 
-# print(x_train_kod.shape)        # (689, 6, 6)
-# print(x_test_kod.shape)         # (216, 6, 6)
-# print(x_val_kod.shape)          # (173, 6, 6)
-# print(x_pred_kod.shape)         # (1, 6, 6)
+print(x_train_kod.shape)        # (689, 6, 6)
+print(x_test_kod.shape)         # (216, 6, 6)
+print(x_val_kod.shape)          # (173, 6, 6)
+print(x_pred_kod.shape)         # (1, 6, 6)
 
 size = 6
 col = 6
@@ -43,12 +43,8 @@ conv1 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(con
 
 conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
 conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv1)
 
 conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv1)
-conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv1)
-
-conv1 = Conv1D(filters=512, kernel_size=3, activation='relu', padding='same')(conv1)
 
 flat1 = Flatten()(conv1)
 
@@ -60,12 +56,8 @@ conv2 = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same')(con
 
 conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
 conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
-conv2 = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same')(conv2)
 
 conv2 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv2)
-conv2 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same')(conv2)
-
-conv2 = Conv1D(filters=512, kernel_size=3, activation='relu', padding='same')(conv2)
 
 flat2 = Flatten()(conv2)
 
@@ -86,7 +78,7 @@ model = Model(inputs=[input1,input2], outputs=output1)
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 savepath = '/content/drive/My Drive/인공지능 과정/stock_prediction/cp/ensemble_c_day19_{epoch:02d}-{val_loss:.4f}.h5'
 
-es = EarlyStopping(monitor='val_loss',patience=50,mode='min')
+es = EarlyStopping(monitor='val_loss',patience=80,mode='min')
 cp = ModelCheckpoint(filepath=savepath, monitor='val_loss',save_best_only=True,mode='min')
 
 model.compile(loss='mse',optimizer='adam',metrics=['mae'])
@@ -140,23 +132,23 @@ plt.show()
 # C_1월 18일, 19일 :  [[89026.43 89231.51]]
 # C_1월 19일 삼성전자 시가 :  [89231.51]
 
-# loss :  853939.5
-# mae :  650.3711547851562
-# RMSE :  853939.5
-# R2 :  0.9884292202278457
-# C_1월 18일, 19일 :  [[87645.82 86836.18]]
-# C_1월 19일 삼성전자 시가 :  [86836.18]
+# loss :  915256.875
+# mae :  685.6292724609375
+# RMSE :  915256.8
+# R2 :  0.9876060671604254
+# C_1월 18일, 19일 :  [[88751.09 88254.2 ]]
+# C_1월 19일 삼성전자 시가 :  [88254.2]
 
-# loss :  894166.8125
-# mae :  682.7576904296875
-# RMSE :  894167.06
-# R2 :  0.9878859615990782
-# C_1월 18일, 19일 :  [[88504.39 88834.78]]
-# C_1월 19일 삼성전자 시가 :  [88834.78]
+# loss :  955883.9375
+# mae :  703.3825073242188
+# RMSE :  955884.2
+# R2 :  0.9870399955413354
+# C_1월 18일, 19일 :  [[88359.336 88455.2  ]]
+# C_1월 19일 삼성전자 시가 :  [88455.2]
 
-# loss :  1069524.875
-# mae :  770.2943725585938
-# RMSE :  1069524.8
-# R2 :  0.985518946880177
-# C_1월 18일, 19일 :  [[87261.62 87943.55]]
-# C_1월 19일 삼성전자 시가 :  [87943.55]
+# loss :  934618.375
+# mae :  694.1921997070312
+# RMSE :  934622.1
+# R2 :  0.9873253002075499
+# C_1월 18일, 19일 :  [[84339.83 84748.36]]
+# C_1월 19일 삼성전자 시가 :  [84748.36]

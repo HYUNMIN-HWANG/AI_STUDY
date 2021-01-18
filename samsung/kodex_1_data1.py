@@ -6,11 +6,7 @@
 import pandas as pd
 import numpy as np
 
-...
-경로 수정해야 함
-...
-
-df_kod = pd.read_csv('/content/drive/My Drive/인공지능 과정/stock_prediction/KODEX 코스닥150 선물인버스.csv', index_col=0, header=0, encoding='cp949')   
+df_kod = pd.read_csv('./samsung/KODEX 코스닥150 선물인버스.csv', index_col=0, header=0, encoding='cp949')   
 # print(df_kod)          # 2021/01/15 ~ 2016/08/10
 # print(df_kod.shape)    # (1088, 16)
 # print(df_kod.columns)
@@ -124,4 +120,4 @@ print(x_pred_kod.shape)         # (1, 6, 6)
 
 
 # 넘파이 저장
-np.save('./samsung/kodex_slicing_data1.npy',arr=[x_train_sam, x_test_sam, x_val_sam,x_pred_sam])
+np.save('./samsung/kodex_slicing_data1.npy',arr=[x_train_kod, x_test_kod, x_val_kod,x_pred_kod])

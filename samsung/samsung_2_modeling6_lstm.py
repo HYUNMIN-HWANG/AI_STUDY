@@ -2,31 +2,31 @@ import numpy as np
 
 #1. DATA
 # x1 >> x_sam : 삼성 데이터
-x_train_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[0]
-x_test_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[1]
-x_val_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[2]
-y_train_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[3]
-y_test_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[4]
-y_val_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[5]
-x_pred_sam = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/samsung_slicing_data5.npy',allow_pickle=True)[6]
+x_train_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[0]
+x_test_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[1]
+x_val_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[2]
+y_train_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[3]
+y_test_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[4]
+y_val_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[5]
+x_pred_sam = np.load('./samsung/samsung_slicing_data5.npy',allow_pickle=True)[6]
 
-# print(x_train_sam.shape)        # (689, 6, 6)
-# print(x_test_sam.shape)         # (216, 6, 6)
-# print(x_val_sam.shape)          # (173, 6, 6)
-# print(y_train_sam.shape)        # (689, 2)
-# print(y_test_sam.shape)         # (216, 2)
-# print(x_pred_sam.shape)         # (1, 6, 6)
+print(x_train_sam.shape)        # (689, 6, 6)
+print(x_test_sam.shape)         # (216, 6, 6)
+print(x_val_sam.shape)          # (173, 6, 6)
+print(y_train_sam.shape)        # (689, 2)
+print(y_test_sam.shape)         # (216, 2)
+print(x_pred_sam.shape)         # (1, 6, 6)
 
 # x2 >> x_kod : KODEX 코스닥150 선물 인버스 데이터
-x_train_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[0]
-x_test_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[1]
-x_val_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[2]
-x_pred_kod = np.load('/content/drive/My Drive/인공지능 과정/stock_prediction/kodex_slicing_data1.npy',allow_pickle=True)[3]
+x_train_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[0]
+x_test_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[1]
+x_val_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[2]
+x_pred_kod = np.load('./samsung/kodex_slicing_data1.npy',allow_pickle=True)[3]
 
-# print(x_train_kod.shape)        # (689, 6, 6)
-# print(x_test_kod.shape)         # (216, 6, 6)
-# print(x_val_kod.shape)          # (173, 6, 6)
-# print(x_pred_kod.shape)         # (1, 6, 6)
+print(x_train_kod.shape)        # (689, 6, 6)
+print(x_test_kod.shape)         # (216, 6, 6)
+print(x_val_kod.shape)          # (173, 6, 6)
+print(x_pred_kod.shape)         # (1, 6, 6)
 
 size = 6
 col = 6

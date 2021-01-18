@@ -5,7 +5,7 @@
 import numpy as np
 import pandas as pd
 
-df = pd.read_csv('/content/drive/My Drive/인공지능 과정/stock_prediction/삼성전자_원본.csv', index_col=0, header=0, encoding='cp949')  
+df = pd.read_csv('./samsung/삼성전자1_raw.csv', index_col=0, header=0, encoding='cp949')  
 # print(df.shape) # (2400, 14)
 # print(df.info())
 # print(df.columns)
@@ -18,7 +18,7 @@ df.drop(['2021-01-13'],axis=0,inplace=True)
 
 # *** df2 데이터를 df에 넣기 ***
 # 추가데이터 append
-df2 = pd.read_csv('/content/drive/My Drive/인공지능 과정/stock_prediction/삼성전자0115.csv', index_col=0, header=0, encoding='cp949') 
+df2 = pd.read_csv('./samsung/삼성전자0115.csv', index_col=0, header=0, encoding='cp949') 
 # print(df2.shape) # (80, 16)
 # print(df2.columns)
 # Index(['시가', '고가', '저가', '종가', '전일비', 'Unnamed: 6', '등락률', '거래량', '금액(백만)',
@@ -205,23 +205,23 @@ x_test_sam = x_test_sam.reshape(x_test_sam.shape[0],size,(col-1))
 x_val_sam = x_val_sam.reshape(x_val_sam.shape[0],size,(col-1))
 x_pred_sam = x_pred_sam.reshape(x_pred_sam.shape[0], size,(col-1))
 
-# print(x_train_sam.shape)        # (689, 6, 6)
-# print(x_test_sam.shape)         # (216, 6, 6)
-# print(x_val_sam.shape)          # (173, 6, 6)
-# print(x_pred_sam.shape)         # (1, 6, 6)
-# print(y_train_sam.shape)        # (689, 2)
-# print(y_test_sam.shape)         # (216, 2)
-# print(y_val_sam.shape)          # (173, 2)
+print(x_train_sam.shape)        # (689, 6, 6)
+print(x_test_sam.shape)         # (216, 6, 6)
+print(x_val_sam.shape)          # (173, 6, 6)
+print(x_pred_sam.shape)         # (1, 6, 6)
+print(y_train_sam.shape)        # (689, 2)
+print(y_test_sam.shape)         # (216, 2)
+print(y_val_sam.shape)          # (173, 2)
 
 # 넘파이 저장
-# np.save('/content/drive/My Drive/인공지능 과정/samsung_slicing_data5.npy',arr=[x_train_sam, x_test_sam, x_val_sam, y_train_sam, y_test_sam, y_val_sam, x_pred_sam])
+np.save('./samsung/samsung_slicing_data5.npy',arr=[x_train_sam, x_test_sam, x_val_sam, y_train_sam, y_test_sam, y_val_sam, x_pred_sam])
 # 코랩에서 저장안돼서 vscode로 저장함
 
 ################################################################################
 
 # Kodex 컬람 중 삼성전자 시가와 관련있는 컬럼이 뭔지 알아보자.
-
-df3 = pd.read_csv('/content/drive/My Drive/인공지능 과정/stock_prediction/KODEX 코스닥150 선물인버스.csv', index_col=0, header=0, encoding='cp949')   
+'''
+df3 = pd.read_csv('./samsung/KODEX 코스닥150 선물인버스.csv', index_col=0, header=0, encoding='cp949')   
 # print(df3.shape) # (1088, 16)
 # print(df3.columns)
 #Index(['시가', '고가', '저가', '종가', '전일비', 'Unnamed: 6', '등락률', '거래량', '금액(백만)',
@@ -273,3 +273,4 @@ plt.show()
 # 상관계수 -0.69 : 시가, 고가, 저가, 종가
 # 상관계수 0.49 : 거래량
 # 상관계수 0.57 : 신용비
+'''
