@@ -342,3 +342,4 @@ AR_Lstm_actual_pred_nn = np.where(AR_Lstm_actual_pred_denorm<0, 0, AR_Lstm_actua
 
 sub.iloc[:,1:] = AR_Lstm_actual_pred_nn
 sub.to_csv("../data/DACON_0126/submission/submission_210118_quantile_ar_lstm_nn.csv",index=False)
+# 점수 2.09857
