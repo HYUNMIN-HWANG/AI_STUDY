@@ -166,8 +166,8 @@ result = model.evaluate(x_test, y_test, batch_size=32)
 print("loss : ", result[0])
 print("mae : ", result[1])
 
-# loss :  531.8359985351562
-# mae :  11.04439640045166
+# loss :  513.1434936523438
+# mae :  10.122678756713867
 
 ################################
 
@@ -187,4 +187,4 @@ for i in range(1,10):
     column_name = 'q_0.' + str(i)
     sub.loc[sub.id.str.contains("Day8"), column_name] = y_pred[:,1]
 
-sub.to_csv('../data/DACON_0126/submission/submission_0119_1.csv', index=False)
+sub.to_csv('../data/DACON_0126/submission_0120_1.csv', index=False)
