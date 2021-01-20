@@ -1,9 +1,9 @@
 # 3차원 Conv1D
-
 import numpy as np
 import pandas as pd
 
 ################################
+# quantile 안 됨 xxxxxxxxxxxxxxxxxxxxxxxx
 
 # 예측할 Target 칼럼 추가하기
 # GHI = DHI + DNI

@@ -3,6 +3,8 @@
 import numpy as np
 import pandas as pd
 
+# quantile 안 됨 xxxxxxxxxxxxxxxxxxxxxxxx
+
 # 목표
 # x : (1089, 7, 48, 6)  # 7일치 데이터
 # y : (1089, 2, 48, 1)  # 1일치 데이터
@@ -182,7 +184,6 @@ for q in q_lst:
     # model.summary()
 
     #3. Compile, train     
-    #                           # y : 실제값, pred : 예측값 ????
     model.compile(loss=lambda y, pred: quantile_loss(q,y,pred), optimizer='adam')
     hist = model.fit(x_train, y_train, epochs=100, batch_size=128, validation_data=(x_val, y_val), callbacks=[es,cp,lr])
 
