@@ -158,5 +158,5 @@ for i in range(1,10):
     sub.loc[sub.id.str.contains("Day8"), column_name] = y_pred[:,1]
 
 # sub.to_csv('../data/DACON_0126/submission/submission_0119_1.csv', index=False)    
-# sub.to_csv('../data/DACON_0126/submission/submission_0119_2.csv', index=False)    # score : 2.8878722584
+# sub.to_csv('../data/DACON_0126/submission/submission_0119_2.csv', index=False)    # score : 2.8878722584 => loss 가장 작은 모델의 등수가 가장 좋았음
 sub.to_csv('../data/DACON_0126/submission/submission_0119_3.csv', index=False)      # score : 3.2707340024

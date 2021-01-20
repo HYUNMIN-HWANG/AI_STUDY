@@ -38,6 +38,7 @@
 
 ================================================
 
+[column_name]
 Hour - 시간
 Minute - 분
 DHI - 수평면 산란일사량(Diffuse Horizontal Irradiance (W/m2))
@@ -46,3 +47,11 @@ WS - 풍속(Wind Speed (m/s))
 RH - 상대습도(Relative Humidity (%))
 T - 기온(Temperature (Degree C))
 Target - 태양광 발전량 (kW)
+
+================================================
+
+Tip
+    - 태양광 발전량 예측이 주제니까 당연히 TARGET은 발전량일텐데요,
+        최댓값이 거의 100인 것을 보면 설비의 스펙과 지역의 특성상 최대 발전량 100 대비 상대적인 발전량으로 보입니다.
+    - pinball loss : https://dacon.io/forum/402228
+    
