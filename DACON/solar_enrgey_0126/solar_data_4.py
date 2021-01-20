@@ -1,3 +1,5 @@
+# 4차원 Conv2D
+
 import numpy as np
 import pandas as pd
 
@@ -182,20 +184,21 @@ for q in q_lst:
     #3. Compile, train     
     #                           # y : 실제값, pred : 예측값 ????
     model.compile(loss=lambda y, pred: quantile_loss(q,y,pred), optimizer='adam')
-    hist = model.fit(x_train, y_train, epochs=3, batch_size=128, validation_data=(x_val, y_val), callbacks=[es,cp,lr])
+    hist = model.fit(x_train, y_train, epochs=100, batch_size=128, validation_data=(x_val, y_val), callbacks=[es,cp,lr])
 
     #4. Evaluate, Predict
     result = model.evaluate(x_test, y_test, batch_size=128)
     print("(q_%.1f) loss : %f" % (q, result))   # (q_0.1) loss : 1.799708 <--- 이런 식으로 프린트
 
     y_pred = model.predict(x_pred)
-    print("y_pred : ", y_pred)
+    # print("y_pred : ", y_pred)
     # print(y_pred.shape) # (81, 2, 48, 1)
     y_pred = y_pred.reshape(7776,1)
 
     # # quatile에 따라 다르게 나오는 결과값 저장
     column_name = 'q_' + str(q)
+    print(column_name)
     sub.loc[:, column_name] = y_pred 
 
 # to csv
-sub.to_csv('../data/DACON_0126/submission_0120_1.csv', index=False)
+sub.to_csv('../data/DACON_0126/submission_0120_1.csv', index=False) # score : 	2.0202123047	

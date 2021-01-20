@@ -1,3 +1,5 @@
+# 3차원 Conv1D
+
 import numpy as np
 import pandas as pd
 
