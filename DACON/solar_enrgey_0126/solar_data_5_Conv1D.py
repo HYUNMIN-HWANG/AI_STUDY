@@ -1,3 +1,7 @@
+
+# 9 quantile * target2개 * 100 epoch >>> 시간이 너무 오래 걸린다.
+# 결과값이 왜 음수가 나오는 거지????????????????
+
 import pandas as pd
 import numpy as np
 import os
@@ -5,7 +9,9 @@ import glob
 import random
 import warnings
 warnings.filterwarnings("ignore")
+
 ##############################################################
+
 # 파일 불러오기
 train = pd.read_csv('../data/DACON_0126/train/train.csv')
 # print(train.shape)  # (52560, 9)
@@ -125,7 +131,7 @@ X_pred = X_pred.reshape(81, 48, 7)
 
 #2. Modeling
 #3. Compile, Train
-
+################################## 모델링 보강#################################
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv1D, Dropout, MaxPool1D,Flatten
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
@@ -142,7 +148,7 @@ def quantile_loss(q, y, pred):
 
 quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-# Modeling, Compile, Train
+# 함수 : Modeling, Compile, Train
 def conv(q, X_train, Y_train, X_valid, Y_valid, X_pred):
     # (a) Modeling  
     model = Sequential()
@@ -187,6 +193,8 @@ def train_data(X_train, Y_train, X_valid, Y_valid, X_pred):
     # LGBM_actual_pred.columns=quantiles
     return conv_models, conv_actual_pred
 
+##############################################################
+
 # Target1 결과값 저장
 models_1, results_1 = train_data(X_train_1, Y_train_1, X_valid_1, Y_valid_1, X_pred)
 
@@ -199,6 +207,7 @@ results_1 = np.transpose(results_1) # 행, 열 바꾸기
 results_2 = np.transpose(results_2)
 # print(results_1.shape, results_2.shape) # (3888, 9) (3888, 9)
 
+##############################################################
 
 submission.loc[submission.id.str.contains("Day7"), "q_0.1":] = results_1    # Day7 (3888, 9)
 submission.loc[submission.id.str.contains("Day8"), "q_0.1":] = results_2    # Day8 (3888, 9)
