@@ -15,7 +15,7 @@ def quantile_loss(y_true, y_pred) :
     q = tf.constant(np.array([qs]), dtype=tf.float32) # constant : list -> tensorflow의 상수(바뀌지 않는 값)로 바꾼다.
     e = y_true - y_pred
     v = tf.maximum(q*e, (q-1)*e)   
-    return K.mean(v)    # 평균 하나만 출력된다. # 0.5 : 중간값, mae과 유사하다.
+    return K.mean(v)    # 평균 하나만 출력된다. # quantile 0.5 : 중간값, mae과 유사하다.
 
 #1. DATA
 x = np.array([1,2,3,4,5,6,7,8]).astype('float32')

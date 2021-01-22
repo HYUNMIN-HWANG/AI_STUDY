@@ -117,4 +117,4 @@ models_2, results_2 = train_data(X_train_2, Y_train_2, X_valid_2, Y_valid_2, X_t
 submission.loc[submission.id.str.contains("Day7"), "q_0.1":] = results_1.sort_index().values
 submission.loc[submission.id.str.contains("Day8"), "q_0.1":] = results_2.sort_index().values
 
-submission.to_csv('../data/DACON_0126/submission_LGBM_v1.csv', index=False)
+submission.to_csv('../data/DACON_0126/submission_LGBM_v1.csv', index=False) # score : 	2.0202123047	
