@@ -283,7 +283,7 @@ print(loss_mean)    # 0.9484676354461246
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0122_2.csv', index=False)  # score : 
+submission.to_csv('../data/DACON_0126/submission_0122_2.csv', index=False)  # score : 2.327856359
 
 
 # 시각화
