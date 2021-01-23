@@ -12,10 +12,10 @@ warnings.filterwarnings("ignore")
 
 ##############################################################
 
-# 만들고 싶은 모양 : 하루치 데이터로 이틀치를 예측한다.
-# print(x.shape)     # (N, 48, 6)
+# 만들고 싶은 모양 : 7일치 데이터로 2일치를 예측한다.
+# print(x.shape)     # (N, 336, 8)
 # print(y.shape)     # (N, 48, 2)
-# print(x_pred.shape)  # (81, 48, 6)
+# print(x_pred.shape)  # (81, 336, 8)
 
 ##############################################################
 
@@ -172,15 +172,13 @@ y_val = y_val.reshape(y_val.shape[0], 2, 2)
 
 # print(x_train[:10])
 
-
 ##############################################################
 
 #2. Modeling
 #3. Compile, Train
-from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv1D, Dropout, MaxPool1D,Flatten, Reshape
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from lightgbm import LGBMRegressor
 import tensorflow.keras.backend as K
 
 # Quantile loss definition
@@ -188,25 +186,32 @@ def quantile_loss(q, y_true, y_pred):
     err = (y_true - y_pred)
     return K.mean(K.maximum(q*err, (q-1)*err), axis=-1)
 
-quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+quantiles = [0.1, 0.2, 0.4] # 값 이상하게 나온 것만 다시 돌리기
+
 
 #2. Modeling
-def modeling() :
+def modeling(x_train, y_train) :
     model = Sequential()
-    model.add(Conv1D(filters=256, kernel_size=3, activation='relu', padding='same',\
-         input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 336, 6)
-    model.add(Conv1D(filters=256, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv1D(filters=32, kernel_size=3, activation='relu', padding='same'))
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same',\
+         input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 2, 6)
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    # model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+
+    # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+
+    # model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Dropout(0.2))
 
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(96, activation='relu'))
-    model.add(Reshape((48,2)))  # output (N, 48, 2)
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(2))
+    model.add(Dense(16))
+    model.add(Dense(y_train.shape[1] * y_train.shape[2], activation='relu'))
+    model.add(Reshape((y_train.shape[1], y_train.shape[2])))  # output (N, 2, 2)
+    model.add(Dense(y_train.shape[2]))
     return model
 
 ##############################################################
@@ -214,25 +219,23 @@ def modeling() :
 loss_list = list()
 
 for q in quantiles :
-    print(f"\n>>>>>>>>>>>>>>>>>>>>>> modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
+    print(f"\n>>>>>>>>>>>>>>>>>>>>>>  modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
 
     #2. Modeling
-    # model = modeling()
-    cp_load = f'../data/modelcheckpoint/solar_0123_1_q{q:.1f}.hdf5'
-    model = load_model(cp_load, compile = False)
+    model = modeling(x_train, y_train)
     model.summary()
 
     #3. Compile, Train
     model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam',  metrics=['mse'])
     
-    # es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
-    # lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, verbose=1)
-    # cp_save = f'../data/modelcheckpoint/solar_0122_q_{q:.1f}.hdf5'
-    # cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    # hist = model.fit(x_train, y_train, epochs=500, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
+    es = EarlyStopping(monitor='val_loss', patience=30, mode='min')
+    lr = ReduceLROnPlateau(monitor='val_loss', patience=15, factor=0.3, verbose=1)
+    cp_save = f'../data/modelcheckpoint/solar_0123_2_q{q:.1f}.hdf5'
+    cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
+    hist = model.fit(x_train, y_train, epochs=400, batch_size=32, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    result = model.evaluate(x_test, y_test,batch_size=64)
+    result = model.evaluate(x_test, y_test,batch_size=32)
     print('loss: ', result[0])
     print('mae: ', result[1])
     loss_list.append(result[0])  # loss 기록
@@ -244,21 +247,35 @@ for q in quantiles :
     y_pred = pd.concat([y_pred], axis=1)
     y_pred[y_pred<0] = 0
     y_pred = y_pred.to_numpy()
-
-    # print(y_pred[:100,0])
-    # print(y_pred[100:200,0])
-    # print(y_pred[200:300,0])
     
     # submission
     # column_name = 'q_' + str(q)
     column_name = f'q_{q}'
     submission.loc[submission.id.str.contains("Day7"), column_name] = y_pred[:, 0].round(2)  # Day7 (3888, 9)
     submission.loc[submission.id.str.contains("Day8"), column_name] = y_pred[:, 1].round(2)   # Day8 (3888, 9)
+    submission.to_csv(f'../data/DACON_0126/submission_0123_2_{q}.csv', index = False)  
+
 
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
-print(loss_mean)   # 0.6755326390266418
+print(loss_mean)    # 
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0123_1.csv', index=False)  # score : 
+submission.to_csv('../data/DACON_0126/submission_0123_2.csv', index = False)  # score :
+
+
+# 시각화
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10,6))  # 판 사이즈 (가로 10, 세로 6)
+
+plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
+plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
+plt.grid()
+
+plt.title('Cost Loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
+
+plt.show()

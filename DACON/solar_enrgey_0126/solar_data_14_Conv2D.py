@@ -185,23 +185,29 @@ def quantile_loss(q, y_true, y_pred):
     err = (y_true - y_pred)
     return K.mean(K.maximum(q*err, (q-1)*err), axis=-1)
 
-quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# quantiles = [0.2, 0.4, 0.5, 0.7, 0.9] # 값 이상하게 나온 것만 다시 돌리기
+# quantiles = [0.5, 0.9] # 값 이상하게 나온 것만 다시 돌리기
+quantiles = [0.4] # 값 이상하게 나온 것만 다시 돌리기
 
 #2. Modeling
 def modeling(x_train, y_train) :
     model = Sequential()
-    model.add(Conv2D(filters=96, kernel_size=3, activation='relu', padding='same',\
+    model.add(Conv2D(filters=96, kernel_size=(1,2), activation='relu', padding='same',\
          input_shape=(x_train.shape[1], x_train.shape[2], x_train.shape[3]))) # input (N, 1, 48, 6)
-    model.add(Conv2D(filters=96, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv2D(filters=96, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv2D(filters=48, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv2D(filters=48, kernel_size=3, activation='relu', padding='same'))
+    model.add(Conv2D(filters=96, kernel_size=(1,2), activation='relu', padding='same'))
+    # model.add(Conv2D(filters=96, kernel_size=(1,2), activation='relu', padding='same'))
+
+    model.add(Conv2D(filters=48, kernel_size=(1,2), activation='relu', padding='same'))
+    model.add(Conv2D(filters=48, kernel_size=(1,2), activation='relu', padding='same'))
+
+    # model.add(Conv2D(filters=144, kernel_size=(1,2), activation='relu', padding='same'))
+    # model.add(Dropout(0.2))
 
     model.add(Flatten())
+    model.add(Dense(96))
     model.add(Dense(y_train.shape[1] * y_train.shape[2], activation='relu'))
     model.add(Reshape((y_train.shape[1], y_train.shape[2])))  # output (N, 48, 2)
-    model.add(Dense(48, activation='relu'))
-    model.add(Dense(8, activation='relu'))
     model.add(Dense(y_train.shape[2]))
     return model
 
@@ -210,7 +216,7 @@ def modeling(x_train, y_train) :
 loss_list = list()
 
 for q in quantiles :
-    print(f"\n>>>>>>>>>>>>>>>>>>>>>> modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
+    print(f"\n>>>>>>>>>>>>>>>>>>>>>>  modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
 
     #2. Modeling
     model = modeling(x_train, y_train)
@@ -219,14 +225,14 @@ for q in quantiles :
     #3. Compile, Train
     model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam',  metrics=['mse'])
     
-    es = EarlyStopping(monitor='val_loss', patience=10, mode='min')
-    lr = ReduceLROnPlateau(monitor='val_loss', patience=5, factor=0.4, verbose=1)
+    es = EarlyStopping(monitor='val_loss', patience=50, mode='min')
+    lr = ReduceLROnPlateau(monitor='val_loss', patience=25, factor=0.5, verbose=1)
     cp_save = f'../data/modelcheckpoint/solar_0122_q_{q:.1f}.hdf5'
     cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    hist = model.fit(x_train, y_train, epochs=120, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
+    hist = model.fit(x_train, y_train, epochs=400, batch_size=48, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    result = model.evaluate(x_test, y_test,batch_size=64)
+    result = model.evaluate(x_test, y_test,batch_size=48)
     print('loss: ', result[0])
     print('mae: ', result[1])
     loss_list.append(result[0])  # loss 기록
@@ -244,16 +250,16 @@ for q in quantiles :
     column_name = f'q_{q}'
     submission.loc[submission.id.str.contains("Day7"), column_name] = y_pred[:, 0].round(2)  # Day7 (3888, 9)
     submission.loc[submission.id.str.contains("Day8"), column_name] = y_pred[:, 1].round(2)   # Day8 (3888, 9)
-    submission.to_csv(f'../data/DACON_0126/submission_0122_3_{q}.csv', index=False)  # score : 
+    submission.to_csv(f'../data/DACON_0126/submission_0122_4_{q}_2.csv', index = False)  
 
 
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
-print(loss_mean)    # 2.5139645404285855
+print(loss_mean)    # 
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0122_3.csv', index=False)  # score : 
+submission.to_csv('../data/DACON_0126/submission_0122_4.csv', index = False)  # score : 
 
 
 # 시각화
