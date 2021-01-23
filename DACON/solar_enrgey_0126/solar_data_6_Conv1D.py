@@ -1,4 +1,4 @@
-
+# 실험 : DHI, DNI 칼람을 뺄 것인가? 그대로 유지할 것인가? >>>> 그대로 유지 
 
 import pandas as pd
 import numpy as np
@@ -33,7 +33,7 @@ def Add_features(data):
 def preprocess_data(data, is_train=True):
     data = Add_features(data)
     temp = data.copy()
-    temp = temp[['Hour','TARGET','GHI','DHI','DNI','WS','RH','T']]
+    temp = temp[['Hour','TARGET','GHI','WS','RH','T']]
 
     if is_train==True:          
         temp['Target1'] = temp['TARGET'].shift(-48).fillna(method='ffill')   # 다음날의 Target
@@ -70,12 +70,6 @@ df_train = preprocess_data(train)
 X = df_train.to_numpy()
 # print(X.shape)      # (52464, 10)
 
-# 3차원으로 바꾸기 전에 2차원에서 StandardScaler >> x_train에만 적용하도록 바꾸기 *************
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-scaler.fit(X)
-X = scaler.transform(X)
-
 # x, y 데이터 분리
 x, y1, y2 = split_xy(X, 1)
 # print(x.shape)     # (52464, 1, 8)  # 한 행씩 자름
@@ -95,11 +89,11 @@ for i in range(81):
     # print(temp.columns) # Index(['Hour', 'TARGET', 'GHI', 'DHI', 'DNI', 'WS', 'RH', 'T'], dtype='object')
     df_test.append(temp)
 
-x_test = pd.concat(df_test)
+df_test = pd.concat(df_test)
 # print(X_test.shape) # (3888, 8)
-x_pred = x_test.to_numpy()
+x_pred = df_test.to_numpy()
 
-x_pred = x_pred.reshape(3888, 1, 8)
+x_pred = x_pred.reshape(3888, 1, 6)
 # print(x_pred.shape)  # (3888, 1, 8)
 # print(x_pred[15:18])
 
@@ -119,6 +113,25 @@ x_train, x_val, y1_train, y1_val, y2_train, y2_val = \
 # print(y1_test.shape)    # (10493, 1)
 # print(y1_val.shape)     # (8395, 1)
 
+x_train = x_train.reshape(x_train.shape[0], x_train.shape[1] * x_train.shape[2])
+x_test = x_test.reshape(x_test.shape[0], x_test.shape[1] * x_test.shape[2])
+x_val = x_val.reshape(x_val.shape[0], x_val.shape[1] * x_val.shape[2])
+x_pred = x_pred.reshape(x_pred.shape[0], x_pred.shape[1] * x_pred.shape[2])
+
+# StandardScaler
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+x_val = scaler.transform(x_val)
+x_pred = scaler.transform(x_pred)
+
+x_train = x_train.reshape(x_train.shape[0], 1, 6)
+x_test = x_test.reshape(x_test.shape[0], 1, 6)
+x_val = x_val.reshape(x_val.shape[0], 1, 6)
+x_pred = x_pred.reshape(x_pred.shape[0], 1, 6)
+
 ##############################################################
 
 #2. Modeling
@@ -130,9 +143,9 @@ from lightgbm import LGBMRegressor
 import tensorflow.keras.backend as K
 
 cp_save = '../data/modelcheckpoint/solar_0121_{val_loss:.4f}.hdf5'
-es = EarlyStopping(monitor='val_loss', patience=10, mode='min')
+es = EarlyStopping(monitor='val_loss', patience=10, mode='auto')
 cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, verbose=1, mode='min')
-lr = ReduceLROnPlateau(monitor='val_loss', patience=5, factor=0.5, verbose=1)
+lr = ReduceLROnPlateau(monitor='val_loss', patience=5, factor=0.3, verbose=1)
 
 # 함수 : Quantile loss definition
 def quantile_loss(q, y_true, y_pred):
@@ -144,17 +157,20 @@ quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 #2. Modeling
 def modeling() :
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same',\
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same',\
          input_shape=(x_train.shape[1], x_train.shape[2])))
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
 
-    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=3, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
 
     model.add(Flatten())
-    model.add(Dense(128))
-    model.add(Dense(64))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(8, activation='relu'))
     model.add(Dense(1))
     return model
 
@@ -167,16 +183,15 @@ def train_data(x_train, x_test, y_train, y_test, x_val, y_val, x_pred):
         print("(q_%.1f) modeling start : >>>>>>>>>>>>>>>>>>>>>>" %q) 
         #2. Modeling
         model = modeling()
-
+        model.summary()
         #3. Compile, Train
-        model.compile(loss = lambda y_true,y_pred: quantile_loss(q,y_true,y_pred), \
-            optimizer = 'adam', metrics = [lambda y_true,y_pred: quantile_loss(q,y_true,y_pred)])
-        model.fit(x_train, y_train, epochs=120, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
+        model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam')
+        model.fit(x_train, y_train, epochs=10, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
         # 4. Evaluate, Predict
         loss = model.evaluate(x_test, y_test,batch_size=64)
-        print("(q_%.1f) loss : %.4f" % (q,loss[0]))
-        loss_list.append(loss[0])
+        print("(q_%.1f) loss : %.4f" % (q, loss))
+        loss_list.append(loss)
 
         pred = pd.DataFrame(model.predict(x_pred).round(2))
         pred_list.append(pred)
@@ -200,8 +215,12 @@ results_2, loss_mean2 = train_data(x_train, x_test, y2_train, y2_test, x_val, y2
 print(loss_mean1)
 print(loss_mean2)
 
-# 0.07797420128352112
-# 0.07946157910757595
+# 2.0617185831069946
+# 2.114506330755022
+
+# del DHI, DNI
+# 2.14768256743749
+# 2.180771264764997
 
 ##############################################################
 
@@ -209,4 +228,4 @@ print(loss_mean2)
 submission.loc[submission.id.str.contains("Day7"), "q_0.1":] = results_1    # Day7 (3888, 9)
 submission.loc[submission.id.str.contains("Day8"), "q_0.1":] = results_2    # Day8 (3888, 9)
 
-submission.to_csv('../data/DACON_0126/submission_0121_1.csv', index=False)  # score : 7.8279809707 왜!!!!!!!!!!!!??/ 전처리 잘못함
+submission.to_csv('../data/DACON_0126/submission_0121_3.csv', index=False)  #

@@ -1,5 +1,3 @@
-# 실험 : DHI, DNI 칼람을 뺄 것인가? 그대로 유지할 것인가? >>>> 그대로 유지 
-
 import pandas as pd
 import numpy as np
 import os
@@ -33,7 +31,7 @@ def Add_features(data):
 def preprocess_data(data, is_train=True):
     data = Add_features(data)
     temp = data.copy()
-    temp = temp[['Hour','TARGET','GHI','WS','RH','T']]
+    temp = temp[['Hour','TARGET','GHI','DHI','DNI','WS','RH','T']]
 
     if is_train==True:          
         temp['Target1'] = temp['TARGET'].shift(-48).fillna(method='ffill')   # 다음날의 Target
@@ -93,7 +91,7 @@ df_test = pd.concat(df_test)
 # print(X_test.shape) # (3888, 8)
 x_pred = df_test.to_numpy()
 
-x_pred = x_pred.reshape(3888, 1, 6)
+x_pred = x_pred.reshape(3888, 1, 8)
 # print(x_pred.shape)  # (3888, 1, 8)
 # print(x_pred[15:18])
 
@@ -127,10 +125,10 @@ x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
 x_pred = scaler.transform(x_pred)
 
-x_train = x_train.reshape(x_train.shape[0], 1, 6)
-x_test = x_test.reshape(x_test.shape[0], 1, 6)
-x_val = x_val.reshape(x_val.shape[0], 1, 6)
-x_pred = x_pred.reshape(x_pred.shape[0], 1, 6)
+x_train = x_train.reshape(x_train.shape[0], 1, 8)
+x_test = x_test.reshape(x_test.shape[0], 1, 8)
+x_val = x_val.reshape(x_val.shape[0], 1, 8)
+x_pred = x_pred.reshape(x_pred.shape[0], 1, 8)
 
 ##############################################################
 
@@ -186,7 +184,7 @@ def train_data(x_train, x_test, y_train, y_test, x_val, y_val, x_pred):
         model.summary()
         #3. Compile, Train
         model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam')
-        model.fit(x_train, y_train, epochs=10, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
+        model.fit(x_train, y_train, epochs=1000, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
         # 4. Evaluate, Predict
         loss = model.evaluate(x_test, y_test,batch_size=64)
@@ -215,12 +213,8 @@ results_2, loss_mean2 = train_data(x_train, x_test, y2_train, y2_test, x_val, y2
 print(loss_mean1)
 print(loss_mean2)
 
-# 2.0617185831069946
-# 2.114506330755022
-
-# del DHI, DNI
-# 2.14768256743749
-# 2.180771264764997
+# 1.9882435997327168
+# 2.030441893471612
 
 ##############################################################
 
@@ -228,4 +222,4 @@ print(loss_mean2)
 submission.loc[submission.id.str.contains("Day7"), "q_0.1":] = results_1    # Day7 (3888, 9)
 submission.loc[submission.id.str.contains("Day8"), "q_0.1":] = results_2    # Day8 (3888, 9)
 
-submission.to_csv('../data/DACON_0126/submission_0121_3.csv', index=False)  #
+submission.to_csv('../data/DACON_0126/submission_0121_3.csv', index=False)  # score : 1.9855	

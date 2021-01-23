@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-submission_v4 = pd.read_csv('../data/DACON_0126/submission_0123_1.csv')
+submission_v4 = pd.read_csv('../data/DACON_0126/submission_0123_2.csv')
 
 ranges = 336
 hours = range(ranges)

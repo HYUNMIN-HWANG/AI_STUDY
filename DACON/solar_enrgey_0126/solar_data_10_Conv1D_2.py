@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore")
 
 ##############################################################
 
-# 만들고 싶은 모양 : 7일치 데이터로 2일치를 예측한다.
+# 만들고 싶은 모양 : 
 # print(x.shape)     # (N, 336, 8)
 # print(y.shape)     # (N, 48, 2)
 # print(x_pred.shape)  # (81, 336, 8)
@@ -139,9 +139,9 @@ x_pred = x_pred.reshape(x_pred.shape[0], x_pred .shape[1] * x_pred.shape[2])
 from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = \
-    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=113)
+    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=66)
 x_train, x_val, y_train, y_val, = \
-    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=113)
+    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=66)
 
 # StandardScaler
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -187,28 +187,31 @@ def quantile_loss(q, y_true, y_pred):
     return K.mean(K.maximum(q*err, (q-1)*err), axis=-1)
 
 # quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-quantiles = [0.1, 0.2, 0.4] # 값 이상하게 나온 것만 다시 돌리기
-
+quantiles = [0.1, 0.8]
 
 #2. Modeling
 def modeling(x_train, y_train) :
     model = Sequential()
-    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same',\
+    model.add(Conv1D(filters=256, kernel_size=2, activation='relu', padding='same',\
          input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 2, 6)
-    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
-    # model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=256, kernel_size=2, activation='relu', padding='same'))
     model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    # model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    # model.add(Dropout(0.2))
 
     # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
     # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
 
     # model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
 
     model.add(Flatten())
-    model.add(Dense(16))
+    model.add(Dense(128))
+    model.add(Dense(64))
+    model.add(Dense(32))
     model.add(Dense(y_train.shape[1] * y_train.shape[2], activation='relu'))
     model.add(Reshape((y_train.shape[1], y_train.shape[2])))  # output (N, 2, 2)
     model.add(Dense(y_train.shape[2]))
@@ -223,19 +226,19 @@ for q in quantiles :
 
     #2. Modeling
     model = modeling(x_train, y_train)
-    model.summary()
+    # model.summary()
 
     #3. Compile, Train
     model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam',  metrics=['mse'])
     
-    es = EarlyStopping(monitor='val_loss', patience=30, mode='min')
-    lr = ReduceLROnPlateau(monitor='val_loss', patience=15, factor=0.3, verbose=1)
+    es = EarlyStopping(monitor='val_loss', patience=32, mode='min')
+    lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.5, verbose=1)
     cp_save = f'../data/modelcheckpoint/solar_0123_2_q{q:.1f}.hdf5'
     cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    hist = model.fit(x_train, y_train, epochs=400, batch_size=32, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
+    hist = model.fit(x_train, y_train, epochs=300, batch_size=16, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    result = model.evaluate(x_test, y_test,batch_size=32)
+    result = model.evaluate(x_test, y_test,batch_size=16)
     print('loss: ', result[0])
     print('mae: ', result[1])
     loss_list.append(result[0])  # loss 기록
@@ -258,11 +261,11 @@ for q in quantiles :
 
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
-print(loss_mean)    # 
+print(loss_mean)    # 1.9791257977485657
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0123_2.csv', index = False)  # score :
+submission.to_csv('../data/DACON_0126/submission_0123_2.csv', index = False)  # score : 1.9715840911	
 
 
 # 시각화
