@@ -1,4 +1,6 @@
-# 같은 시간대 별로 묶는다.
+# 상관계수 높은 열만 사용하기
+# 7일치로 2일 예측하기
+# epochs 10으로 했는데도 점수 잘 나온다
 
 import pandas as pd
 import numpy as np
@@ -22,11 +24,11 @@ warnings.filterwarnings("ignore")
 ##############################################################
 
 # 파일 불러오기
-train = pd.read_csv('../data/DACON_0126/train/train.csv')
+train = pd.read_csv('../data/train/train.csv')
 # print(train.shape)  # (52560, 9)
 # print("df_train null : ", train.duplicated().sum())   # 0
 
-submission = pd.read_csv('../data/DACON_0126/sample_submission.csv')
+submission = pd.read_csv('../data/sample_submission.csv')
 # print(submission.shape) # (7776, 10)
 
 ##############################################################
@@ -134,7 +136,7 @@ y = y.reshape(48, 1089, 1, 2)
 # test data : 81개의 0 ~ 7 Day 데이터 합치기
 df_test = []
 for i in range(81):
-    file_path = '../data/DACON_0126/test/' + str(i) + '.csv'
+    file_path = '../data/test/' + str(i) + '.csv'
     temp = pd.read_csv(file_path)
     temp = preprocess_data(temp, is_train=False)
     # print(temp.columns) # Index(['TARGET', 'GHI', 'DHI', 'DNI', 'RH', 'T'], dtype='object')
@@ -205,18 +207,22 @@ def quantile_loss(q, y_true, y_pred):
     return K.mean(K.maximum(q*err, (q-1)*err), axis=-1)
 
 # quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-quantiles = [0.8]
+# quantiles = [0.7, 0.8, 0.9]
+quantiles = [0.4]
 
 #2. Modeling
 def modeling() :
     model = Sequential()
-    model.add(Conv1D(filters=120, kernel_size=2, activation='relu', padding='same',\
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same',\
          input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 5, 6)
-    model.add(Conv1D(filters=90, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=60, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=16, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=16, kernel_size=2, activation='relu', padding='same'))
 
     model.add(Flatten())
-    model.add(Dense(30, activation='relu'))
+    model.add(Dense(8, activation='relu'))
     model.add(Dense(2, activation='relu'))
     model.add(Reshape((1, 2)))  # output (N, 1, 2)
     model.add(Dense(2))
@@ -236,15 +242,15 @@ for q in quantiles :
     #3. Compile, Train
     model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam')
     
-    cp_save = f'../data/modelcheckpoint/solar_0124_s1_q_{q:.1f}.hdf5'
-    # es = EarlyStopping(monitor='val_loss', patience=12, mode='auto')
+    cp_save = f'../data/cp/solar_0124_s1_q_{q:.1f}.hdf5'
+    es = EarlyStopping(monitor='val_loss', patience=24, mode='auto')
     cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    lr = ReduceLROnPlateau(monitor='val_loss', patience=6, factor=0.4, verbose=1)
+    lr = ReduceLROnPlateau(monitor='val_loss', patience=12, factor=0.4, verbose=1)
 
-    hist = model.fit(x_train, y_train, epochs=120, batch_size=18, validation_data=(x_val, y_val), callbacks=[cp, lr])
+    model.fit(x_train, y_train, epochs=10, batch_size=8, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    loss = model.evaluate(x_test, y_test,batch_size=18)
+    loss = model.evaluate(x_test, y_test,batch_size=8)
     print("loss : ", loss)
     loss_list.append(loss)  # loss 기록
 
@@ -260,27 +266,11 @@ for q in quantiles :
     column_name = f'q_{q}'
     submission.loc[submission.id.str.contains("Day7"), column_name] = np.around(y_pred[:, 0],3)   # Day7 (3888, 9)
     submission.loc[submission.id.str.contains("Day8"), column_name] = np.around(y_pred[:, 1],3)   # Day8 (3888, 9)
-    submission.to_csv(f'../data/DACON_0126/submission_0124_1_{q}.csv', index = False)  # score : 
+    submission.to_csv(f'../data/submission_0124_1_{q}.csv', index = False)  # score : 
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
-print("loss_mean : ", loss_mean)    #  1.5342636108398438
+print("loss_mean : ", loss_mean)    # 3.3224260807037354
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0124_1.csv', index=False)  # score : 2.1841329701	
-
-
-# 시각화
-import matplotlib.pyplot as plt
-plt.figure(figsize=(10,6))  # 판 사이즈 (가로 10, 세로 6)
-
-plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
-plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
-plt.grid()
-
-plt.title('Cost Loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
-
-plt.show()
+submission.to_csv('../data/submission_0124_1.csv', index=False)  # score : 		1.9230960513

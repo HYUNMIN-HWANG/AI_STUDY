@@ -199,14 +199,6 @@ def modeling(x_train, y_train) :
     model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
-    # model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
-    # model.add(Dropout(0.2))
-
-    # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
-    # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
-
-    # model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
-    # model.add(Dropout(0.2))
 
     model.add(Flatten())
     model.add(Dense(128, activation='relu'))

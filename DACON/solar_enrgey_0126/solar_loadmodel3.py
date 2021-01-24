@@ -1,4 +1,5 @@
-# 같은 시간대 별로 묶는다.
+# 상관계수 높은 열만 사용하기
+# 하루치 데이터로 이틀치를 예측
 
 import pandas as pd
 import numpy as np
@@ -11,13 +12,10 @@ warnings.filterwarnings("ignore")
 
 ##############################################################
 
-# 만들고 싶은 모양 : 같은 시간대 별로 묶는다.
-# 5일치 데이터로 2일치를 예측한다.
-# print(x.shape)     # (48, N, 5, 8)
-# print(y.shape)     # (48, N, 1, 2)
-
-# print(x_pred.shape)  # (48, 81, 5, 8)
-# y_pred.shape (48, 81, 1, 2)
+# 만들고 싶은 모양 : 하루치 데이터로 이틀치를 예측한다.
+# print(x.shape)     # (N, 48, 6)
+# print(y.shape)     # (N, 48, 2)
+# print(x_pred.shape)  # (81, 48, 6)
 
 ##############################################################
 
@@ -194,7 +192,7 @@ y_val = y_val.reshape(8 * 1089, 1, 2)
 
 #2. Modeling
 #3. Compile, Train
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, Conv1D, Dropout, MaxPool1D,Flatten, Reshape
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import tensorflow.keras.backend as K
@@ -204,83 +202,73 @@ def quantile_loss(q, y_true, y_pred):
     err = (y_true - y_pred)
     return K.mean(K.maximum(q*err, (q-1)*err), axis=-1)
 
-# quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-quantiles = [0.8]
+quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 #2. Modeling
-def modeling() :
-    model = Sequential()
-    model.add(Conv1D(filters=120, kernel_size=2, activation='relu', padding='same',\
-         input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 5, 6)
-    model.add(Conv1D(filters=90, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=60, kernel_size=2, activation='relu', padding='same'))
+# def modeling() :
+#     model = Sequential()
+#     model.add(Conv1D(filters=256, kernel_size=3, activation='relu', padding='same',\
+#          input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 336, 6)
+#     model.add(Conv1D(filters=256, kernel_size=3, activation='relu', padding='same'))
+#     model.add(Conv1D(filters=128, kernel_size=3, activation='relu', padding='same'))
+#     model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'))
+#     model.add(Conv1D(filters=32, kernel_size=3, activation='relu', padding='same'))
 
-    model.add(Flatten())
-    model.add(Dense(30, activation='relu'))
-    model.add(Dense(2, activation='relu'))
-    model.add(Reshape((1, 2)))  # output (N, 1, 2)
-    model.add(Dense(2))
-    return model
+#     model.add(Flatten())
+#     model.add(Dense(128, activation='relu'))
+#     model.add(Dense(96, activation='relu'))
+#     model.add(Reshape((48,2)))  # output (N, 48, 2)
+#     model.add(Dense(64, activation='relu'))
+#     model.add(Dense(32, activation='relu'))
+#     model.add(Dense(2))
+#     return model
 
 ##############################################################
 
 loss_list = list()
 
 for q in quantiles :
-    print(f"\n>>>>>>>>>>>>>>>>>>>>>>  modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
+    print(f"\n>>>>>>>>>>>>>>>>>>>>>> modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
 
     #2. Modeling
-    model = modeling()
+    # model = modeling()
+    cp_load = f'../data/modelcheckpoint/solar_0124_s2_q_{q:.1f}.hdf5'
+    model = load_model(cp_load, compile = False)
     model.summary()
 
     #3. Compile, Train
-    model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam')
+    model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam',  metrics=['mse'])
     
-    cp_save = f'../data/modelcheckpoint/solar_0124_s1_q_{q:.1f}.hdf5'
-    # es = EarlyStopping(monitor='val_loss', patience=12, mode='auto')
-    cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    lr = ReduceLROnPlateau(monitor='val_loss', patience=6, factor=0.4, verbose=1)
-
-    hist = model.fit(x_train, y_train, epochs=120, batch_size=18, validation_data=(x_val, y_val), callbacks=[cp, lr])
+    # es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
+    # lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, verbose=1)
+    # cp_save = f'../data/modelcheckpoint/solar_0122_q_{q:.1f}.hdf5'
+    # cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
+    # hist = model.fit(x_train, y_train, epochs=500, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    loss = model.evaluate(x_test, y_test,batch_size=18)
-    print("loss : ", loss)
-    loss_list.append(loss)  # loss 기록
+    result = model.evaluate(x_test, y_test,batch_size=64)
+    print('loss: ', result[0])
+    print('mae: ', result[1])
+    loss_list.append(result[0])  # loss 기록
 
     y_pred = model.predict(x_pred)
-    # print("1 ",y_pred.shape)    # (3888, 1, 2)
+    # print(y_pred.shape) # (81, 48, 2)
     y_pred = pd.DataFrame(y_pred.reshape(y_pred.shape[0]*y_pred.shape[1],y_pred.shape[2])) # (3888, 2)
-    # print("2 ",y_pred.shape)    #(3888, 2)
+    # print(y_pred.shape) #(3888, 2)
     y_pred = pd.concat([y_pred], axis=1)
     y_pred[y_pred<0] = 0
     y_pred = y_pred.to_numpy()
 
     # submission
+    # column_name = 'q_' + str(q)
     column_name = f'q_{q}'
-    submission.loc[submission.id.str.contains("Day7"), column_name] = np.around(y_pred[:, 0],3)   # Day7 (3888, 9)
-    submission.loc[submission.id.str.contains("Day8"), column_name] = np.around(y_pred[:, 1],3)   # Day8 (3888, 9)
-    submission.to_csv(f'../data/DACON_0126/submission_0124_1_{q}.csv', index = False)  # score : 
+    submission.loc[submission.id.str.contains("Day7"), column_name] = y_pred[:, 0].round(2)  # Day7 (3888, 9)
+    submission.loc[submission.id.str.contains("Day8"), column_name] = y_pred[:, 1].round(2)   # Day8 (3888, 9)
+
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
-print("loss_mean : ", loss_mean)    #  1.5342636108398438
+print(loss_mean)   # 
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0124_1.csv', index=False)  # score : 2.1841329701	
-
-
-# 시각화
-import matplotlib.pyplot as plt
-plt.figure(figsize=(10,6))  # 판 사이즈 (가로 10, 세로 6)
-
-plt.plot(hist.history['loss'], marker='.', c='red', label='loss')   # label=' ' >> legend에서 설정한 위치에 라벨이 표시된다.
-plt.plot(hist.history['val_loss'], marker='.', c='blue', label='val_loss')
-plt.grid()
-
-plt.title('Cost Loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(loc='upper right')   # loc 를 명시하지 않으면 그래프가 비어있는 지역에 자동으로 위치한다.
-
-plt.show()
+submission.to_csv('../data/DACON_0126/submission_0124_2.csv', index=False)  # score : 
