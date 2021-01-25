@@ -1,5 +1,6 @@
 # 상관계수 높은 열만 사용하기
-# 하루치 데이터로 이틀치를 예측
+# 7일치로 2일 예측하기
+# epochs 10으로 했는데도 점수 잘 나온다
 
 import pandas as pd
 import numpy as np
@@ -12,10 +13,13 @@ warnings.filterwarnings("ignore")
 
 ##############################################################
 
-# 만들고 싶은 모양 : 하루치 데이터로 이틀치를 예측한다.
-# print(x.shape)     # (N, 48, 6)
-# print(y.shape)     # (N, 48, 2)
-# print(x_pred.shape)  # (81, 48, 6)
+# 만들고 싶은 모양 : 같은 시간대 별로 묶는다.
+# 6일치 데이터로 2일치를 예측한다.
+# print(x.shape)     # (48, N, 5, 8)
+# print(y.shape)     # (48, N, 1, 2)
+
+# print(x_pred.shape)  # (48, 81, 5, 8)
+# y_pred.shape (48, 81, 1, 2)
 
 ##############################################################
 
@@ -158,9 +162,9 @@ print("x_pred.shape : ", x_pred.shape) # (81, 48, 6, 5)
 from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = \
-    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=166)
+    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=32)
 x_train, x_val, y_train, y_val, = \
-    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=166)
+    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=32)
 
 # print(x_train.shape)    # (30, 1088, 6, 5)
 # print(x_test.shape)     # (10, 1088, 6, 5)
@@ -198,7 +202,7 @@ y_val = y_val.reshape(8 * 1088, 1, 2)
 
 #2. Modeling
 #3. Compile, Train
-from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv1D, Dropout, MaxPool1D,Flatten, Reshape
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import tensorflow.keras.backend as K
@@ -208,106 +212,77 @@ def quantile_loss(q, y_true, y_pred):
     err = (y_true - y_pred)
     return K.mean(K.maximum(q*err, (q-1)*err), axis=-1)
 
-quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 #2. Modeling
-# def modeling() :
-#     model = Sequential()
-#     model.add(Conv1D(filters=256, kernel_size=3, activation='relu', padding='same',\
-#          input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 336, 6)
-#     model.add(Conv1D(filters=256, kernel_size=3, activation='relu', padding='same'))
-#     model.add(Conv1D(filters=128, kernel_size=3, activation='relu', padding='same'))
-#     model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'))
-#     model.add(Conv1D(filters=32, kernel_size=3, activation='relu', padding='same'))
+def modeling() :
+    model = Sequential()
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same',\
+         input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 5, 6)
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=16, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=16, kernel_size=2, activation='relu', padding='same'))
 
-#     model.add(Flatten())
-#     model.add(Dense(128, activation='relu'))
-#     model.add(Dense(96, activation='relu'))
-#     model.add(Reshape((48,2)))  # output (N, 48, 2)
-#     model.add(Dense(64, activation='relu'))
-#     model.add(Dense(32, activation='relu'))
-#     model.add(Dense(2))
-#     return model
+    model.add(Flatten())
+    model.add(Dense(8, activation='relu'))
+    model.add(Dense(2, activation='relu'))
+    model.add(Reshape((1, 2)))  # output (N, 1, 2)
+    model.add(Dense(2))
+    return model
 
 ##############################################################
 
 loss_list = list()
 
+# quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# quantiles = [0.4, 0.6, 0.7, 0.8]
+# quantiles = [0.1, 0.2, 0.3, 0.5, 0.9]
+quantiles = [0.9]
+
+epoch = 10
+batch = 16
+
 for q in quantiles :
-    print(f"\n>>>>>>>>>>>>>>>>>>>>>> modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
+    print(f"\n>>>>>>>>>>>>>>>>>>>>>>  modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
 
     #2. Modeling
-    # model = modeling()
-    cp_load = f'../data/modelcheckpoint/solar_0126_s2_q_{q:.1f}.hdf5'
-    model = load_model(cp_load, compile = False)
-    model.summary()
+    model = modeling()
+    # model.summary()
 
     #3. Compile, Train
-    model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam',  metrics=['mse'])
+    model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam')
     
-    # es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
-    # lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, verbose=1)
-    # cp_save = f'../data/modelcheckpoint/solar_0122_q_{q:.1f}.hdf5'
-    # cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    # hist = model.fit(x_train, y_train, epochs=500, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
+    cp_save = f'../data/modelcheckpoint/solar_0126_s1_q_{q:.1f}.hdf5'
+    es = EarlyStopping(monitor='val_loss', patience=24, mode='auto')
+    cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
+    lr = ReduceLROnPlateau(monitor='val_loss', patience=12, factor=0.4, verbose=1)
+
+    model.fit(x_train, y_train, epochs=epoch, batch_size=batch, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    result = model.evaluate(x_test, y_test, batch_size=4)
-    print('loss: ', result[0])
-    print('mae: ', result[1])
-    loss_list.append(result[0])  # loss 기록
+    loss = model.evaluate(x_test, y_test,batch_size=8)
+    print("loss : ", loss)
+    loss_list.append(loss)  # loss 기록
 
     y_pred = model.predict(x_pred)
-    # print(y_pred.shape) # (81, 48, 2)
+    # print("1 ",y_pred.shape)    # (3888, 1, 2)
     y_pred = pd.DataFrame(y_pred.reshape(y_pred.shape[0]*y_pred.shape[1],y_pred.shape[2])) # (3888, 2)
-    # print(y_pred.shape) #(3888, 2)
+    # print("2 ",y_pred.shape)    #(3888, 2)
     y_pred = pd.concat([y_pred], axis=1)
     y_pred[y_pred<0] = 0
     y_pred = y_pred.to_numpy()
 
     # submission
-    # column_name = 'q_' + str(q)
     column_name = f'q_{q}'
-    submission.loc[submission.id.str.contains("Day7"), column_name] = y_pred[:, 0].round(2)  # Day7 (3888, 9)
-    submission.loc[submission.id.str.contains("Day8"), column_name] = y_pred[:, 1].round(2)   # Day8 (3888, 9)
-
+    submission.loc[submission.id.str.contains("Day7"), column_name] = np.around(y_pred[:, 0],3)   # Day7 (3888, 9)
+    submission.loc[submission.id.str.contains("Day8"), column_name] = np.around(y_pred[:, 1],3)   # Day8 (3888, 9)
+    submission.to_csv(f'../data/DACON_0126/submission_0126_1_{q}.csv', index = False)  # score : 
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
-print("loss_mean : ", loss_mean)    #
-print("9 loss : ", loss_list)
+print("loss_mean : ", loss_mean)    # 
+print("loss_list : ", loss_list )
+
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0126_2.csv', index=False)  # score : 
-
-# 01-25
-# submission 1
-# loss_mean :  2.0906164050102234
-# 9 loss :  [1.401052713394165, 2.3083579540252686, 2.5304408073425293, 2.8630199432373047, 2.846902847290039, 2.3841283321380615, 2.1714553833007812, 1.492830514907837, 0.8173591494560242]
-# score 2.1031931547	
-
-
-# submission 2
-# loss_mean :  2.34127891725964
-# 9 loss :  [1.5960848331451416, 2.581838607788086, 3.0542895793914795, 3.261608123779297, 3.130524158477783, 2.7902138233184814, 2.245457172393799, 1.5715806484222412, 0.8399133086204529]
-# score : 1.9817587091	
-
-
-# submission 3
-# loss_mean : 2.3986232611868115
-# 9 loss :  [1.6318514347076416, 2.5639123916625977, 3.103139638900757, 3.417604446411133, 3.243687868118286, 2.8485240936279297, 2.2717182636260986, 1.6412888765335083, 0.8658823370933533]
-# score : 1.9416983628	
-##############################
-# 01_26
-
-# 1
-# loss_mean :  2.4379326038890414
-# 9 loss :  [1.6375917196273804, 2.6726913452148438, 3.2661657333374023, 3.39941143989563, 3.2425382137298584, 2.865349292755127, 2.3362159729003906, 1.648589849472046, 0.8728398680686951]
-# score : 1.9442525224
-
-# 7
-# loss_mean :  2.3000545501708984
-# 9 loss :  [1.4710476398468018, 2.528590440750122, 2.85558819770813, 3.2215945720672607, 3.13633131980896, 2.723604440689087, 2.260201930999756, 1.6264822483062744, 0.8770501613616943]
-
-# 2
-# loss_mean :  2.3534387747446694
-# 9 loss :  [1.5558990240097046, 2.550999641418457, 3.055598020553589, 3.1890032291412354, 3.181591510772705, 2.871227741241455, 2.268519878387451, 1.6338671445846558, 0.8742427825927734]
+submission.to_csv('../data/DACON_0126/submission_0126_1.csv', index=False)  # score : 
