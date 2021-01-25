@@ -161,9 +161,9 @@ print("x_pred.shape : ", x_pred.shape) # (81, 48, 6, 5)
 from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = \
-    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=166)
+    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=32)
 x_train, x_val, y_train, y_val, = \
-    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=166)
+    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=32)
 
 # print(x_train.shape)    # (30, 1088, 6, 5)
 # print(x_test.shape)     # (10, 1088, 6, 5)
@@ -188,10 +188,10 @@ x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
 x_pred = scaler.transform(x_pred)
 
-x_train = x_train.reshape(30 , 1088, 6, 5)
-x_test = x_test.reshape(10 , 1088, 6, 5)
-x_val = x_val.reshape(8 , 1088, 6, 5)
-x_pred = x_pred.reshape(81 , 48, 6, 5)
+x_train = x_train.reshape(30 * 1088, 6, 5)
+x_test = x_test.reshape(10 * 1088, 6, 5)
+x_val = x_val.reshape(8 * 1088, 6, 5)
+x_pred = x_pred.reshape(81 * 48, 6, 5)
 
 y_train = y_train.reshape(30 * 1088, 1, 2)
 y_test = y_test.reshape(10 * 1088, 1, 2)
@@ -202,7 +202,7 @@ y_val = y_val.reshape(8 * 1088, 1, 2)
 #2. Modeling
 #3. Compile, Train
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Dropout, MaxPool2D,Flatten, Reshape
+from tensorflow.keras.layers import Dense, Conv1D, Dropout, MaxPool1D,Flatten, Reshape
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import tensorflow.keras.backend as K
 
@@ -215,9 +215,10 @@ def quantile_loss(q, y_true, y_pred):
 def modeling() :
     model = Sequential()
     model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same',\
-         input_shape=(x_train.shape[1], x_train.shape[2], x_train.shape[3]))) # input (N, 1088, 6, 5)
-    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+         input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 6, 5)
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
 
     model.add(Flatten())
     model.add(Dense(16, activation='relu'))
@@ -231,7 +232,8 @@ def modeling() :
 
 loss_list = list()
 
-quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+quantiles = [0.2, 0.3]
 
 epoch = 20
 batch = 16
