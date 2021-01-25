@@ -28,6 +28,7 @@ submission = pd.read_csv('../data/DACON_0126/sample_submission.csv')
 # print(submission.shape) # (7776, 10)
 
 ##############################################################
+
 #1. DATA
 
 # 함수 : GHI column 추가
@@ -35,14 +36,22 @@ def Add_features(data):
     data['cos'] = np.cos(np.pi/2 - np.abs(data['Hour']%12 - 6)/6*np.pi/2)
     data.insert(1,'GHI',data['DNI']*data['cos']+data['DHI'])
     data.drop(['cos'], axis= 1, inplace = True)
+    c = 243.12
+    b = 17.62
+    gamma = (b * (data['T']) / (c + (data['T']))) + np.log(data['RH'] / 100)
+    dp = ( c * gamma) / (b - gamma)
+    data.insert(1,'Td',dp)
+    data.insert(1,'T-Td',data['T']-data['Td'])
     return data
 
 # 함수 : train data column 정리
 # 끝에 다음날, 다다음날 TARGET 데이터 column을 추가한다.
 def preprocess_data(data, is_train=True):
     data = Add_features(data)
+    # print(data.columns) 
+    # Index(['Day', 'T-Td', 'Td', 'GHI', 'Hour', 'Minute', 'DHI', 'DNI', 'WS', 'RH','T', 'TARGET'], dtype='object')
     temp = data.copy()
-    temp = temp[['Day','TARGET','GHI','DHI','DNI','RH','T']]
+    temp = temp[['Day','TARGET','GHI','DHI','DNI','T-Td','Td', 'WS', 'RH','T']]
 
     if is_train==True:          
         temp['Target1'] = temp['TARGET'].shift(-48).fillna(method='ffill')   # 다음날의 Target
@@ -82,7 +91,7 @@ def split_xy(dataset, time_steps) :  # data, 5
         y_end = x_end-1
         if x_end > len(dataset) :
             break
-        tmp_x = dataset[i : x_end, 1:-2]       # ['TARGET', 'GHI', 'DHI', 'DNI', 'RH', 'T']
+        tmp_x = dataset[i : x_end, 1:-2]      # ['TARGET', 'GHI', 'DHI', 'DNI', 'T-Td']
         tmp_y = dataset[y_end, -2:]           # ['Target1', 'Target2']
         x.append(tmp_x)
         y.append(tmp_y)
@@ -92,9 +101,9 @@ def split_xy(dataset, time_steps) :  # data, 5
 
 # train data
 df_train = preprocess_data(train)
-# print(df_train.shape)   # (52464, 9)
+# print(df_train.shape)   # (52464, 8)
 # print(df_train.columns) 
-# Index(['Day','TARGET', 'GHI', 'DHI', 'DNI', 'RH', 'T', 'Target1', 'Target2'], dtype='object')
+# Index(['Day', 'TARGET', 'GHI', 'DHI', 'DNI', 'T-Td', 'Target1', 'Target2'], dtype='object')
 
 
 # 상관계수 확인
@@ -105,11 +114,11 @@ df_train = preprocess_data(train)
 # sns.heatmap(data=df_train.corr(),square=True, annot=True, cbar=True)
 # plt.show()
 # > 기준 : Target1, Target2
-# > 상관계수 0.5 이상 : Target, GHI, DHI, DNI, RH, T
+# > 상관계수 0.6 이상 : Target, GHI, DHI, DNI, T-Td
 
 # 같은 시간대 별로 묶기
 same_time = same_train(df_train)
-# print(same_time.shape)  # (48, 1093, 9)
+# print(same_time.shape)  # (48, 1093, 8)
 # print(same_time[0:3, :5 :])
 
 # X = same_time.to_numpy()
@@ -123,7 +132,7 @@ for i in range(48):
 
 x = np.array(x)
 y = np.array(y)
-print("x.shape : ", x.shape) # (48, 1089, 5, 6)
+print("x.shape : ", x.shape) # (48, 1089, 5, 9)
 print("y.shape : ", y.shape) # (48, 1089, 2)
 
 y = y.reshape(48, 1089, 1, 2)
@@ -134,30 +143,27 @@ for i in range(81):
     file_path = '../data/DACON_0126/test/' + str(i) + '.csv'
     temp = pd.read_csv(file_path)
     temp = preprocess_data(temp, is_train=False)
-    # print(temp.columns) # Index(['TARGET', 'GHI', 'DHI', 'DNI', 'RH', 'T'], dtype='object')
+    # print(temp.columns) # Index(['TARGET', 'GHI', 'DHI', 'DNI', 'T-Td'], dtype='object')
     temp = pd.DataFrame(temp)
     temp = same_train(temp)
     df_test.append(temp)
 
 x_pred = np.array(df_test)
-print("x_pred.shape : ", x_pred.shape) # (81, 48, 5, 6)
+print("x_pred.shape : ", x_pred.shape) # (81, 48, 5, 9)
 
-# x_pred = x_pred.reshape(81, 336, 6)
-# print("x_pred.shape : " , x_pred.shape)  # (81, 336, 6)
-# print(x_pred[15:18])
 
 ##############################################################
 # x >> preprocessing
 from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = \
-    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=1666)
+    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=166)
 x_train, x_val, y_train, y_val, = \
-    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=1666)
+    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=166)
 
-# print(x_train.shape)    # (30, 1089, 5, 6)
-# print(x_test.shape)     # (10, 1089, 5, 6)
-# print(x_val.shape)      # (8, 1089, 5, 6)
+# print(x_train.shape)    # (30, 1089, 5, 5)
+# print(x_test.shape)     # (10, 1089, 5, 5)
+# print(x_val.shape)      # (8, 1089, 5, 5)
 
 # print(y_train.shape)   # (30, 1089, 1, 2)
 # print(y_test.shape)    # (10, 1089, 1, 2)
@@ -178,10 +184,10 @@ x_test = scaler.transform(x_test)
 x_val = scaler.transform(x_val)
 x_pred = scaler.transform(x_pred)
 
-x_train = x_train.reshape(30 * 1089, 5, 6)
-x_test = x_test.reshape(10 * 1089, 5, 6)
-x_val = x_val.reshape(8 * 1089, 5, 6)
-x_pred = x_pred.reshape(81 * 48, 5, 6)
+x_train = x_train.reshape(30 * 1089, 5, 9)
+x_test = x_test.reshape(10 * 1089, 5, 9)
+x_val = x_val.reshape(8 * 1089, 5, 9)
+x_pred = x_pred.reshape(81 * 48, 5, 9)
 
 y_train = y_train.reshape(30 * 1089, 1, 2)
 y_test = y_test.reshape(10 * 1089, 1, 2)
@@ -231,7 +237,7 @@ for q in quantiles :
 
     #2. Modeling
     # model = modeling()
-    cp_load = f'../data/modelcheckpoint/solar_0124_s3_q_{q:.1f}.hdf5'
+    cp_load = f'../data/modelcheckpoint/solar_0125_s9_q_{q:.1f}.hdf5'
     model = load_model(cp_load, compile = False)
     model.summary()
 
@@ -245,7 +251,7 @@ for q in quantiles :
     # hist = model.fit(x_train, y_train, epochs=500, batch_size=64, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
     # 4. Evaluate, Predict
-    result = model.evaluate(x_test, y_test,batch_size=32)
+    result = model.evaluate(x_test, y_test, batch_size=4)
     print('loss: ', result[0])
     print('mae: ', result[1])
     loss_list.append(result[0])  # loss 기록
@@ -269,17 +275,20 @@ loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
 print("loss_mean : ", loss_mean)    #
 print("9 loss : ", loss_list)
 
-#1
-# loss_mean :  3.327049321598477
-# 9 loss :  [1.8412233591079712, 3.0747170448303223, 3.2816927433013916, 5.051294326782227, 4.587679862976074, 4.4744439125061035, 3.667638063430786, 2.608302593231201, 1.3564519882202148]
-
-#2
-# loss_mean :  3.5952348046832614
-# 9 loss :  [2.0967471599578857, 3.347757339477539, 4.2517194747924805, 5.449656963348389, 5.200865745544434, 4.373456001281738, 3.8236114978790283, 2.45139741897583, 1.3619016408920288]
-
-# 3
-# loss_mean :  3.046861688296
-# 9 loss :  [2.1996142864227295, 3.4834983348846436, 4.18468713760376, 4.306450366973877, 3.991983413696289, 3.4749550819396973, 2.764890193939209, 1.9702167510986328, 1.0454596281051636]
-
 # to csv
-# submission.to_csv('../data/DACON_0126/submission_0125_1.csv', index=False)  # score : 
+submission.to_csv('../data/DACON_0126/submission_0125_9.csv', index=False)  # score : 
+
+# 1
+# loss_mean :  2.2153460250960455
+# 9 loss :  [1.401052713394165, 2.3083579540252686, 2.8981404304504395, 3.102811813354492, 2.9542789459228516, 2.6727585792541504, 2.2208614349365234, 1.5590449571609497, 0.8208073973655701]
+
+# 2
+# loss_mean :  2.1290189226468406
+# 9 loss :  [1.7459722757339478, 2.309061050415039, 2.5304408073425293, 2.8630199432373047, 2.846902847290039, 2.3841283321380615, 2.1714553833007812, 1.492830514907837, 0.8173591494560242]
+
+# 9
+# loss_mean :  2.0906164050102234
+# 9 loss :  [1.401052713394165, 2.3083579540252686, 2.5304408073425293, 2.8630199432373047, 2.846902847290039, 2.3841283321380615, 2.1714553833007812, 1.492830514907837, 0.8173591494560242]
+# score 2.1031931547	
+
+
