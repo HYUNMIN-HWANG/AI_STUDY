@@ -162,9 +162,9 @@ print("x_pred.shape : ", x_pred.shape) # (81, 48, 6, 5)
 from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = \
-    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=32)
+    train_test_split(x, y, train_size=0.8, shuffle=True, random_state=332)
 x_train, x_val, y_train, y_val, = \
-    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=32)
+    train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=332)
 
 # print(x_train.shape)    # (30, 1088, 6, 5)
 # print(x_test.shape)     # (10, 1088, 6, 5)
@@ -216,15 +216,19 @@ def quantile_loss(q, y_true, y_pred):
 #2. Modeling
 def modeling() :
     model = Sequential()
-    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same',\
+    model.add(Conv1D(filters=256, kernel_size=2, activation='relu', padding='same',\
          input_shape=(x_train.shape[1], x_train.shape[2]))) # input (N, 5, 6)
+    model.add(Conv1D(filters=256, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
+    model.add(Conv1D(filters=128, kernel_size=2, activation='relu', padding='same'))
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=32, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=16, kernel_size=2, activation='relu', padding='same'))
-    model.add(Conv1D(filters=16, kernel_size=2, activation='relu', padding='same'))
+    # model.add(Conv1D(filters=64, kernel_size=2, activation='relu', padding='same'))
 
     model.add(Flatten())
+    model.add(Dense(16, activation='relu'))
     model.add(Dense(8, activation='relu'))
     model.add(Dense(2, activation='relu'))
     model.add(Reshape((1, 2)))  # output (N, 1, 2)
@@ -235,13 +239,13 @@ def modeling() :
 
 loss_list = list()
 
-# quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-quantiles = [0.1, 0.6, 0.9]
-# quantiles = [0.1, 0.2, 0.3, 0.5, 0.9]
-# quantiles = [0.9]
+quantiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+# quantiles = [ 0.4, 0.5, 0.7, 0.8]
+# quantiles = [0.3, 0.4, 0.5, 0.6, 0.9]
+# quantiles = [0.8]
 
-epoch = 2000
-batch = 64
+epoch = 20
+batch = 16
 
 for q in quantiles :
     print(f"\n>>>>>>>>>>>>>>>>>>>>>>  modeling start 'q_{q}'  >>>>>>>>>>>>>>>>>>>>>>") 
@@ -253,10 +257,10 @@ for q in quantiles :
     #3. Compile, Train
     model.compile(loss = lambda y_true,y_pred: quantile_loss(q, y_true,y_pred), optimizer = 'adam')
     
-    cp_save = f'../data/modelcheckpoint/solar_0126_s3_q_{q:.1f}.hdf5'
-    es = EarlyStopping(monitor='val_loss', patience=24, mode='auto')
+    cp_save = f'../data/modelcheckpoint/solar_0126_s6_q_{q:.1f}.hdf5'
+    es = EarlyStopping(monitor='val_loss', patience=20, mode='auto')
     cp = ModelCheckpoint(filepath=cp_save, monitor='val_loss', save_best_only=True, mode='min')
-    lr = ReduceLROnPlateau(monitor='val_loss', patience=12, factor=0.4, verbose=1)
+    lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, verbose=1)
 
     model.fit(x_train, y_train, epochs=epoch, batch_size=batch, validation_data=(x_val, y_val), callbacks=[es, cp, lr])
 
@@ -277,7 +281,7 @@ for q in quantiles :
     column_name = f'q_{q}'
     submission.loc[submission.id.str.contains("Day7"), column_name] = np.around(y_pred[:, 0],3)   # Day7 (3888, 9)
     submission.loc[submission.id.str.contains("Day8"), column_name] = np.around(y_pred[:, 1],3)   # Day8 (3888, 9)
-    submission.to_csv(f'../data/DACON_0126/submission_0126_3_{q}.csv', index = False)  # score : 
+    submission.to_csv(f'../data/DACON_0126/submission_0126_6_{q}.csv', index = False)  # score : 
 
 loss_mean = sum(loss_list) / len(loss_list) # 9개 loss 평균
 print("loss_mean : ", loss_mean)    # 
@@ -285,4 +289,4 @@ print("loss_list : ", loss_list )
 
 
 # to csv
-submission.to_csv('../data/DACON_0126/submission_0126_3.csv', index=False)  # score : 
+submission.to_csv('../data/DACON_0126/submission_0126_6.csv', index=False)  # score : 
