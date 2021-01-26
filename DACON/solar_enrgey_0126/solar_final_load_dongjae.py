@@ -13,6 +13,7 @@ for i in range(20,25):
     x.append(data)
 
 x = np.array(x)
+# print(x.shape)  # (5, 7776, 9)
 
 df = pd.read_csv(f'../data/DACON_0126/submission/submission_{i}.csv', index_col=0, header=0)
 for i in range(7776):
@@ -21,8 +22,7 @@ for i in range(7776):
         for k in range(5):
             a.append(x[k,i,j].astype('float32'))
         a = np.array(a)
-        df.iloc[[i],[j]] = (pd.DataFrame(a).astype('float32').quantile(0.5,axis = 0)[0]).astype('float32')
+        df.iloc[[i],[j]] = (pd.DataFrame(a).astype('float32').quantile(0.5,axis = 0)[0]).astype('float32')  # 5개 파일의 중앙값
         
 y = pd.DataFrame(df, index = None, columns = None)
 y.to_csv('../data/DACON_0126/submission/sample_submission25_check.csv') 
-

@@ -1,5 +1,5 @@
 # 상관계수 높은 열만 사용하기
-# 7일치로 2일 예측하기
+# 6일치로 2일 예측하기
 # epochs 10으로 했는데도 점수 잘 나온다
 
 import pandas as pd
@@ -15,10 +15,10 @@ warnings.filterwarnings("ignore")
 
 # 만들고 싶은 모양 : 같은 시간대 별로 묶는다.
 # 6일치 데이터로 2일치를 예측한다.
-# print(x.shape)     # (48, N, 5, 8)
+# print(x.shape)     # (48, N, 6, 8)
 # print(y.shape)     # (48, N, 1, 2)
 
-# print(x_pred.shape)  # (48, 81, 5, 8)
+# print(x_pred.shape)  # (48, 81, 6, 8)
 # y_pred.shape (48, 81, 1, 2)
 
 ##############################################################
@@ -35,7 +35,7 @@ submission = pd.read_csv('../data/DACON_0126/sample_submission.csv')
 
 #1. DATA
 
-# 함수 : GHI column 추가
+# 함수 : GHI, T-Td column 추가
 def Add_features(data):
     data['cos'] = np.cos(np.pi/2 - np.abs(data['Hour']%12 - 6)/6*np.pi/2)
     data.insert(1,'GHI',data['DNI']*data['cos']+data['DHI'])
@@ -57,13 +57,13 @@ def preprocess_data(data, is_train=True):
     temp = data.copy()
     temp = temp[['Day','TARGET','GHI','DHI','DNI','T-Td']]
 
-    if is_train==True:          
+    if is_train==True:      # >> train data       
         temp['Target1'] = temp['TARGET'].shift(-48).fillna(method='ffill')   # 다음날의 Target
         temp['Target2'] = temp['TARGET'].shift(-48*2).fillna(method='ffill') # 다다음날의 Target
         temp = temp.dropna()    # 결측값 제거
         return temp.iloc[:-96, :]  # 뒤에서 이틀은 뺀다. (예측하고자 하는 날짜이기 때문)
 
-    elif is_train==False:     
+    elif is_train==False:     # >> test data
         return temp.iloc[-48*6:, 1:]  # 6일치만 사용
 
 #함수 : 같은 시간대끼리 모으기
@@ -73,7 +73,7 @@ def same_train(train) :
     final_x = list()
     for i in range(48) :
         same_time = pd.DataFrame()
-        for j in range(int(len(temp)/48)) :
+        for j in range(int(len(temp)/48)) : # 1095일 반복
             tmp = temp.iloc[i + 48*j, : ]
             tmp = tmp.to_numpy()
             tmp = tmp.reshape(1, tmp.shape[0])
@@ -124,9 +124,6 @@ df_train = preprocess_data(train)
 same_time = same_train(df_train)
 # print(same_time.shape)  # (48, 1093, 8)
 # print(same_time[0:3, :5 :])
-
-# X = same_time.to_numpy()
-# print(X.shape)      # (52464, 8)
 
 x, y = list(), list()
 for i in range(48):
