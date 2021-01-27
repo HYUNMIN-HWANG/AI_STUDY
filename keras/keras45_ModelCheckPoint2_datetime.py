@@ -78,22 +78,33 @@ import datetime
 # print(date_time)    # 0127_1013
 
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-# 체크포인트의 가중치를 저장할 파일경로 지정
-
-    
-filepath='../data/modelCheckpoint/'
+filepath='../data/modelcheckpoint/'
 filename='_{epoch:02d}-{val_loss:.4f}.hdf5'
+modelpath = "".join([filepath, "k45_", '{timer}', filename])
 
-# modelpath = "".join([filepath, "k45_", date_time, filename])     # string을 합친다.
-modelpath = "".join([filepath, "k45_", datetime.datetime.now().strftime('%m%d_%H%M%S'), filename])     # string을 합친다.
-
-print(modelpath)    # ../data/modelCheckpoint/k45_0127_1018_{epoch:02d}-{val_loss:.4f}.hdf5
-
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.python.util.tf_export import keras_export
+from tensorflow.python.distribute import distributed_file_utils
+@keras_export('keras.callbacks.ModelCheckpoint')
+class MyModelCheckpoint(tf.keras.callbacks.ModelCheckpoint):
+    def _get_file_path(self, epoch, logs):
+        """Returns the file path for checkpoint."""
+        # pylint: disable=protected-access
+        try:
+        # `filepath` may contain placeholders such as `{epoch:02d}` and
+        # `{mape:.2f}`. A mismatch between logged metrics and the path's
+        # placeholders can cause formatting to fail.
+            file_path = self.filepath.format(epoch=epoch + 1, timer=datetime.datetime.now().strftime('%m%d_%H%M%S'), **logs)
+        except KeyError as e:
+            raise KeyError('Failed to format this callback filepath: "{}". '
+                        'Reason: {}'.format(self.filepath, e))
+        self._write_filepath = distributed_file_utils.write_filepath(
+            file_path, self.model.distribute_strategy)
+        return self._write_filepath
+        
+cp = MyModelCheckpoint(filepath=modelpath, monitor='val_loss', save_best_only=True, mode='auto')
 es = EarlyStopping(monitor='val_loss', patience=5, mode='max')
-cp = ModelCheckpoint(filepath=modelpath, monitor='val_loss', save_best_only=True, mode='auto')
-                    # filepath : 최저점이 찍힐 때마다 가중치가 세이브된 파일이 생성된다. 
-                    # 궁극의 목적 : 최적의 weight를 구하기 위해서
-                    # predict할 때 혹은 evaluate 할 때 이 weight를 넣기만 하면된다.
 
 # Compile, Train            
 
