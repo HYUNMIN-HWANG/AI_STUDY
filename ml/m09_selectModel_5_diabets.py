@@ -34,7 +34,7 @@ for (name, algorithm) in allAlgorithms :    # 분류형 모델 전체를 반복�
 # print(sklearn.__version__)  # 0.23.2
 
 '''
-ARDRegression 의 정답률 :  0.5278342233068394
+ARDRegression 의 정답률 :  0.5278342233068394 ***
 AdaBoostRegressor 의 정답률 :  0.4660060886814217
 BaggingRegressor 의 정답률 :  0.34786632031121967
 BayesianRidge 의 정답률 :  0.5193410135537663
