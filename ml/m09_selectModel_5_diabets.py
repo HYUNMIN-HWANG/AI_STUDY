@@ -16,7 +16,7 @@ y = dataset.target
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=44)
 
-allAlgorithms = all_estimators(type_filter='regressor')    # type_filter='classifier' : 분류형 모델 전체를 불러온다.
+allAlgorithms = all_estimators(type_filter='regressor')    # type_filter='regressor' : 회귀형 모델 전체를 불러온다.
 
 for (name, algorithm) in allAlgorithms :    # 분류형 모델 전체를 반복해서 돌린다.
     # try ... except... : 예외처리 구문
