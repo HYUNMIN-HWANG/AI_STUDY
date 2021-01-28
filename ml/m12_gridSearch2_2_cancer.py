@@ -19,6 +19,8 @@ from sklearn.ensemble import RandomForestClassifier
 import warnings
 warnings.filterwarnings('ignore')
 
+import datetime
+
 ########################################################
 
 #1. DATA
@@ -39,14 +41,6 @@ parameters=[
     {'min_samples_split' : [2, 3, 5, 9, 10], 'n_jobs' : [-1, 2, 4]}
 ]
 
-# parameters = [
-#     {'n_estimators' : [100,200], 'max_depth' : [6,8]},
-#     {'max_depth' : [6,8,10,12], 'min_samples_leaf' : [3,5,7]},
-#     {'min_samples_leaf' : [3,5,7,10]},
-#     # {'min_samples_split ' : [2, 3, 5, 10]},
-#     {'n_jobs' : [-1]}
-# ] 
-
 #2. Modeling 
 # model = SVC()
 model = GridSearchCV(RandomForestClassifier(), parameters, cv=kfold)
@@ -57,7 +51,10 @@ model = GridSearchCV(RandomForestClassifier(), parameters, cv=kfold)
 
 
 #3. Compile, Train
+start = datetime.datetime.now()
 model.fit(x_train, y_train)
+end = datetime.datetime.now()
+print("time : ", end - start)   # time :  0:02:26.586798
 
 #4. Evaluate, Predict
 print("최적의 매개변수 : ", model.best_estimator_)
