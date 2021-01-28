@@ -40,8 +40,7 @@ models = [LinearSVC, SVC, KNeighborsClassifier, DecisionTreeClassifier, RandomFo
 for algorithm in models :  
     model = algorithm()
     scores = cross_val_score(model, x_train, y_train, cv=kfold) # accuracy_score
-    print(algorithm)
-    print('scores : ', scores)  
+    print('scores : ', scores , '-' + str(algorithm))  
 
 # model = LinearSVC()
 # model = SVC()
