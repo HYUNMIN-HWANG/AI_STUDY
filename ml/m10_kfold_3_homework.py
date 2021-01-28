@@ -29,80 +29,43 @@ y = dataset.target
 # x preprocessing >>  K-Fold 
 kfold = KFold(n_splits=5, shuffle=True) # 데이터를 5등분한다. > train data 와 test data 로 구분한다.
 
-# 머신러닝은 원핫인코딩 안해도 된다.
+#2. Modeling
+model=[LinearSVC(), SVC(), KNeighborsClassifier(), LogisticRegression(), RandomForestClassifier(), DecisionTreeClassifier()]
 
-#2. Modeling (한 줄로 끝)
-model = LinearSVC()
-# model = SVC()
-# model = KNeighborsClassifier()
-# model = DecisionTreeClassifier()
-# model = RandomForestClassifier()
-# model = LogisticRegression()
+# kfold 만 적용
+# for algorithm in model :
+#     score = cross_val_score(algorithm, x, y, cv=kfold)
+    # print('score : ', score, '-'+str(algorithm))
 
-# train 과 test 부분을 5등분한다.
-scores = cross_val_score(model, x, y, cv=kfold)
-# print(x.shape)  # (150, 4)
+# score :  [1.         1.         0.93333333 0.9        0.93333333] -LinearSVC()
+# score :  [0.96666667 1.         1.         0.86666667 0.93333333] -SVC()
+# score :  [0.9        0.96666667 0.96666667 0.96666667 0.96666667] -KNeighborsClassifier()
+# score :  [0.96666667 0.96666667 1.         0.96666667 0.86666667] -LogisticRegression()
+# score :  [0.96666667 0.96666667 0.93333333 0.96666667 0.93333333] -RandomForestClassifier()
+# score :  [0.93333333 0.93333333 0.96666667 0.83333333 0.96666667] -DecisionTreeClassifier()
 
-# train test split
-x_train, x_val, y_train, y_val = \
-    train_test_split(x, y, random_state=77, shuffle=True, train_size=0.8)
+# kfold >> train, test 분리
+for train_index, test_index in kfold.split(x) :
+    
+    # print("TRAIN", train_index, '\n', "TEST", test_index)
+    x_train, x_test = x[train_index], x[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    # train_test_split >> train, validation 분리
+    x_train, x_val, y_train, y_val = \
+        train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=47)
+    # print(x.shape)          # (150, 4)
+    # print(x_train.shape)    # (96, 4)
+    # print(x_val.shape)      # (24, 4)
+    # print(x_test.shape)     # (30, 4)
 
-print('scores : ', scores)  
-# model.fit과 model.score 한꺼번에 실행됨
-# 결과 : model.score에 해당하는 값이 5번 출력된다.
-# train / test kfold >> scores :  [0.9        0.96666667 0.93333333 1.         1.        ]
-# train / test split >> train / validation kfold >> scores :  [0.83333333 1.         1.         1.         0.91666667]
-# train / test kfold >> train / validation split >> scores :  [0.93333333 0.93333333 1.         0.96666667 0.96666667]
-# print(x_train.shape)    # (120, 4)
-# print(x_val.shape)      # (30, 4)
+for algorithm in model :
+    score = cross_val_score(algorithm, x_train, y_train, cv=kfold)
+    print('score : ', score, '-'+str(algorithm))
 
-"""
-#3. Compile, Train
-
-model.fit(x_train, y_train)
-
-
-#4. Evaluate, Predict
-
-y_pred = model.predict(x_test)      
-print("y_pred : ", y_pred)  
-
-result = model.score(x_test, y_test)    # evaluate
-print("model.score : ", result)         
-
-acc = accuracy_score(y_test, y_pred)    # acc
-print("accuracy_score : ", acc)      
-
-# model = LinearSVC()
-# y_pred :  [1 1 1 0 1 1 0 0 0 2 2 2 0 2 2 0 1 1 2 2 0 1 1 2 1 2 0 0 1 2]
-# model.score :  0.9666666666666667
-# accuracy_score :  0.9666666666666667
-
-# model = SVC()
-# y_pred :  [1 1 1 0 1 1 0 0 0 2 2 2 0 2 2 0 1 1 2 2 0 1 1 2 1 2 0 0 2 2]
-# model.score :  1.0
-# accuracy_score :  1.0
-
-# model = KNeighborsClassifier()
-# y_pred :  [1 1 1 0 1 1 0 0 0 2 2 2 0 2 2 0 1 1 2 2 0 1 1 2 1 2 0 0 2 2]
-# model.score :  1.0
-# accuracy_score :  1.0
-
-# model = DecisionTreeClassifier()
-# y_pred :  [1 1 1 0 1 1 0 0 0 1 2 2 0 2 2 0 1 1 2 2 0 1 1 2 1 2 0 0 2 2]
-# model.score :  0.9666666666666667
-# accuracy_score :  0.9666666666666667
-
-# model = RandomForestClassifier()
-# y_pred :  [1 1 1 0 1 1 0 0 0 2 2 2 0 2 2 0 1 1 2 2 0 1 1 2 1 2 0 0 1 2]
-# model.score :  0.9666666666666667
-# accuracy_score :  0.9666666666666667
-
-# model = LogisticRegression()
-# y_pred :  [1 1 1 0 1 1 0 0 0 2 2 2 0 2 2 0 1 1 2 2 0 1 1 2 1 2 0 0 1 2]
-# model.score :  0.9666666666666667
-# accuracy_score :  0.9666666666666667
-
-# tensorflow _ CNN
-# acc : 1.0 ***
-"""
+# score :  [1.         0.89473684 0.89473684 1.         1.        ] -LinearSVC()
+# score :  [0.95       1.         0.94736842 0.89473684 1.        ] -SVC()
+# score :  [1.         0.89473684 0.94736842 1.         1.        ] -KNeighborsClassifier()
+# score :  [0.95       1.         0.94736842 0.94736842 0.94736842] -LogisticRegression()
+# score :  [1.         0.89473684 1.         1.         0.94736842] -RandomForestClassifier()
+# score :  [1.         1.         0.89473684 0.94736842 0.94736842] -DecisionTreeClassifier()
