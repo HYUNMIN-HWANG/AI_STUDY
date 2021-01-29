@@ -1,4 +1,4 @@
-# Pipeline
+# Pipeline : 파라미터튜닝에 전처리까지 합친다. >> 전처리와 모델을 합친다.
 
 import numpy as np
 from sklearn.datasets import load_iris

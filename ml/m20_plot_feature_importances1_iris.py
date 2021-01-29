@@ -1,4 +1,4 @@
-# feature_importances
+# feature_importances : tree계열
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.datasets import load_iris
