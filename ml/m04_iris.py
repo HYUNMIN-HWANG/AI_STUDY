@@ -11,8 +11,8 @@ from sklearn.metrics import accuracy_score
 # 모델마다 나오는 결과 값을 비교한다.
 from sklearn.svm import LinearSVC, SVC
 from sklearn.neighbors import KNeighborsClassifier  # Classifier : 분류모델
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier     # 트리 계열
+from sklearn.ensemble import RandomForestClassifier # decision tree의 업그레이드 버전 : 트리를 앙상블했다 >> 숲
 from sklearn.linear_model import LogisticRegression # 회귀가 아닌 분류 모델임
 
 ########################################################
@@ -59,7 +59,7 @@ model.fit(x_train, y_train)
 y_pred = model.predict(x_test)      
 print("y_pred : ", y_pred)  
 
-result = model.score(x_test, y_test)    # evaluate
+result = model.score(x_test, y_test)    # evaluate >> acc score
 print("model.score : ", result)         
 
 acc = accuracy_score(y_test, y_pred)    # acc

@@ -38,7 +38,7 @@ model = LinearSVC()
 # model = RandomForestClassifier()
 # model = LogisticRegression()
 
-# 모델과 kfold data 를 엮어서 CrossValidation을 확인한다.
+# 모델과 kfold data 를 엮어서 Cross Validation을 확인한다.
 scores = cross_val_score(model, x, y, cv=kfold) 
 
 print('scores : ', scores)  

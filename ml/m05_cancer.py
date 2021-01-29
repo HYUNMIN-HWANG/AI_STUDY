@@ -58,7 +58,7 @@ model.fit(x_train, y_train)
 y_pred = model.predict(x_test)      
 print("y_pred : ", y_pred)  
 
-result = model.score(x_test, y_test)
+result = model.score(x_test, y_test)    # >> acc score
 print("model.score : ", result)         
 
 acc = accuracy_score(y_test, y_pred)

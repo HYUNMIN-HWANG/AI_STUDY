@@ -54,7 +54,7 @@ model.fit(x_train, y_train)
 y_pred = model.predict(x_test)      
 print("y_pred : ", y_pred)  
 
-result = model.score(x_test, y_test)    # evaluate
+result = model.score(x_test, y_test)    # evaluate >> r2 score
 print("model.score : ", result)         
 
 r2 = r2_score(y_test, y_pred)

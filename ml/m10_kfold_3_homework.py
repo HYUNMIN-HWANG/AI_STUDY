@@ -31,6 +31,7 @@ kfold = KFold(n_splits=5, shuffle=True) # 데이터를 5등분한다. > train da
 
 #2. Modeling
 model=[LinearSVC(), SVC(), KNeighborsClassifier(), RandomForestClassifier(), DecisionTreeClassifier()]
+# model=[LinearSVC(), SVC(), KNeighborsClassifier(), RandomForestClassifier()]
 
 # kfold 만 적용
 # for algorithm in model :
@@ -62,7 +63,10 @@ for train_index, test_index in kfold.split(x) : # 다섯번 반복
     # print(x_test.shape)     # (30, 4)
 
     for algorithm in model :
-        score = cross_val_score(algorithm, x_train, y_train, cv=kfold)
+        model = algorithm
+        # score = cross_val_score(algorithm, x_train, y_train, cv=kfold)
+        model.fit(x_train, y_train)
+        score = model.score(x_test, y_test)
         print('score : ', score, '-'+str(algorithm))
     i += 1
 

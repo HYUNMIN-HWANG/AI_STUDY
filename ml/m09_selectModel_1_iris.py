@@ -1,4 +1,4 @@
-# 모든 분류모델
+# 모든 분류모델 all_estimators(type_filter='classifier') 
 
 import numpy as np
 
