@@ -17,7 +17,6 @@ x_pd = pd.DataFrame(x, columns=dataset['feature_names'])
 x = x_pd.drop(['sepal width (cm)'], axis=1)
 x = x.to_numpy()
 
-dataset = load_iris()
 x_train, x_test, y_train, y_test = \
     train_test_split(x, y, train_size=0.8, random_state=44)
 

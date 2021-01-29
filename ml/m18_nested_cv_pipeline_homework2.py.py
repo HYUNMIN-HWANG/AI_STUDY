@@ -38,11 +38,11 @@ kfold = KFold(n_splits=5, shuffle=True)
 # pipline : 파라미터튜닝에 전처리까지 합친다. >> 전처리와 모델을 합친다.
 
 # # [1] Pipeline
-parameters=[
-    {'model__n_estimators' : [100, 200, 300], 'model__max_depth' : [6, 8, 10, 12]},
-    {'model__max_depth' : [6, 8, 10, 12], 'model__min_samples_leaf' : [3, 7, 10]},
-    {'model__min_samples_split' : [2, 3, 5, 9], 'model__n_jobs' : [-1, 2, 4]}
-]
+# parameters=[
+#     {'model__n_estimators' : [100, 200, 300], 'model__max_depth' : [6, 8, 10, 12]},
+#     {'model__max_depth' : [6, 8, 10, 12], 'model__min_samples_leaf' : [3, 7, 10]},
+#     {'model__min_samples_split' : [2, 3, 5, 9], 'model__n_jobs' : [-1, 2, 4]}
+# ]
 
 # # [2] make_pipeline
 # parameters=[
@@ -53,13 +53,13 @@ parameters=[
 
 for train_index, test_index in kfold.split(x) :
 
-pipe = Pipeline([("scaler", MinMaxScaler()), ('model', RandomForestClassifier())])
-# pipe = make_pipeline(scale, RandomForestClassifier())
+    x_train, x_test = x[train_index], x[test_index]
+    y_train, y_test = y[train_index], y[test_index]
 
-model = RandomizedSearchCV(pipe, parameters, cv=5)
-model.fit(x_train, y_train)
-results = model.score(x_test, y_test)
-print(str(scale),str(CV)+':'+str(results))
+    model = Pipeline([("scaler", MinMaxScaler()), ('model', RandomForestClassifier())])
+    # model = RandomizedSearchCV(pipe, parameters, cv=5)
+    score = cross_val_score(model, x_train, y_train, cv=kfold )
+    print('교차검증점수 : ', score)
 
 
 
@@ -84,3 +84,11 @@ print(str(scale),str(CV)+':'+str(results))
 # MinMaxScaler() <class 'sklearn.model_selection._search.GridSearchCV'>:0.9722222222222222
 # StandardScaler() <class 'sklearn.model_selection._search.RandomizedSearchCV'>:0.9722222222222222
 # StandardScaler() <class 'sklearn.model_selection._search.GridSearchCV'>:0.9444444444444444
+
+# train / test/ validataion - pipeliine & randomforest
+# 교차검증점수 :  [1.         1.         1.         0.96428571 1.        ]
+# 교차검증점수 :  [0.96551724 1.         0.96428571 0.92857143 1.        ]
+# 교차검증점수 :  [1.         0.96551724 1.         0.92857143 1.        ]
+# 교차검증점수 :  [1.         1.         0.96551724 0.96428571 0.96428571]
+# 교차검증점수 :  [1.         0.96551724 0.96551724 0.96428571 1.        ]
+

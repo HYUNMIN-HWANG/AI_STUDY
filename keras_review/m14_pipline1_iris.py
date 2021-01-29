@@ -25,25 +25,28 @@ kf = KFold(n_splits=5, shuffle=True, random_state=47)
 #2. Modeling
 
 # [1]
+# parameters = [
+#     {'model__n_estimators' : [10, 100, 1000], 'model__max_depth' : [5, 6, 8, 10]},
+#     {'model__min_samples_leaf' : [2, 4, 6], 'model__n_jobs' : [1, 2, 4]}
+# ]
+
+# pipe = Pipeline([("scaler", MinMaxScaler()),("model", RandomForestClassifier())])
+# model = RandomizedSearchCV(pipe, parameters, cv=kf)
+# model.fit(x_train, y_train)
+# results = model.score(x_test, y_test)
+# print("model.score " , results)
+
+# [2]
 parameters = [
-    {'model__n_estimators' : [10, 100, 1000], 'model__max_depth' : [5, 6, 8, 10]},
-    {'model__min_samples_leaf' : [2, 4, 6], 'model__n_jobs' : [1, 2, 4]}
+    {'randomforestclassifier__n_estimators' : [10, 100, 1000], 'randomforestclassifier__max_depth' : [5,6,8,10]},
+    {'randomforestclassifier__min_samples_leaf' : [2,4,6], 'randomforestclassifier__n_jobs' : [1,2,4]}
 ]
 
-pipe = Pipeline([("scaler", MinMaxScaler()),("model", RandomForestClassifier())])
+pipe = make_pipeline(MinMaxScaler(), RandomForestClassifier())
 model = RandomizedSearchCV(pipe, parameters, cv=kf)
 model.fit(x_train, y_train)
 results = model.score(x_test, y_test)
-print("model.score " , results)
+print("model.score : ", results)
 
 
 
-# [2]
-# model = make_pipeline(MinMaxScaler(), SVC())
-
-#3. Trian
-# model.fit(x_train, y_train)
-# results = model.score(x_test, y_test)
-# print("model.score : ", results)
-
-#4. Score, Predict
