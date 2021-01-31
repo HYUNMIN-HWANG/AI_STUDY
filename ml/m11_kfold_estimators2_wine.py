@@ -25,8 +25,8 @@ for (name, algorithm) in allAlgorithms :    # 분류형 모델 전체를 반복�
         model = algorithm()
         score = cross_val_score(model, x_train, y_train, cv=kfold)
         # model.fit(x_train, y_train)
-        # y_pred = model.predict(x_test)
         print(name, '의 정답률 : \n', score)
+        # y_pred = model.predict(x_test)
     except :          #에러가 발생하면
         # continue    # 정지시키지 않고 계속 진행시키겠다.
         print(name, "은 없는 모델") # 예외처리한 모델 이름을 출력 

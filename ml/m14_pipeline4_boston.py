@@ -5,7 +5,7 @@ from sklearn.datasets import load_boston
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler  # 둘 중에 하나 사용
 from sklearn.model_selection import train_test_split, KFold, cross_val_score, GridSearchCV, RandomizedSearchCV
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, r2_score
 from sklearn.pipeline import Pipeline, make_pipeline
 
 # 모델마다 나오는 결과 값을 비교한다.
