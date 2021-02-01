@@ -7,7 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, accuracy_score
 from sklearn.pipeline import Pipeline
 from xgboost import XGBRegressor
 
@@ -72,16 +72,16 @@ for i in range(x.shape[1]) :
     # pca / RandomForest
     # n_components  1
     # model.score :  0.9
-    # r2_score :  0.845890410958904
+    # accuracy_score :  0.9
     # n_components  2
     # model.score :  0.9333333333333333
-    # r2_score :  0.9033816425120773
+    # accuracy_score :  0.9333333333333333
     # n_components  3
     # model.score :  0.9
-    # r2_score :  0.8628048780487805
+    # accuracy_score :  0.9
     # n_components  4
     # model.score :  0.9333333333333333
-    # r2_score :  0.9033816425120773
+    # accuracy_score :  0.9333333333333333
 
     # XGBoost
     # n_components  1

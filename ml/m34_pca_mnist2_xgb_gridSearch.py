@@ -54,7 +54,7 @@ kf = KFold(n_splits=5, shuffle=True, random_state=47)
 #2. Modling
 parameters = [
     {"n_estimators":[90, 100], "learning_rate":[0.3, 0.001]},
-    {"n_estimators":[90, 100], "learning_rate":[0.01, 0.001], "max_depth":[4, 5, 6]},
+    {"n_estimators":[90, 100], "max_depth":[4, 5, 6]},
     {"colsample_bytree":[0.6, 0.9], "colsample_bylevel" :[0.6, 0.7, 0.9]}
 ]
 model = GridSearchCV(XGBClassifier(n_jobs = 8, use_label_encoder=False, n_estimators=100), parameters, cv=kf)
@@ -108,5 +108,17 @@ print("accuracy_score : ", score)
 # result :  0.9619285714285715
 
 # PCA(>0.95) - XGBoost - gridSearch
+# 최적의 매개변수 :  XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=0.7,
+#               colsample_bynode=1, colsample_bytree=0.6, gamma=0, gpu_id=-1,
+#               importance_type='gain', interaction_constraints='',
+#               learning_rate=0.300000012, max_delta_step=0, max_depth=6,
+#               min_child_weight=1, missing=nan, monotone_constraints='()',
+#               n_estimators=200, n_jobs=8, num_parallel_tree=1,
+#               objective='multi:softprob', random_state=0, reg_alpha=0,
+#               reg_lambda=1, scale_pos_weight=None, subsample=1,
+#               tree_method='exact', use_label_encoder=False,
+#               validate_parameters=1, verbosity=None)
+# result :  0.9686428571428571
+# accuracy_score :  0.9686428571428571
 
 # PCA(>1.0) - XGBoost - gridSearch

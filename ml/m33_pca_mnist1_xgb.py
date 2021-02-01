@@ -19,6 +19,7 @@ from sklearn.metrics import accuracy_score
 x = np.append(x_train, x_test, axis=0)
 x =x.reshape(70000, 28*28)  # 3차원은 PCA에 들어가지 않으므로 2차원으로 바꿔준다.
 print(x.shape)  # (70000, 784)
+x = x/255.
 
 y = np.append(y_train, y_test, axis=0)
 print(y.shape)  # (70000,)
