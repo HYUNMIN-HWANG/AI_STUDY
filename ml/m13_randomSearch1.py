@@ -1,6 +1,6 @@
 # gridSearch 단점 : 너무 느리다. 파라미터 100프로 모두 돌린다. 내가 지정한 파라미터를 100프로 신뢰할 수 없다.
 # >> RandomizedSearchCV (랜덤서치): 모든 파라미터를 건드릴 필요가 없다. 랜덤하게 일부만 확인한다. 속도가 빠르다.
-# >> 기본값 n_iter = 10 
+# >> 기본값 n_iter = 10 (기본 10번 돌아간다.)
 
 import numpy as np
 from sklearn.datasets import load_iris
