@@ -1,4 +1,5 @@
-# xgboost & gridsearch
+# xgboost & randomsearch
+
 
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
