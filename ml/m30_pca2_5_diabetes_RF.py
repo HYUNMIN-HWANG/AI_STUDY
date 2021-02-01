@@ -9,6 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import r2_score
 from sklearn.pipeline import Pipeline
+from xgboost import XGBRegressor
 
 #1. DATA
 datasets = load_diabetes()
@@ -44,6 +45,7 @@ print(x_test.shape)             # (89, 8) >> 컬럼을 압축시켰다. 컬럼 �
 
 #2. Modeling
 model = Pipeline([("scaler", MinMaxScaler()),("model",RandomForestRegressor())])
+model = Pipeline([("scaler", MinMaxScaler()),("model",XGBRegressor())])
 
 #3. Train
 model.fit(x_train, y_train)
@@ -57,5 +59,10 @@ y_pred = model.predict(x_test)
 score = r2_score(y_pred, y_test)
 print("r2_score : ", score)
 
+# RandomForestRegressor
 # model.score :  0.43512635590690074
 # r2_score :  -0.5421970924222612
+
+# XGBoost
+# model.score :  0.3449642489091771
+# r2_score :  -0.3388132027144872

@@ -35,11 +35,11 @@ start = datetime.datetime.now()
 # model = DecisionTreeClassifier(max_depth=4)
 # model = RandomForestClassifier()
 # model = GradientBoostingClassifier()
-model = XGBClassifier(n_jobs = -1)      # n_jobs = -1 : CPU 자원을 모두 사용하겠다.
+model = XGBClassifier(n_jobs = -1, use_label_encoder=False)      # n_jobs = -1 : CPU 자원을 모두 사용하겠다.
 # model = XGBClassifier(n_jobs = 1)      
 
 #3. Train
-model.fit(x_train, y_train)
+model.fit(x_train, y_train, eval_metric='logloss')
 
 #4. Score, Predict
 acc = model.score(x_test, y_test)

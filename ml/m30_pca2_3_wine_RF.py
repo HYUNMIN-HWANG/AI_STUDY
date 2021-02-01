@@ -9,6 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import r2_score
 from sklearn.pipeline import Pipeline
+from xgboost import XGBClassifier
 
 #1. DATA
 datasets = load_wine()
@@ -45,9 +46,11 @@ print(x_test.shape)             # (36, 2)    >> 컬럼을 압축시켰다. 컬�
 # plt.show()
 
 #2. Modeling
-model = Pipeline([("scaler", MinMaxScaler()),("model",RandomForestRegressor())])
+# model = Pipeline([("scaler", MinMaxScaler()),("model",RandomForestRegressor())])
+model = Pipeline([("scaler", MinMaxScaler()),("model",XGBClassifier())])
 
 #3. Train
+# model.fit(x_train, y_train)
 model.fit(x_train, y_train)
 
 #4. Score, Predict
@@ -56,8 +59,13 @@ print("model.score : ", result)
 
 y_pred = model.predict(x_test)
 
-score = r2_score(y_pred, y_test)
-print("r2_score : ", score)
+score = accuracy_score(y_pred, y_test)
+print("accuracy_score : ", score)
 
+# RandomForest
 # model.score :  0.16912835051546382
 # r2_score :  0.040802995015498
+
+# XGboost
+# model.score :  0.6944444444444444
+# r2_score :  -0.01098901098901095

@@ -32,10 +32,10 @@ start = datetime.datetime.now()
 # model = RandomForestClassifier()
 # model = GradientBoostingClassifier()
 # model = XGBClassifier(n_jobs=-1)
-model = XGBClassifier(n_jobs=1)
+model = XGBClassifier(n_jobs=1, use_label_encoder=False)
 
 #3. Train
-model.fit(x_train, y_train)
+model.fit(x_train, y_train, eval_metric='logloss')
 
 #4. Score, Predict
 acc = model.score(x_test, y_test)

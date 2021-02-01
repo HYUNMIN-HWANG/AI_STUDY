@@ -31,10 +31,10 @@ start = datetime.datetime.now()
 # model = DecisionTreeRegressor(max_depth=4)
 # model = RandomForestRegressor()
 # model = GradientBoostingRegressor()
-model = XGBRegressor(n_jobs=1)
+model = XGBRegressor(n_jobs=1, use_label_encoer=False)
 
 #3. Train
-model.fit(x_train, y_train)
+model.fit(x_train, y_train, eval_metric='logloss')
 
 #4. Score, Predict
 acc = model.score(x_test, y_test)
