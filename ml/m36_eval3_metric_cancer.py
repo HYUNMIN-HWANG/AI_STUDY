@@ -1,5 +1,5 @@
 # eval set : validation0, 1을 볼 수 있다.
-# eval_metric : 메트릭스를 지정한다.
+# eval_metric : 메트릭스를 지정한다. >> 여러 개 사용할 수 있다.
 # evals_result : eval_metric 에 지정했던 rmse가 줄어드는 걸 볼 수 있다
 
 from xgboost import XGBClassifier, XGBRegressor
