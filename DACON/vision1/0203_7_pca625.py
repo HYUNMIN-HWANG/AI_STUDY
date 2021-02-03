@@ -1,7 +1,7 @@
 # 코랩으로 돌렸음 (경로 다름)
 # pca (cumsum > 0.9999) : 625열로 압축
 # 결과 너~~~~~~~무 안 좋음 
-# pca 버림
+# pca 버려
 
 import numpy as np
 import pandas as pd
@@ -173,5 +173,5 @@ sub['digit'] = result.argmax(1)
 print(sub)
 sub.to_csv('/content/drive/My Drive/AIA/DACON_vision1/0203_4_private3.csv', index=False)
 
-# xian submission
-# score 
+# xian submission 0203_3_pca
+# score 	0.2156862745	

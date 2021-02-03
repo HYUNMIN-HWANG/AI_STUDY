@@ -1,5 +1,5 @@
 # private 3등 코드
-# train / test / validation 분리
+# train / test / validation(0.9) 분리
 # acc 기록 / 데이터 증푹 (-3,3) >> 점수 더 떨어짐
 
 import numpy as np
