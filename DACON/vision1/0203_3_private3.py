@@ -1,6 +1,6 @@
 # private 3등 코드
 # train / test / validation 분리
-# acc 기록 / 데이터 증푹 (-3,3)
+# acc 기록 / 데이터 증푹 (-3,3) >> 점수 더 떨어짐
 
 import numpy as np
 import pandas as pd
@@ -49,7 +49,7 @@ train2 = train2/255.0
 test2 = test2/255.0
 
 #  ImageDataGenerator >> 데이터 증폭 : 데이터 양을 늘림으로써 오버피팅을 해결할 수 있다.
-idg = ImageDataGenerator(height_shift_range=(-1,1),width_shift_range=(-1,1))
+idg = ImageDataGenerator(height_shift_range=(-3,3),width_shift_range=(-3,3))
 # width_shift_range : 왼쪽 오른쪽으로 움직인다.
 # height_shift_range : 위쪽 아래쪽으로 움직인다.
 idg2 = ImageDataGenerator()
@@ -80,11 +80,12 @@ reLR = ReduceLROnPlateau(patience=100, verbose=1, factor=0.5)
 es = EarlyStopping(patience=120, verbose=1)
 
 val_loss_min = []
+val_acc_max = []
 result = 0
 nth = 0
 
 for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
-    path = '../data/DACON_vision1/cp/0203_1_cp_test.hdf5'
+    path = '../data/DACON_vision1/cp/0203_2_cp.hdf5'
     mc = ModelCheckpoint(path, save_best_only=True, verbose=1)
 
     x_train = train2[train_index]
@@ -142,7 +143,7 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
                                                                         # epsilon : 0으로 나눠지는 것을 피하기 위함
     learning_hist = model.fit_generator(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
-    model.load_weights('../data/DACON_vision1/cp/0203_1_cp_test.hdf5')
+    model.load_weights('../data/DACON_vision1/cp/0203_2_cp.hdf5')
 
     #4. Evaluate, Predict
     loss, acc = model.evaluate(test_generator)
@@ -154,16 +155,18 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     # save val_loss
     hist = pd.DataFrame(learning_hist.history)
     val_loss_min.append(hist['val_loss'].min())
+    val_acc_max.append(hist['val_acc'].max())
 
     nth += 1
     print(nth, "번째 학습을 완료했습니다.")
 
-    print(val_loss_min, np.mean(val_loss_min))  # val_loss_mean : 0.2370362402871251
+    print("val_loss_mean : ", np.mean(val_loss_min))  # val_loss_mean :0.41666211783885954
+    print("val_acc_max : ", np.mean(val_acc_max))     # val_acc_max : 0.8840000003576278
     model.summary()
 
 sub['digit'] = result.argmax(1)
 print(sub)
-sub.to_csv('../data/DACON_vision1/0203_1_private3_test.csv', index=False)
+sub.to_csv('../data/DACON_vision1/0203_2_private3.csv', index=False)
 
-# submission 0203_1_private3.csv
-# score 0.9509803922	
+# submission 0203_2_private3
+# score 0.9264705882
