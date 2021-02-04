@@ -1,5 +1,6 @@
 # private 3등 코드
 # fit_generator >> fit
+# 돌려보기
 
 import numpy as np
 import pandas as pd
@@ -141,7 +142,7 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
                                                                         # epsilon : 0으로 나눠지는 것을 피하기 위함
     learning_hist = model.fit(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
-    model.load_weights('../data/DACON_vision1/cp/0204_6_cp_test.hdf5')
+    model.load_weights('../data/DACON_vision1/cp/0204_6_cp.hdf5')
 
     #4. Evaluate, Predict
     loss, acc = model.evaluate(test_generator)
