@@ -1,8 +1,6 @@
-# private 3등 코드
-# train / test / validation (0.95) 분리
-# batch_size = 16
-# n_splits = 60 
-# >>> loss 줄었음 , 점수 동일
+# private 2등 코드
+# 노이즈 제
+# 모르겠다
 
 import numpy as np
 import pandas as pd
@@ -14,6 +12,9 @@ from keras import Sequential
 from keras.layers import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras.optimizers import Adam
+import cv2
+import gc
+from keras import backend as bek
 
 ######################################################
 
@@ -30,37 +31,75 @@ print(test.shape)   # (20480, 786)
 ######################################################
 
 #1. DATA
+
+# x_train
 # print(train, test, sub)
-
 # print(train['digit'].value_counts())    # 0부터 9까지
+x_train = train.drop(['id', 'digit', 'letter'], axis=1).values
+x_train = x_train.reshape(-1, 28, 28, 1)
 
-train2 = train.drop(['id', 'digit','letter'],1)
-test2 = test.drop(['id','letter'],1)  # >> x_pred
+x_train = np.where((x_train<=20)&(x_train!=0) ,0.,x_train)
 
-train2 = train2.values  # >>> x
-test2 = test2.values    # >>> x_pred
+x_train = x_train/255
+x_train = x_train.astype('float32')
 
-# plt.imshow(train2[100].reshape(28,28))
-# plt.show()
+train_224=np.zeros([2048,300,300,3],dtype=np.float32)
+for i, s in enumerate(x_train):
+    converted = cv2.cvtColor(s, cv2.COLOR_GRAY2RGB)
+    resized = cv2.resize(converted,(300,300),interpolation = cv2.INTER_CUBIC)
+    del converted
+    train_224[i] = resized
+    del resized
+    bek.clear_session()
+    gc.collect()
 
-train2 = train2.reshape(-1,28,28,1)
-test2 = test2.reshape(-1,28,28,1)
+print("\ntrain_224 <done>\n")
 
-# preprocess
-train2 = train2/255.0
-test2 = test2/255.0
+# y
+y = train['digit']
+y_224 = np.zeros((len(y), len(y.unique())))  # 총 행의수 , 10(0~9)
+for i, digit in enumerate(y):
+    y_224[i, digit] = 1
+
+# x_pred
+x_test = test.drop(['id', 'letter'], axis=1).values
+x_test = x_test.reshape(-1, 28, 28, 1)
+x_test = np.where((x_test<=20)&(x_test!=0) ,0.,x_test)
+x_test = x_test/255
+x_test = x_test.astype('float32')
+
+test_224=np.zeros([20480,300,300,3],dtype=np.float32)
+
+for i, s in enumerate(x_test):
+    converted = cv2.cvtColor(s, cv2.COLOR_GRAY2RGB)
+    resized = cv2.resize(converted,(300,300),interpolation = cv2.INTER_CUBIC)
+    del converted
+    test_224[i] = resized
+    del resized
+
+bek.clear_session()
+gc.collect()
+
+print("\ntest_224 <done>\n")
+
 
 #  ImageDataGenerator >> 데이터 증폭 : 데이터 양을 늘림으로써 오버피팅을 해결할 수 있다.
-idg = ImageDataGenerator(height_shift_range=(-1,1),width_shift_range=(-1,1))
-# width_shift_range : 왼쪽 오른쪽으로 움직인다.
-# height_shift_range : 위쪽 아래쪽으로 움직인다.
+idg = ImageDataGenerator(width_shift_range=0.05,
+        height_shift_range=0.05,
+        zoom_range=0.15,
+        rotation_range = 10,
+        validation_split=0.2)
 idg2 = ImageDataGenerator()
 
 '''
-sample_data = train2[100].copy()
+sample_data = train2[115].copy()
 sample = expand_dims(sample_data,0)
 # expand_dims : 차원을 확장시킨다.
-sample_datagen = ImageDataGenerator(height_shift_range=(-1,1),width_shift_range=(-1,1))
+sample_datagen = ImageDataGenerator(width_shift_range=0.05,
+        height_shift_range=0.05,
+        zoom_range=0.15,
+        rotation_range = 10,
+        validation_split=0.2)
 sample_generator = sample_datagen.flow(sample, batch_size=1)    #  flow : ImageDataGenerator 디버깅
 
 plt.figure(figsize=(16,10))
@@ -68,7 +107,7 @@ for i in range(9) :
     plt.subplot(3, 3, i+1)
     sample_batch = sample_generator.next()
     sample_image = sample_batch[0]
-    plt.imshow(sample_image.reshape(28, 28))
+    plt.imshow(sample_image.reshape(28, 28), cmap='Greys_r')
 plt.show()
 '''
 
@@ -86,24 +125,24 @@ val_acc_max = []
 result = 0
 nth = 0
 
-for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
-    path = '../data/DACON_vision1/cp/0204_1_cp.hdf5'
+for train_index, test_index in skf.split(train_224, y_224) : # >>> x, y
+    path = '../data/DACON_vision1/cp/0204_3_cp.hdf5'
     mc = ModelCheckpoint(path, save_best_only=True, verbose=1)
 
-    x_train = train2[train_index]
-    x_test = train2[test_index]
-    y_train = train['digit'][train_index]
-    y_test = train['digit'][test_index]
+    x_train = train_224[train_index]
+    x_test = train_224[test_index]
+    y_train = y_224[train_index]
+    y_test = y_224[test_index]
 
     x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, train_size=0.95, shuffle=True, random_state=47)
 
     train_generator = idg.flow(x_train, y_train, batch_size=16)
     test_generator = idg2.flow(x_test, y_test, batch_size=16)
     valid_generator = idg2.flow(x_valid, y_valid)
-    pred_generator = idg2.flow(test2, shuffle=False)
+    pred_generator = idg2.flow(test_224, shuffle=False)
 
-    print(x_train.shape, x_test.shape, x_valid.shape)  # (1896, 28, 28, 1) (52, 28, 28, 1) (100, 28, 28, 1)
-    print(y_train.shape, y_test.shape, y_valid.shape)  # (1896,) (52,) (100,)
+    print(x_train.shape, x_test.shape, x_valid.shape)  # (1912, 300, 300, 3) (35, 300, 300, 3) (101, 300, 300, 3)
+    print(y_train.shape, y_test.shape, y_valid.shape)  # (1912,) (35,) (101,)
 
     #2. Modeling
     model = Sequential()
@@ -142,17 +181,17 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     model.add(Dense(10, activation='softmax'))
 
     #3. Compile, Train
-    model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
+    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
                                                                         # epsilon : 0으로 나눠지는 것을 피하기 위함
     learning_hist = model.fit_generator(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
-    model.load_weights('../data/DACON_vision1/cp/0204_1_cp.hdf5')
+    model.load_weights('../data/DACON_vision1/cp/0204_3_cp.hdf5')
 
     #4. Evaluate, Predict
     loss, acc = model.evaluate(test_generator)
     print("loss : ", loss)
     print("acc : ", acc)
 
-    result += model.predict_generator(pred_generator, verbose=True)/40
+    result += model.predict_generator(pred_generator, verbose=True)/60
 
     # save val_loss
     hist = pd.DataFrame(learning_hist.history)
@@ -162,13 +201,13 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     nth += 1
     print(nth, "번째 학습을 완료했습니다.")
 
-    print("val_loss_min :", np.mean(val_loss_min))  # val_loss_mean : 0.18540469873696566
-    print("val_acc_max :", np.mean(val_acc_max))    # val_acc_max : 0.9491749326388041
+    print("val_loss_min :", np.mean(val_loss_min))  # val_loss_mean : 
+    print("val_acc_max :", np.mean(val_acc_max))    # val_acc_max :
     model.summary()
 
 sub['digit'] = result.argmax(1)
 print(sub)
-sub.to_csv('../data/DACON_vision1/0204_1_sub.csv', index=False)
+sub.to_csv('../data/DACON_vision1/0204_3_sub.csv', index=False)
 
-# submission 0204_1_sub.csv
-# score 0.9509803922	
+# submission 
+# score 	

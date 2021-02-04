@@ -1,8 +1,5 @@
 # private 3등 코드
-# train / test / validation (0.95) 분리
-# batch_size = 16
-# n_splits = 60 
-# >>> loss 줄었음 , 점수 동일
+# fit_generator >> fit
 
 import numpy as np
 import pandas as pd
@@ -73,7 +70,7 @@ plt.show()
 '''
 
 # cross validation
-skf = StratifiedKFold(n_splits=60, random_state=42, shuffle=True)
+skf = StratifiedKFold(n_splits=40, random_state=42, shuffle=True)
 
 #2. Modeling
 # %%time
@@ -82,12 +79,11 @@ reLR = ReduceLROnPlateau(patience=100, verbose=1, factor=0.5)
 es = EarlyStopping(patience=120, verbose=1)
 
 val_loss_min = []
-val_acc_max = []
 result = 0
 nth = 0
 
 for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
-    path = '../data/DACON_vision1/cp/0204_1_cp.hdf5'
+    path = '../data/DACON_vision1/cp/0204_6_cp.hdf5'
     mc = ModelCheckpoint(path, save_best_only=True, verbose=1)
 
     x_train = train2[train_index]
@@ -95,15 +91,15 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     y_train = train['digit'][train_index]
     y_test = train['digit'][test_index]
 
-    x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, train_size=0.95, shuffle=True, random_state=47)
+    x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, train_size=0.9, shuffle=True, random_state=47)
 
     train_generator = idg.flow(x_train, y_train, batch_size=16)
     test_generator = idg2.flow(x_test, y_test, batch_size=16)
     valid_generator = idg2.flow(x_valid, y_valid)
     pred_generator = idg2.flow(test2, shuffle=False)
 
-    print(x_train.shape, x_test.shape, x_valid.shape)  # (1896, 28, 28, 1) (52, 28, 28, 1) (100, 28, 28, 1)
-    print(y_train.shape, y_test.shape, y_valid.shape)  # (1896,) (52,) (100,)
+    print(x_train.shape, x_test.shape, x_valid.shape)  # (1796, 28, 28, 1) (52, 28, 28, 1), (200, 28, 28, 1)
+    print(y_train.shape, y_test.shape, y_valid.shape)  # (1796,) (52,), (200,)
 
     #2. Modeling
     model = Sequential()
@@ -144,8 +140,8 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     #3. Compile, Train
     model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
                                                                         # epsilon : 0으로 나눠지는 것을 피하기 위함
-    learning_hist = model.fit_generator(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
-    model.load_weights('../data/DACON_vision1/cp/0204_1_cp.hdf5')
+    learning_hist = model.fit(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
+    model.load_weights('../data/DACON_vision1/cp/0204_6_cp_test.hdf5')
 
     #4. Evaluate, Predict
     loss, acc = model.evaluate(test_generator)
@@ -157,18 +153,16 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     # save val_loss
     hist = pd.DataFrame(learning_hist.history)
     val_loss_min.append(hist['val_loss'].min())
-    val_acc_max.append(hist['val_acc'].max())
 
     nth += 1
     print(nth, "번째 학습을 완료했습니다.")
 
-    print("val_loss_min :", np.mean(val_loss_min))  # val_loss_mean : 0.18540469873696566
-    print("val_acc_max :", np.mean(val_acc_max))    # val_acc_max : 0.9491749326388041
+    print(val_loss_min, np.mean(val_loss_min))  # val_loss_mean : 
     model.summary()
 
 sub['digit'] = result.argmax(1)
 print(sub)
-sub.to_csv('../data/DACON_vision1/0204_1_sub.csv', index=False)
+sub.to_csv('../data/DACON_vision1/0204_6_private3.csv', index=False)
 
-# submission 0204_1_sub.csv
-# score 0.9509803922	
+# submission 
+# score 
