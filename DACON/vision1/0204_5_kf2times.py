@@ -1,5 +1,6 @@
 # private 3등 코드
 # kf 2번 (총 150번 돌려야 함)
+# 결과 별로임
 
 import numpy as np
 import pandas as pd

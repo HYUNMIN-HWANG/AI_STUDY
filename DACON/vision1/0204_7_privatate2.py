@@ -48,7 +48,7 @@ train_224=np.zeros([2048,56,56,3],dtype=np.float32) # [2048,56,56,3] 의 검은�
 
 for i, s in enumerate(x_train):
     converted = cv2.cvtColor(s, cv2.COLOR_GRAY2RGB) # 컬러 이미지로 바꿔줌
-    resized = cv2.resize(converted,(56,56),interpolation = cv2.INTER_CUBIC) # 56, 56으로 리사이즈
+    resized = cv2.resize(converted,(56,56),interpolation = cv2.INTER_CUBIC) # (56, 56)으로 리사이즈
     del converted
     train_224[i] = resized
     del resized
@@ -71,7 +71,7 @@ valgen = ImageDataGenerator()
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.callbacks import EarlyStopping
 
-def create_model() :
+def create_model() :    # Model
     
     effnet = tf.keras.applications.EfficientNetB3(
         include_top=True,
@@ -89,17 +89,17 @@ def create_model() :
                 metrics=['accuracy'])
     return model
 
-initial_learningrate=2e-3  
+initial_learningrate=2e-3  # 가중치
 
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import KFold
 
-kfold = RepeatedKFold(n_splits=5, n_repeats=10, random_state=40)
+kfold = RepeatedKFold(n_splits=5, n_repeats=10, random_state=40)    # 50번 반복
 cvscores = []
 Fold = 1
 results = np.zeros((20480,10))
 
-def lr_decay(epoch):#lrv
+def lr_decay(epoch):    #lrv >> learning rate 비율 점차 감소
     return initial_learningrate * 0.99 ** epoch
 
 
@@ -112,7 +112,6 @@ x_test = x_test.astype('float32')
 
 test_224=np.zeros([20480,56,56,3],dtype=np.float32)
 
-
 for i, s in enumerate(x_test):
     converted = cv2.cvtColor(s, cv2.COLOR_GRAY2RGB)
     resized = cv2.resize(converted,(56,56),interpolation = cv2.INTER_CUBIC)
@@ -123,20 +122,16 @@ for i, s in enumerate(x_test):
 bek.clear_session()
 gc.collect()
 
-
-
 results = np.zeros( (20480,10),dtype=np.float32)
 
-
-for train, val in kfold.split(train_224): 
+for train, val in kfold.split(train_224): # 50번 반복
     # if Fold<25:
     #   Fold+=1
     #   continue
     initial_learningrate=2e-3  
     es = EarlyStopping(monitor='val_loss', verbose=1, patience=50)      
-    filepath_val_acc="../data/DACON_vision1/cp/effi_model_aug"+str(Fold)+".ckpt"
+    filepath_val_acc="../data/DACON_vision1/cp/effi_model_aug"+str(Fold)+".ckpt"    # .ckpt : 모델체크포인트 만 저장하는 확장자
     checkpoint_val_acc = ModelCheckpoint(filepath_val_acc, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max',save_weights_only=True)
-
 
     gc.collect()
     bek.clear_session()
@@ -152,12 +147,12 @@ for train, val in kfold.split(train_224):
     model = create_model()
 
 
-    training_generator = datagen.flow(X_train, Y_train, batch_size=8,seed=7,shuffle=True)
+    training_generator = datagen.flow(X_train, Y_train, batch_size=8,seed=7,shuffle=True)   # sedd : random_state와 유사한 기능
     validation_generator = valgen.flow(X_val, Y_val, batch_size=8,seed=7,shuffle=True)
     model.fit(training_generator,epochs=150,callbacks=[LearningRateScheduler(lr_decay),es,checkpoint_val_acc],
                shuffle=True,
                validation_data=validation_generator,
-               steps_per_epoch =len(X_train)//32
+               steps_per_epoch =len(X_train)//8     # steps_per_epoch : 한 epoch에 사용한 스텝 수. 훈련샘플수 % 배치사이즈
                )
 
     del X_train

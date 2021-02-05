@@ -1,31 +1,35 @@
-# private 3등 코드
-# fit_generator >> fit
-# 돌려보기 (부계정 0204_2 돌리는 중)
+# colab
 
+# warnings.filterwarnings("ignore")
+import tensorflow as tf
 import numpy as np
 import pandas as pd
+import os
+from tensorflow.keras.optimizers import RMSprop, Adam
+# from tensorflow.keras.applications.efficientnet import EfficientNetB7
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import *
+from tensorflow.keras.models import Model
+from tensorflow.keras import optimizers
+# from keras.utils import np_utils
+import cv2
+import gc
+from keras import backend as bek
 import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split, KFold, cross_val_score, StratifiedKFold
 from keras.preprocessing.image import ImageDataGenerator
 from numpy import expand_dims
-from sklearn.model_selection import StratifiedKFold, cross_validate, train_test_split
-from keras import Sequential
-from keras.layers import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from keras.optimizers import Adam
 
-######################################################
-
-# 데이터 로드
-train = pd.read_csv('../data/DACON_vision1/train.csv')
+train = pd.read_csv('/content/drive/My Drive/DACON_vision1/train.csv')
 print(train.shape)  # (2048, 787)
-
-sub = pd.read_csv('../data/DACON_vision1/submission.csv')
-print(sub.shape) # (20480, 2)
-
-test = pd.read_csv('../data/DACON_vision1/test.csv')
+sub = pd.read_csv('/content/drive/My Drive/DACON_vision1/submission.csv')
+print(sub.shape)    # (20480, 2)
+test = pd.read_csv('/content/drive/My Drive/DACON_vision1/test.csv')
 print(test.shape)   # (20480, 786)
 
-######################################################
+# fit_genetraot, predict_generator 에서 generator 다 빼고 실행
 
 #1. DATA
 # print(train, test, sub)
@@ -80,11 +84,12 @@ reLR = ReduceLROnPlateau(patience=100, verbose=1, factor=0.5)
 es = EarlyStopping(patience=120, verbose=1)
 
 val_loss_min = []
+val_acc_max = []
 result = 0
 nth = 0
 
 for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
-    path = '../data/DACON_vision1/cp/0204_6_cp.hdf5'
+    path = '/content/drive/My Drive/DACON_vision1/cp/0205_1_cp.hdf5'
     mc = ModelCheckpoint(path, save_best_only=True, verbose=1)
 
     x_train = train2[train_index]
@@ -139,31 +144,33 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     model.add(Dense(10, activation='softmax'))
 
     #3. Compile, Train
-    model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
+    model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.01, epsilon=None), metrics=['acc'])
                                                                         # epsilon : 0으로 나눠지는 것을 피하기 위함
     learning_hist = model.fit(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
-    model.load_weights('../data/DACON_vision1/cp/0204_6_cp.hdf5')
+    model.load_weights('/content/drive/My Drive/DACON_vision1/cp/0205_1_cp.hdf5')
 
     #4. Evaluate, Predict
     loss, acc = model.evaluate(test_generator)
     print("loss : ", loss)
     print("acc : ", acc)
 
-    result += model.predict_generator(pred_generator, verbose=True)/40
+    result += model.predict(pred_generator, verbose=True)/40
 
     # save val_loss
     hist = pd.DataFrame(learning_hist.history)
     val_loss_min.append(hist['val_loss'].min())
+    val_acc_max.append(hist['val_acc'].max())
 
     nth += 1
     print(nth, "번째 학습을 완료했습니다.")
 
-    print(val_loss_min, np.mean(val_loss_min))  # val_loss_mean : 
+    print(val_loss_min, np.mean(val_loss_min))  # val_loss_mean : 0.2516942050307989
+    print(val_acc_max, np.mean(val_acc_max))    # val_acc_max :0.9353750005364418
     model.summary()
 
 sub['digit'] = result.argmax(1)
 print(sub)
-sub.to_csv('../data/DACON_vision1/0204_6_private3.csv', index=False)
+sub.to_csv('/content/drive/My Drive/DACON_vision1/0205_1_private3.csv', index=False)
 
-# submission 
-# score 
+# xian submission 0205_1_private3.csv
+# score 	0.9460784314	

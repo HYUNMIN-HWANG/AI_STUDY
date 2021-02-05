@@ -1,6 +1,5 @@
 # private 3등 코드
-# fit_generator >> fit
-# 돌려보기 (부계정 0204_2 돌리는 중)
+# train / test / validation (0.9) 분리
 
 import numpy as np
 import pandas as pd
@@ -44,6 +43,9 @@ test2 = test2.values    # >>> x_pred
 train2 = train2.reshape(-1,28,28,1)
 test2 = test2.reshape(-1,28,28,1)
 
+train2 = np.where((train2<=20)&(train2!=0) ,0.,train2)
+test2 = np.where((test2<=20)&(test2!=0) ,0.,test2)
+
 # preprocess
 train2 = train2/255.0
 test2 = test2/255.0
@@ -80,11 +82,12 @@ reLR = ReduceLROnPlateau(patience=100, verbose=1, factor=0.5)
 es = EarlyStopping(patience=120, verbose=1)
 
 val_loss_min = []
+val_acc_max = []
 result = 0
 nth = 0
 
 for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
-    path = '../data/DACON_vision1/cp/0204_6_cp.hdf5'
+    path = '../data/DACON_vision1/cp/0205_1_cp.hdf5'
     mc = ModelCheckpoint(path, save_best_only=True, verbose=1)
 
     x_train = train2[train_index]
@@ -94,7 +97,7 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
 
     x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, train_size=0.9, shuffle=True, random_state=47)
 
-    train_generator = idg.flow(x_train, y_train, batch_size=16)
+    train_generator = idg.flow(x_train, y_train, batch_size=16, seed=2021)
     test_generator = idg2.flow(x_test, y_test, batch_size=16)
     valid_generator = idg2.flow(x_valid, y_valid)
     pred_generator = idg2.flow(test2, shuffle=False)
@@ -105,35 +108,48 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     #2. Modeling
     model = Sequential()
 
-    model.add(Conv2D(16, (3,3), activation='relu', input_shape=(28, 28,1), padding='same'))
+    model.add(Conv2D(32, (3,3), activation='relu', input_shape=(28, 28,1), padding='same'))
     model.add(BatchNormalization()) 
     # BatchNormalization >> 학습하는 동안 모델이 추정한 입력 데이터 분포의 평균과 분산으로 normalization을 하고자 하는 것
-    model.add(Dropout(0.3))
-
+    model.add(Conv2D(32, (5,5), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
     model.add(Conv2D(32, (3,3), activation='relu', padding='same'))
     model.add(BatchNormalization()) 
-    model.add(Conv2D(32, (5, 5), activation='relu', padding='same'))
-    model.add(BatchNormalization()) 
-    model.add(Conv2D(32, (5, 5), activation='relu', padding='same'))
-    model.add(BatchNormalization()) 
-    model.add(Conv2D(32, (5, 5), activation='relu', padding='same'))
-    model.add(BatchNormalization()) 
-    model.add(MaxPooling2D(3,3))
+    model.add(AveragePooling2D(3,3))
     model.add(Dropout(0.3))
 
     model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
     model.add(BatchNormalization()) 
     model.add(Conv2D(64, (5, 5), activation='relu', padding='same'))
     model.add(BatchNormalization()) 
-    model.add(MaxPooling2D(3,3))
+    model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
+    model.add(AveragePooling2D(3,3))
+    model.add(Dropout(0.3))
+
+    model.add(Conv2D(128, (3,3), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
+    model.add(Conv2D(128, (5,5), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
+    model.add(Conv2D(128, (3,3), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
+    model.add(AveragePooling2D(3,3))
+    model.add(Dropout(0.3))
+
+    model.add(Conv2D(256, (3,3), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
+    model.add(Conv2D(256, (5,5), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
+    model.add(Conv2D(256, (3,3), activation='relu', padding='same'))
+    model.add(BatchNormalization()) 
     model.add(Dropout(0.3))
 
     model.add(Flatten())
 
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(256, activation='relu'))
     model.add(BatchNormalization())
     model.add(Dropout(0.3))
-    model.add(Dense(64, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(BatchNormalization())
     model.add(Dropout(0.3))
     model.add(Dense(10, activation='softmax'))
@@ -141,8 +157,8 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     #3. Compile, Train
     model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.002, epsilon=None), metrics=['acc'])
                                                                         # epsilon : 0으로 나눠지는 것을 피하기 위함
-    learning_hist = model.fit(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
-    model.load_weights('../data/DACON_vision1/cp/0204_6_cp.hdf5')
+    learning_hist = model.fit_generator(train_generator, epochs=1000, validation_data=valid_generator, callbacks=[es, mc, reLR] )
+    model.load_weights('../data/DACON_vision1/cp/0205_1_cp.hdf5')
 
     #4. Evaluate, Predict
     loss, acc = model.evaluate(test_generator)
@@ -154,16 +170,18 @@ for train_index, test_index in skf.split(train2, train['digit']) : # >>> x, y
     # save val_loss
     hist = pd.DataFrame(learning_hist.history)
     val_loss_min.append(hist['val_loss'].min())
+    val_acc_max.append(hist['val_acc'].max())
 
     nth += 1
     print(nth, "번째 학습을 완료했습니다.")
 
-    print(val_loss_min, np.mean(val_loss_min))  # val_loss_mean : 
+    print(np.mean(val_loss_min))  # val_loss_mean :0.45666230469942093
+    print(np.mean(val_acc_max))  # val_acc_max :0.9023749977350235
     model.summary()
 
 sub['digit'] = result.argmax(1)
 print(sub)
-sub.to_csv('../data/DACON_vision1/0204_6_private3.csv', index=False)
+sub.to_csv('../data/DACON_vision1/0205_1_private3.csv', index=False)
 
-# submission 
-# score 
+# xian submission 	bit_0205_1_private3.csv
+# score 0.931372549	
