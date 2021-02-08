@@ -33,11 +33,7 @@ def build_model(drop=0.5, optimizer='adam') :
     return model
 
 model2 = build_model()
-model2.save('../data/h5/k64_save.h5')
 
-# 함수형 모델을 KerasClassifier로 wrapping
-# keras 모델을 sklearn작업에 사용할 수 있다.
-# build_fn: 호출가능한 함수 혹은 클레스 인스턴스
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 model2 = KerasClassifier(build_fn=build_model, verbose=1)   
 
@@ -54,34 +50,34 @@ search = RandomizedSearchCV(model2, hyperparameters, cv=2)
 # search = GridSearchCV(model2, hyperparameters, cv=2)
 
 search.fit(x_train, y_train, verbose=1)
+# search.save('../data/h5/k64_save1.h5')
 
 print("best_params : ", search.best_params_)         
-# 내가 선택한 파라미터 중에서 좋은 것
-# best_params :  {'optimizer': 'adam', 'drop': 0.1, 'batch_size': 30}
+
 print("best_estimator : ", search.best_estimator_)   
-# 전체 파라미터에서 좋은 것 >> sklearn에서는 인식하지 못한다.
-# best_estimator :  <tensorflow.python.keras.wrappers.scikit_learn.KerasClassifier object at 0x000001C0872F5DF0>
+
 print("best_score : ", search.best_score_)           
-# best_score :  0.9562999904155731 
 
 acc = search.score(x_test, y_test)
 print("Score : ", acc)
-# Score :  0.9675999879837036
+
+# model.save
+search.best_estimator_.model.save('../data/h5/k64_save.h5')
 
 # y_pred = search.predict(x_test)
 # r2 = r2_score(y_test, y_pred)
 # print("r2 : ", r2)
 
-print("========model load========")
-model3 = load_model('../data/h5/k64_save.h5')
-print("best_score : ", model3.best_score_)           
+# print("========model load========")
+# model3 = load_model('../data/h5/k64_save.h5')
+# print("best_score : ", model3.best_score_)           
+
+import pickle
+pickle.dump(search, open('../data/h5/k64.pickle.data', 'wb')) # wb : write
+print("== save complete ==")
 
 print("========pickle load========")
-# import pickle
-# pickle.dump(search, open('../data/h5/k64.pickle.data', 'wb')) # wb : write
-# print("== save complete ==")
-
-# model3 = pickle.load(open('../data/h5/k64_save_pickle.data', 'rb'))
+# model3 = pickle.load(open('../data/h5/k64.pickle.data', 'rb'))
 # print("== load complete ==")
 # r2_2 = model3.score(x_test, y_test)
 # print("r2_2 : ", r2_2)

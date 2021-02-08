@@ -77,7 +77,7 @@ cv_result = search.cv_results_
 print("cv_result :", cv_result)
 
 import pandas as pd
-result = pd.DataFrame(cv_result)
+result = pd.DataFrame(cv_result)    # GridSearchCV
 print(result)
 '''
     mean_fit_time  std_fit_time  mean_score_time  std_score_time param_batch_size  ... split0_test_score split1_test_score mean_test_score  std_test_score  rank_test_score
