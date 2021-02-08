@@ -56,14 +56,12 @@ search = RandomizedSearchCV(model2, hyperparameters, cv=2)
 
 # search.fit(x_train, y_train, verbose=1)
 search.fit(x_train, y_train, verbose=1, validation_split=0.2, callbacks=[cp, es, lr])
-
+# eopch 넣을 수 있다. >> KerasClassifier에 epoch을 넣은 것보다 더 우선순위임
 
 print("best_params : ", search.best_params_)         
 # 내가 선택한 파라미터 중에서 좋은 것
 # best_params :  {'optimizer': 'adam', 'drop': 0.3, 'batch_size': 20}
 print("best_estimator : ", search.best_estimator_)   
-# 전체 파라미터에서 좋은 것 >> sklearn에서는 인식하지 못한다.
-# best_estimator :  <tensorflow.python.keras.wrappers.scikit_learn.KerasClassifier object at 0x000001C0872F5DF0>
 print("best_score : ", search.best_score_)           
 
 acc = search.score(x_test, y_test)

@@ -33,7 +33,7 @@ def build_model(drop=0.5, optimizer='adam') :
     model.compile(optimizer=optimizer, metrics=['acc'], loss='categorical_crossentropy')
     return model
 
-model2 = build_model()
+# model2 = build_model()
 
 # 함수형 모델을 KerasClassifier로 wrapping
 # keras 모델을 sklearn작업에 사용할 수 있다.
@@ -77,7 +77,7 @@ cv_result = search.cv_results_
 print("cv_result :", cv_result)
 
 import pandas as pd
-result = pd.DataFrame(cv_result)    # GridSearchCV
+result = pd.DataFrame(cv_result)    # GridSearchCV 만 가능하다.
 print(result)
 '''
     mean_fit_time  std_fit_time  mean_score_time  std_score_time param_batch_size  ... split0_test_score split1_test_score mean_test_score  std_test_score  rank_test_score

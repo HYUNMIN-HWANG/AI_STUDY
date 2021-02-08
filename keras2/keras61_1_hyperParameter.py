@@ -30,13 +30,15 @@ def build_model(drop=0.5, optimizer='adam') :
     model.compile(optimizer=optimizer, metrics=['acc'], loss='categorical_crossentropy')
     return model
 
-model2 = build_model()
+# model2 = build_model()
 
-# 함수형 모델을 KerasClassifier로 wrapping
+##############################################################
+# 함수형 모델을 KerasClassifier로 wrapping해야 한다.
 # keras 모델을 sklearn작업에 사용할 수 있다.
 # build_fn: 호출가능한 함수 혹은 클레스 인스턴스
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 model2 = KerasClassifier(build_fn=build_model, verbose=1)   
+##############################################################
 
 def create_hyperparameters() :
     batches = [10, 20, 30, 40, 50]

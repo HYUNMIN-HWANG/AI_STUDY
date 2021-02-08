@@ -32,7 +32,7 @@ def build_model(drop=0.5, optimizer='adam') :
     model.compile(optimizer=optimizer, metrics=['acc'], loss='categorical_crossentropy')
     return model
 
-model2 = build_model()
+# model2 = build_model()
 
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 model2 = KerasClassifier(build_fn=build_model, verbose=1)   
@@ -53,9 +53,7 @@ search.fit(x_train, y_train, verbose=1)
 # search.save('../data/h5/k64_save1.h5')
 
 print("best_params : ", search.best_params_)         
-
 print("best_estimator : ", search.best_estimator_)   
-
 print("best_score : ", search.best_score_)           
 
 acc = search.score(x_test, y_test)
@@ -72,7 +70,7 @@ search.best_estimator_.model.save('../data/h5/k64_save.h5')
 # model3 = load_model('../data/h5/k64_save.h5')
 # print("best_score : ", model3.best_score_)           
 
-import pickle
+import pickle   # 실패
 pickle.dump(search, open('../data/h5/k64.pickle.data', 'wb')) # wb : write
 print("== save complete ==")
 
