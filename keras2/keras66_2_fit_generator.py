@@ -104,13 +104,12 @@ history = model.fit_generator(
 #   steps_per_epoch : 한 에포 당 돌아가는 횟수 -->> 전체 데이터(160) / 배치 사이즈(5) = steps_per_epoch=32
 #   validation_steps : 한 epoch 종료 시 마다 검증할 때 사용되는 검증 스텝 수
 
-# Graph 
 acc = history.history['acc']
 val_acc = history.history['val_acc']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-plt.plot(loss)
+# Graph
 plt.plot(val_loss)
 plt.plot(acc)
 plt.plot(val_acc)

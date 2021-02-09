@@ -47,10 +47,10 @@ print(test[0][0].shape)     # (217, 56, 56, 3) >> x_test
 print(test[0][1].shape)     # (217,)           >> y_test
 
 # data numpy save
-np.save('../data/image/brain/npy/keras67_train_x.npy', arr = train[0][0]) 
-np.save('../data/image/brain/npy/keras67_train_y.npy', arr = train[0][1]) 
-np.save('../data/image/brain/npy/keras67_test_x.npy', arr = test[0][0]) 
-np.save('../data/image/brain/npy/keras67_test_y.npy', arr = test[0][1]) 
+# np.save('../data/image/gender/npy/keras67_train_x.npy', arr = train[0][0]) 
+# np.save('../data/image/gender/npy/keras67_train_y.npy', arr = train[0][1]) 
+# np.save('../data/image/gender/npy/keras67_test_x.npy', arr = test[0][0]) 
+# np.save('../data/image/gender/npy/keras67_test_y.npy', arr = test[0][1]) 
 
 #2. Modeling
 model = Sequential()

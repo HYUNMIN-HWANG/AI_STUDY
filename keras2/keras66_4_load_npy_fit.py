@@ -64,8 +64,8 @@ print("acc : ", acc)
 # loss :  0.5336507558822632
 # acc :  0.7416666746139526
 
-y_pred = model.predict(x_test)
+# y_pred = model.predict(x_test)
 
-print("y_pred : \n", y_pred)
-print(y_pred.shape) # (120, 1)
-print(np.argmax(y_pred,axis=1))
+# print("y_pred : \n", y_pred)
+# print(y_pred.shape) # (120, 1)
+# print(np.argmax(y_pred,axis=1))
