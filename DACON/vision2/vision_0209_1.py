@@ -3,7 +3,7 @@ import pandas as pd
 
 from keras.preprocessing.image import ImageDataGenerator
 from numpy import expand_dims
-from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split, KFold
 from keras import Sequential
 from keras.layers import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
@@ -43,15 +43,27 @@ for i in range(0,50000):
 
 x = pd.concat(df_x)
 x = x.values
-print(x.shape)       # (12800000, 256) >>> (50000, 256, 256, 1)
+print("x.shape ", x.shape)       # (12800000, 256) >>> (50000, 256, 256, 1)
+print(x[0,:])
 x = x.reshape(50000, 256, 256, 1)
 x = x/255
 x = x.astype('float32')
 
 y = train.iloc[:,1:]
-print(y.shape)    # (50000, 27)
+print("y.shape ", y.shape)    # (50000, 26)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=47)
+x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=47)
+kf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
+# ImageGenerator >> 그림 확인하기
+idg = ImageDataGenerator(
+    height_shift_range=0.1,
+    width_shift_range=0.1,
+    rotation_range=10,
+    zoom_range=0.2
+    )
+idg2 = ImageDataGenerator()
 
 #### pred
 df_pred = []
@@ -79,21 +91,21 @@ x_pred = x_pred.astype('float32')
 
 #2. Modeling
 model = Sequential()
-model.add(Conv2D(filters=16, kernel_size=(3,3), activation='relu', padding='same',input_shape=(256, 256, 1)))
+model.add(Conv2D(filters=16, kernel_size=(2,2), activation='relu', padding='same',input_shape=(256, 256, 1)))
 model.add(BatchNormalization())
 model.add(Conv2D(filters=16, kernel_size=(3,3), activation='relu', padding='same'))
 model.add(BatchNormalization()) 
 model.add(AveragePooling2D(3,3))
 model.add(Dropout(0.2))
 
-model.add(Conv2D(filters=32, kernel_size=(3,3), activation='relu', padding='same'))
+model.add(Conv2D(filters=32, kernel_size=(2,2), activation='relu', padding='same'))
 model.add(BatchNormalization()) 
 model.add(Conv2D(filters=32, kernel_size=(3,3), activation='relu', padding='same'))
 model.add(BatchNormalization()) 
 model.add(AveragePooling2D(3,3))
 model.add(Dropout(0.3))
 
-model.add(Conv2D(filters=64, kernel_size=(3,3), activation='relu', padding='same'))
+model.add(Conv2D(filters=64, kernel_size=(2,2), activation='relu', padding='same'))
 model.add(BatchNormalization()) 
 model.add(Conv2D(filters=64, kernel_size=(3,3), activation='relu', padding='same'))
 model.add(BatchNormalization()) 
@@ -108,28 +120,37 @@ model.add(Dense(26, activation='softmax'))
 model.summary()
 
 #3. Compile, Train
+
+train_generator = idg.flow(x_train, y_train, batch_size=28)
+test_generator = idg2.flow(x_test, y_test, batch_size=28)
+valid_generator = idg2.flow(x_valid, y_valid)
+pred_generator = idg2.flow(x_pred)
+
+es = EarlyStopping(monitor='val_loss', patience=40, verbose=1)
+lr = ReduceLROnPlateau(monitor='val_loss', patience=20, factor=0.4, verbose=1)
+
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
-model.fit(x_train, y_train, batch_size=28, epochs=5, validation_split=0.2, verbose=1)
+model.fit_generator(train_generator, epochs=10, validation_data=valid_generator, verbose=1, callbacks=[es, lr])
 
 #4. Evaluate, Predict
-loss, acc = model.evaluate(x_test, y_test, batch_size=28)
+loss, acc = model.evaluate_generator(test_generator)
 print("loss : ", loss)
 print("acc : ", acc)
 
-# loss :  88.31974792480469
-# acc :  0.027799999341368675
-
-y_pred = model.predict(x_pred)
+y_pred = model.predict_generator(pred_generator)
+y_pred[y_pred<0.5] = 0
+y_pred[y_pred>=0.5] = 1
 print(y_pred.shape) # (5000, 26)
-print(y_pred)
 
-# result = pd.DataFrame(y_pred)
-# result = y_pred.to_numpy()
+
 sub.iloc[:,1:] = y_pred
 
-sub.to_csv('../data/DACON_vision2/0208_1.csv', index=False)
+sub.to_csv('../data/DACON_vision2/sub_0209_1.csv', index=False)
+print(sub.head())
+# sub
+# score 
 
-# sub_0208_2.csv
-# score 0 
-
-#  >>> 0.5 이하는 0, 0.5 이상은 1로 바꿔보자
+# Kerasclassifer >> hyperparameter 확인해보기
+# x, y 제대로 넣은 거 맞는지 다시 확인 , acc 너무 낮다.
+# dirty data - 글자 있는 곳이 1일까, 없는 곳이 1일까
+# kfold
