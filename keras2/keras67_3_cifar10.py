@@ -19,6 +19,8 @@ print(x_train.shape, y_train.shape)     # (40000, 32, 32, 3) (40000, 1)
 print(x_test.shape, y_test.shape)       # (10000, 32, 32, 3) (10000, 1)
 print(x_valid.shape, y_valid.shape)     # (10000, 32, 32, 3) (10000, 1)
 
+print(len(x_train)) # 40000
+
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 y_valid = to_categorical(y_valid)
@@ -69,12 +71,13 @@ es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, mode='min')
 
 model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.01), metrics=['acc'])
-hist = model.fit_generator(train_generator, epochs=50, validation_data=valid_generator, callbacks=[es, lr])
+hist = model.fit_generator(train_generator, epochs=50, \
+    steps_per_epoch = len(x_train) // 16 , validation_data=valid_generator, callbacks=[es, lr])
 
 #4. Evaluate, Predict
 loss, acc = model.evaluate(test_generator)
 print("loss : ", loss)
 print("acc : ", acc)    
 
-# loss :  2.250462055206299
-# acc :  0.6003999710083008
+# loss :  1.1506491899490356
+# acc :  0.6115999817848206
