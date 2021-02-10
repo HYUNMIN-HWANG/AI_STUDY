@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Dropout, MaxPool2D, BatchNormalization, AveragePooling2D, Activation
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.optimizers import Adam
 
 #1. DATA
@@ -22,13 +22,13 @@ print(y_train.shape, y_valid.shape, y_test.shape)  # (1319,) (347,) (70,)
 
 #2. Modeling
 model = Sequential()
-model.add(Conv2D(128, (2,2), padding='same', input_shape=(56, 56, 3)))
+model.add(Conv2D(32, (2,2), padding='same', input_shape=(56, 56, 3)))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
-model.add(Conv2D(128, (2,2), padding='same'))
+model.add(Conv2D(32, (2,2), padding='same'))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
-model.add(Conv2D(128, (2,2), padding='same'))
+model.add(Conv2D(32, (2,2), padding='same'))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(AveragePooling2D(2,2))
@@ -41,6 +41,18 @@ model.add(Conv2D(64, (2,2), padding='same'))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(Conv2D(64, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(AveragePooling2D(2,2))
+model.add(Dropout(0.2))
+
+model.add(Conv2D(128, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(Conv2D(128, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(Conv2D(128, (2,2), padding='same'))
 model.add(Activation('relu'))
 model.add(BatchNormalization())
 model.add(AveragePooling2D(2,2))
@@ -58,11 +70,13 @@ model.add(Dense(1, activation='sigmoid'))
 #3. Compile, Train
 es = EarlyStopping(monitor='val_loss', patience=50, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', factor=0.4, patience=30, mode='min')
+path = '../data/modelcheckpoint/k67_2_{val_loss:.3f}_{epoch:02d}.h5'
+cp = ModelCheckpoint(path, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 
 model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.01), metrics=['acc'])
-model.fit(x_train, y_train, epochs=1000, batch_size=8, validation_data=(x_valid, y_valid), callbacks=[es, lr])
+model.fit(x_train, y_train, epochs=1000, batch_size=16, validation_data=(x_valid, y_valid), callbacks=[es, lr, cp])
 
-loss, acc = model.evaluate(x_test, y_test, batch_size=8)
+loss, acc = model.evaluate(x_test, y_test, batch_size=16)
 print("loss : ", loss)
 print("acc : ", acc)
 

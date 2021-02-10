@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import *
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold, StratifiedKFold
 from keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 
@@ -28,6 +28,8 @@ print("<==complete load==>")
 
 print(x.shape, y.shape, x_pred.shape) # (50000, 256, 256, 1) (50000, 26) (5000, 256, 256, 1)
 x[x < 253] = 0
+
+kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=47)
 x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=47)
@@ -83,7 +85,7 @@ model.add(Dense(26, activation='softmax'))
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, mode='min')
 
-model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.01, epsilon=None), metrics=['acc'])
+model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.001, epsilon=None), metrics=['acc'])
 hist = model.fit_generator(train_generator, epochs=30, \
     steps_per_epoch = len(x_train) // batch , validation_data=valid_generator, callbacks=[es, lr])
 
@@ -103,8 +105,8 @@ print(y_pred.shape) # (5000, 26)
 
 sub.iloc[:,1:] = y_pred
 
-sub.to_csv('../data/DACON_vision2/sub_0210_1.csv', index=False)
+sub.to_csv('../data/DACON_vision2/sub_0210_2.csv', index=False)
 print(sub.head())
 
-# sub 제출안함
+# sub
 # score 	

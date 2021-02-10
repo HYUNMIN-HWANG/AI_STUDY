@@ -57,6 +57,7 @@ print(valid[0][1].shape)     # (32,)            >> x_valid
 # np.save('../data/image/gender/npy/keras67_valid_x.npy', arr = valid[0][0]) 
 # np.save('../data/image/gender/npy/keras67_valid_y.npy', arr = valid[0][1]) 
 
+'''
 #2. Modeling
 model = Sequential()
 model.add(Conv2D(32, (2,2), padding='same', activation='relu', input_shape=(56, 56, 3)))
@@ -113,3 +114,4 @@ print("acc : ", acc)
 # y_pred = model.predict_generator(train[0][0])
 # print(np.where(y_pred>0.5, 1, 0))
 
+'''
