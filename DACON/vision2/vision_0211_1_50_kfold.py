@@ -88,7 +88,7 @@ for alph in alphabet :  # 한 알파벳씩 검증
         print(x_train.shape, x_test.shape, x_valid.shape)  # (20000, 50, 50, 1) (25000, 50, 50, 1) (5000, 50, 50, 1)
         print(y_train.shape, y_test.shape, y_valid.shape)  # (20000,) (25000,) (5000,)
 
-        batch = 16
+        batch = 25
         train_generator = train_datagen.flow(x_train, y_train, batch_size=batch, seed=2021)
         test_generator = etc_datagen.flow(x_test, y_test, batch_size=batch, seed=2021)
         valid_generator = etc_datagen.flow(x_valid, y_valid)
@@ -99,7 +99,7 @@ for alph in alphabet :  # 한 알파벳씩 검증
 
         #3. Compile, Train
 
-        path = '../data/DACON_vision2/cp/vision_0210_4_{val_loss:.4f}.hdf5'
+        path = '../data/DACON_vision2/cp/vision_0211_1_{val_loss:.4f}.hdf5'
         cp = ModelCheckpoint(filepath=path, monitor='val_loss', mode='min', save_best_only=True, verbose=1)
         es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
         lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4, mode='min')
@@ -142,8 +142,10 @@ for alph in alphabet :  # 한 알파벳씩 검증
 print("mean loss : ", sum(val_loss_list)/26*kf_split)
 print("mean acc : ", sum(val_acc_list)/26*kf_split)
 
-sub.to_csv('../data/DACON_vision2/sub_0210_4.csv', index=False)
+sub.to_csv('../data/DACON_vision2/sub_0211_1.csv', index=False)
 print(sub.head())
 
 # sub
 # score 
+
+# 알파벳 하나에 한시간 걸림 >> 총 26시간 예상됨... 이건 아닌 듯

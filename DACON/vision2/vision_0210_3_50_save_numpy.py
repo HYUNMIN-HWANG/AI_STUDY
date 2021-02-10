@@ -46,12 +46,12 @@ for i in range(0,50000):
 
 x = pd.concat(df_x)
 x = x.values
-# print("x.shape ", x.shape)       # (12800000, 256) >>> (50000, 64, 64, 1)
+# print("x.shape ", x.shape)       # (12800000, 256) >>> (50000, 50, 50, 1)
 # print(x[0,:])
 x[100 < x] = 253
 x[x < 100] = 0
 x = x.reshape(50000, 50, 50, 1)
-print("x.shape ", x.shape)      # (50000, 64, 64, 1)
+print("x.shape ", x.shape)      # (50000, 50, 50, 1)
 
 y = train.iloc[:,1:]
 y = y.values
@@ -81,10 +81,10 @@ for i in range(0,5000):
 
 x_pred = pd.concat(df_pred)
 x_pred = x_pred.values
-print(x_pred.shape)       # (1280000, 256) >>> (5000, 64, 64, 1)
+print(x_pred.shape)       # (1280000, 256) >>> (5000, 50, 50, 1)
 
 x_pred = x_pred.reshape(5000, 50, 50, 1)
 x_pred[100 < x_pred] = 253
 x_pred[x_pred < 100] = 0
-print("x_pred.shape ", x_pred.shape)       # (5000, 64, 64, 1)
+print("x_pred.shape ", x_pred.shape)       # (5000, 50, 50, 1)
 np.save('../data/DACON_vision2/npy/vision_x_pred3.npy', arr=x_pred)
