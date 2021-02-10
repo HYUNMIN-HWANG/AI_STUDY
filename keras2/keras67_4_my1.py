@@ -25,10 +25,14 @@ print(x_train.shape, x_valid.shape, x_test.shape)  # (1319, 56, 56, 3) (347, 56,
 print(y_train.shape, y_valid.shape, y_test.shape)  # (1319,) (347,) (70,)
 
 #2. Modeling
-# model = load_model('../data/modelcheckpoint/k67_56_0.693.h5')   # keep
+# model = load_model('../data/modelcheckpoint/k67_56_0.693.h5')   # 
 # model = load_model('../data/modelcheckpoint/k67_56_2_0.691.h5')   # 
 # model = load_model('../data/modelcheckpoint/k67_56_3_0.688.h5')   # 
-model = load_model('../data/modelcheckpoint/k67_56_3_0.688.hdf5')   # 
+# model = load_model('../data/modelcheckpoint/k67_56_6_0.690.hdf5')   # keep
+# model = load_model('../data/modelcheckpoint/k67_0.682_17.h5')   # 
+model = load_model('../data/modelcheckpoint/k67_56_7_0.674.hdf5')   # keep
+
+
 
 #3. Compile, Train
 # es = EarlyStopping(monitor='val_loss', patience=50, mode='min')
@@ -104,3 +108,9 @@ HB_pred = model.predict(HB)
 HB_pred = HB_pred[0][0]
 # print(HB_pred)
 print("현빈은   ",np.round(HB_pred*100,2), '%의 확률로 남자입니다.')
+
+# 당신은    50.43 %의 확률로 여자입니다.
+# 이혜리는  32.75 %의 확률로 여자입니다.
+# 이효리는  39.9 %의 확률로 여자입니다.
+# 강동원는  62.47 %의 확률로 남자입니다.
+# 현빈은    62.21 %의 확률로 남자입니다.

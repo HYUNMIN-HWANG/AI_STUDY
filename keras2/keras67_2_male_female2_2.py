@@ -22,43 +22,52 @@ print(y_train.shape, y_valid.shape, y_test.shape)  # (1319,) (347,) (70,)
 
 #2. Modeling
 model = Sequential()
-model.add(Conv2D(64, (2,2), padding='same', input_shape=(56, 56, 3), activation='relu'))
-model.add(Conv2D(64,(2,2), activation='relu',  padding='same'))
+model.add(Conv2D(128, (2,2), padding='same', input_shape=(56, 56, 3)))
+model.add(Activation('relu'))
 model.add(BatchNormalization())
+model.add(Conv2D(128, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(Conv2D(128, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(AveragePooling2D(2,2))
+model.add(Dropout(0.2))
+
+model.add(Conv2D(64, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(Conv2D(64, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(Conv2D(64, (2,2), padding='same'))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(AveragePooling2D(2,2))
+model.add(Dropout(0.2))
+
 model.add(Flatten())
-model.add(Dense(16, activation='relu'))
+model.add(Dense(64))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
+model.add(Dense(32))
+model.add(Activation('relu'))
+model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 
 #3. Compile, Train
 es = EarlyStopping(monitor='val_loss', patience=50, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', factor=0.4, patience=30, mode='min')
-path = '../data/modelcheckpoint/k67_56_5_{val_loss:.3f}.hdf5'
+# path = '../data/modelcheckpoint/k67_56_6_{val_loss:.3f}.hdf5'
+path = '../data/modelcheckpoint/k67_56_8_{val_loss:.3f}.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 
-model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.01), metrics=['acc'])
-model.fit(x_train, y_train, epochs=1000, batch_size=16, validation_data=(x_valid, y_valid), callbacks=[es, lr, cp])
+model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.05), metrics=['acc'])
+model.fit(x_train, y_train, epochs=1000, batch_size=8, validation_data=(x_valid, y_valid), callbacks=[es, lr, cp])
 
-loss, acc = model.evaluate(x_test, y_test, batch_size=16)
+loss, acc = model.evaluate(x_test, y_test, batch_size=8)
 print("loss : ", loss)
 print("acc : ", acc)
 
-# loss :  0.9621424078941345
-# acc :  0.5428571701049805
-
-# loss :  0.9163194894790649
-# acc :  0.5571428537368774
-
-# loss :  1.775903582572937
-# acc :  0.5428571701049805
-
-# loss :  0.6946509480476379
-# acc :  0.48571428656578064
-
-# loss :  2.7977030277252197
-# acc :  0.5142857432365417
-
-# loss :  1.3844975233078003
-# acc :  0.5142857432365417
-
-# loss :  0.6946845054626465
-# acc :  0.48571428656578064
+# loss :  0.9973050951957703
+# acc :  0.5285714268684387
