@@ -108,5 +108,5 @@ sub.iloc[:,1:] = y_pred
 sub.to_csv('../data/DACON_vision2/sub_0210_2.csv', index=False)
 print(sub.head())
 
-# sub
-# score 	
+# sub_0210_1(2)
+# score 0.5342923077
