@@ -83,7 +83,7 @@ lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, mode='min')
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 model.fit_generator(
-    train, steps_per_epoch=8, epochs=100, validation_data=test, validation_steps=4
+    train, steps_per_epoch=8, epochs=100, validation_data=test, validation_steps=4, callbacks=[es, lr]
 )
 
 #4. Evaluate, Predict

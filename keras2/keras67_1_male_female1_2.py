@@ -29,8 +29,8 @@ train = train_datagen.flow_from_directory(
     '../data/image/gender/',
     target_size=(56, 56),
     class_mode='binary',
-    # batch_size=batch,
-    batch_size=1389,
+    batch_size=batch,
+    # batch_size=1389,
     subset="training"
 )
 # Found 1389 images belonging to 2 classes.
@@ -39,8 +39,8 @@ valid = train_datagen.flow_from_directory(
     '../data/image/gender/',
     target_size=(56, 56),
     class_mode='binary',
-    # batch_size=batch,
-    batch_size=347,
+    batch_size=batch,
+    # batch_size=347,
     subset="validation"
 )
 # Found 347 images belonging to 2 classes.
@@ -52,11 +52,11 @@ print(valid[0][0].shape)     # (32, 56, 56, 3)  >> x_valid
 print(valid[0][1].shape)     # (32,)            >> x_valid
 
 # data numpy save
-np.save('../data/image/gender/npy/keras67_train_x.npy', arr = train[0][0]) 
-np.save('../data/image/gender/npy/keras67_train_y.npy', arr = train[0][1]) 
-np.save('../data/image/gender/npy/keras67_valid_x.npy', arr = valid[0][0]) 
-np.save('../data/image/gender/npy/keras67_valid_y.npy', arr = valid[0][1]) 
-'''
+# np.save('../data/image/gender/npy/keras67_train_x.npy', arr = train[0][0]) 
+# np.save('../data/image/gender/npy/keras67_train_y.npy', arr = train[0][1]) 
+# np.save('../data/image/gender/npy/keras67_valid_x.npy', arr = valid[0][0]) 
+# np.save('../data/image/gender/npy/keras67_valid_y.npy', arr = valid[0][1]) 
+
 #2. Modeling
 model = Sequential()
 model.add(Conv2D(32, (2,2), padding='same', activation='relu', input_shape=(56, 56, 3)))
@@ -102,4 +102,14 @@ print("val_acc : ", val_acc[:-1])   # val_acc 처음부터 끝까지
 # acc :  0.5983787775039673
 # val_acc :  [0.515625, 0.46875, 0.5078125, 0.515625, 0.515625, 0.484375, 0.453125, 0.46875, 0.46875, 0.6484375, 0.53125, 0.5625, 0.484375, 0.484375, 0.4921875, 0.5625, 0.5703125, 0.5703125, 0.5703125, 0.53125, 0.6796875, 
 # 0.53125, 0.625, 0.5703125, 0.5, 0.5625, 0.5390625, 0.6015625, 0.609375, 0.609375, 0.5703125, 0.6171875, 0.5703125, 0.5859375, 0.4765625, 0.53125, 0.53125, 0.4921875, 0.609375, 0.671875, 0.5859375, 0.53125, 0.546875, 0.609375, 0.484375, 0.5703125, 0.5078125, 0.640625, 0.59375, 0.609375, 0.484375, 0.5234375, 0.6171875, 0.625, 0.5546875, 0.59375, 0.515625, 0.6953125, 0.6328125, 0.5703125, 0.578125, 0.5859375, 0.6328125, 0.515625, 0.578125, 0.6328125, 0.609375, 0.609375, 0.6015625, 0.5859375, 0.5703125, 0.6328125, 0.5546875, 0.515625, 0.609375, 0.6640625, 0.59375, 0.5625, 0.6171875, 0.4921875, 0.5625, 0.53125, 0.6015625, 0.6484375, 0.5625, 0.671875, 0.609375, 0.5859375, 0.515625, 0.5546875, 0.546875, 0.6015625, 0.609375, 0.5703125, 0.6328125, 0.5703125, 0.5703125, 0.5703125, 0.5703125]
-'''
+
+loss, acc = model.evaluate(valid)
+print("loss : ", loss)
+print("acc : ", acc)
+
+# loss :  0.6926454305648804
+# acc :  0.5158501267433167
+
+# y_pred = model.predict_generator(train[0][0])
+# print(np.where(y_pred>0.5, 1, 0))
+

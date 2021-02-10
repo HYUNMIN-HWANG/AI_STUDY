@@ -68,6 +68,7 @@ print(xy_train[0][1].shape)  # (120,)
 # print(xy_train[15][1].shape) # (10,) >> 0부터 15까지 이미지가 생성된다.
 print("==========================================")
 # npy 저장
+# 주의 포인트 : 전체 데이터를 저장해야 하기 때문에 batch_size 에 전체 데이터가 들어갈 수 있도록 설정한다.
 # np.save('../data/image/brain/npy/keras66_train_x.npy', arr=xy_train[0][0]) # train_x 가 저장된다.
 # np.save('../data/image/brain/npy/keras66_train_y.npy', arr=xy_train[0][1]) # train_y 가 저장된다.
 # np.save('../data/image/brain/npy/keras66_test_x.npy', arr=xy_test[0][0]) # test_x 가 저장된다.

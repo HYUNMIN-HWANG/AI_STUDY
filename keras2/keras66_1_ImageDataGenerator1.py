@@ -3,6 +3,7 @@
 
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+# 참고 : https://keras.io/ko/preprocessing/image/
 
 # [1] 선언
 # ImageDataGenerator 선언 >> 이미지를 증폭시킴으로써 더 많은 데이터로 훈련시킬 수 있다.
@@ -15,14 +16,18 @@ train_datagen = ImageDataGenerator(
     rotation_range=5,       # 회전
     zoom_range=1.2,         # 확대
     shear_range=0.7,        # 밀림 정도
-    fill_mode='nearest'     # 빈 자리를 유사한 값으로 채운다.
+    fill_mode='nearest'     # 빈 자리를 유사한 값으로 채운다.(padding='same'과 비슷)
 )
 test_datagen = ImageDataGenerator(rescale=1./255)   # 전처리만 한다. >> test에서는 이미지 증폭을 할 필요가 없다.
 
 # [2] 데이터화
 #   1) flow >> 이미지가 데이터화 되어 있을 때 사용함
 #   2) flow_from_directory >> 폴더 안에 있는 파일을 데이터화 한다.
-# 폴더 자체를 라벨링할 수 있다. --> (ex) ad : 0, noraml : 1
+#       >> 폴더 자체를 라벨링할 수 있다. --> (ex) ad : 0, noraml : 1
+
+#   [참고]
+#   * fit_generator 는 배치사이즈 신경 안써도 된다. 자동으로 연산해준다.
+#   * fit 할 때는 배치사이즈 고려해서 잘라줘야 한다.
 
 # train_generator
 # ad / normal (앞에 있는 걸 0, 뒤에 있는 걸 1로 라벨링됨)
@@ -38,10 +43,6 @@ xy_train = train_datagen.flow_from_directory(
     class_mode='binary'             # 이진분류 0, 1
 )
 # 결과 : Found 160 images belonging to 2 classes.
-
-#   [참고]
-#   * fit_generator 는 배치사이즈 신경 안써도 된다. 자동으로 연산해준다.
-#   * fit 할 때는 배치사이즈 고려해서 잘라줘야 한다.
 
 # test_generator
 xy_test = test_datagen.flow_from_directory(
