@@ -22,36 +22,17 @@ print(y_train.shape, y_valid.shape, y_test.shape)  # (1319,) (347,) (70,)
 
 #2. Modeling
 model = Sequential()
-model.add(Conv2D(32, 2, padding='same', input_shape=(56, 56, 3), activation='relu'))
+model.add(Conv2D(64, (2,2), padding='same', input_shape=(56, 56, 3), activation='relu'))
+model.add(Conv2D(64,(2,2), activation='relu',  padding='same'))
 model.add(BatchNormalization())
-model.add(Conv2D(32, (2,2), padding='same', activation='relu'))
-model.add(BatchNormalization())
-model.add(Dropout(0.2))
-model.add(Conv2D(64, (2,2), padding='same', activation='relu'))
-model.add(BatchNormalization())
-model.add(Conv2D(64, (2,2), padding='same', activation='relu'))
-model.add(BatchNormalization())
-model.add(AveragePooling2D(2,2))
-model.add(Dropout(0.3))
-model.add(Conv2D(128, (2,2), padding='same', activation='relu'))
-model.add(BatchNormalization())
-model.add(Conv2D(128, (2,2), padding='same', activation='relu'))
-model.add(BatchNormalization())
-model.add(AveragePooling2D(2,2))
-model.add(Dropout(0.4))
 model.add(Flatten())
-model.add(Dense(64, activation='relu'))
-model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 #3. Compile, Train
 es = EarlyStopping(monitor='val_loss', patience=50, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', factor=0.4, patience=30, mode='min')
-# path = '../data/modelcheckpoint/k67_2_{val_loss:.3f}_{epoch:02d}.h5'
-# path = '../data/modelcheckpoint/k67_3_{val_loss:.3f}_{epoch:02d}.h5'
-# path = '../data/modelcheckpoint/k67_56_{val_loss:.3f}.h5'
-path = '../data/modelcheckpoint/k67_56_3_{val_loss:.3f}.h5'
+path = '../data/modelcheckpoint/k67_56_5_{val_loss:.3f}.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 
 model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.01), metrics=['acc'])
@@ -75,3 +56,9 @@ print("acc : ", acc)
 
 # loss :  2.7977030277252197
 # acc :  0.5142857432365417
+
+# loss :  1.3844975233078003
+# acc :  0.5142857432365417
+
+# loss :  0.6946845054626465
+# acc :  0.48571428656578064

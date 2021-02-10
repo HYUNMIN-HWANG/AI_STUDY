@@ -25,9 +25,10 @@ print(x_train.shape, x_valid.shape, x_test.shape)  # (1319, 56, 56, 3) (347, 56,
 print(y_train.shape, y_valid.shape, y_test.shape)  # (1319,) (347,) (70,)
 
 #2. Modeling
-model = load_model('../data/modelcheckpoint/k67_56_0.693.h5')   # keep
+# model = load_model('../data/modelcheckpoint/k67_56_0.693.h5')   # keep
 # model = load_model('../data/modelcheckpoint/k67_56_2_0.691.h5')   # 
 # model = load_model('../data/modelcheckpoint/k67_56_3_0.688.h5')   # 
+model = load_model('../data/modelcheckpoint/k67_56_3_0.688.hdf5')   # 
 
 #3. Compile, Train
 # es = EarlyStopping(monitor='val_loss', patience=50, mode='min')
@@ -81,7 +82,7 @@ HB = datagen_2.flow(my5)
 
 my_pred = model.predict(my)
 my_pred = my_pred[0][0]
-print(my_pred)
+# print(my_pred)
 print("당신은   ",np.round((1-my_pred)*100,2), '%의 확률로 여자입니다.')
 
 HL_pred = model.predict(HL)
