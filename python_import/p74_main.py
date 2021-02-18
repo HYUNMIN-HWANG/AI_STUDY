@@ -8,3 +8,7 @@ malddong = p73.Person('maldong', 20, 'Seoul jongro')
 # 말동 클래스 안에 있는 함수를 실행시킨다.
 malddong.greeting() 
 
+
+
+# 파이썬 모듈 배포 참고 페이지 
+# https://docs.python.org/ko/3/distributing/index.html
