@@ -136,12 +136,12 @@ for alph in alphabet :  # 한 알파벳씩 검증
 print("mean loss : ", sum(val_loss_list)/26)
 print("mean acc : ", sum(val_acc_list)/26)
 
-# mean loss : 
-# mean acc : 
+# mean loss :  9.230142545241575
+# mean acc :  0.4998094748992186
 
 sub.to_csv('../data/DACON_vision2/sub_0219_2.csv', index=False)
 print(sub.head())
 
 
-# sub	sub_0219_1.csv
-# score 0.5252461538	
+# sub	sub_0219_2.csv
+# score 0.4921846154	
