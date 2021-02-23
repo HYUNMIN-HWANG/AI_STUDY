@@ -72,7 +72,9 @@ def mymodel () :
     return model
 
 # alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-alphabet = ['c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+# alphabet = ['c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+# alphabet = ['j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+alphabet = ['q','r','s','t','u','v','w','x','y','z']
 
 val_loss_list = []
 val_acc_list = []
