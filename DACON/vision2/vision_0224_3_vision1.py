@@ -1,6 +1,3 @@
-# private 2등 코드
-# 300, 300 >> 56, 56
-
 # warnings.filterwarnings("ignore")
 import tensorflow as tf
 import numpy as np
@@ -35,30 +32,52 @@ x_train = train.drop(['id', 'digit', 'letter'], axis=1).values
 x_train = x_train.reshape(-1, 28, 28, 1)
 
 x_train = np.where((x_train<=20)&(x_train!=0) ,0.,x_train)  # 특징이 낮은 것들은 모두 0으로 반환
+x_train = np.where((x_train>=80) ,252.,x_train)  # 알파벳만 강조
 
 x_train = x_train/255
 x_train = x_train.astype('float32')
 
-y = train['digit']
-y_train = np.zeros((len(y), len(y.unique())))  # 총 행의수 , 10(0~9)
+print(x_train.shape)    # (2048, 28, 28, 1)
 
-print(y_train.shape)    # (2048, 10)
+y = train['letter']
+y_train = np.zeros((len(y), len(y.unique())))  # 총 행의수 26
+print(y_train.shape)    # (2048, 26)
 
-for i, digit in enumerate(y):
-    y_train[i, digit] = 1
-    print(y_train[i])
+i = 0
+for letter in y :
+    print(i, letter)
+    # 문자열을 아스키 코드로 변환, A = 0 부터 시작하도록 지정
+    asc =  ord(letter) - 65
+    y_train[i, asc] = 1
+    i += 1
+print(y_train.shape)    # (2048, 26)
 
 train_224=np.zeros([2048,56,56,3],dtype=np.float32) # [2048,56,56,3] 의 검은색 배경을 만들어 준다.
 
 for i, s in enumerate(x_train):
-    converted = cv2.cvtColor(s, cv2.COLOR_GRAY2RGB) # 컬러 이미지로 바꿔줌
+    converted = cv2.cvtColor(s, cv2.COLOR_GRAY2RGB) 
     resized = cv2.resize(converted,(56,56),interpolation = cv2.INTER_CUBIC) # (56, 56)으로 리사이즈
+    blur =  cv2.GaussianBlur(resized, (5,5), cv2.BORDER_DEFAULT)
+    threshold, thresh = cv2.threshold(blur, 50, 255, cv2.THRESH_BINARY)
+
+    cv2.imshow("thresh", thresh)
+    cv2.waitKey(0)
+
     del converted
     train_224[i] = resized
+    # cv2.imshow("resized_224", train_224[i])
+    # cv2.waitKey(0)
     del resized
     bek.clear_session()
     gc.collect()
 
+    # img = cv.imread(file_path)
+    # img = cv.resize(img,(64,64))
+    # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    # blur = cv.GaussianBlur(gray, (5,5), cv.BORDER_DEFAULT)
+    # threshold, thresh = cv.threshold(blur, 200, 255, cv.THRESH_BINARY)
+
+'''
 from tensorflow.python.keras.callbacks import ModelCheckpoint
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 from sklearn import metrics
