@@ -3,9 +3,11 @@ import numpy as np
 
 
 img_color = cv.imread('../data/DACON_vision2/dirty_mnist_2nd/00000.png')
+# img_color = cv.imread('../data/DACON_vision2/dirty_mnist_2nd/00001.png')
 img_gray = cv.cvtColor(img_color, cv.COLOR_BGR2GRAY)
 blur = cv.GaussianBlur(img_gray, (3,3), cv.BORDER_DEFAULT)
 
+# 이진화
 ret, img_binary = cv.threshold(blur, 170, 255, cv.THRESH_BINARY)
 cv.imshow("img_binary", img_binary)
 # cv.waitKey(0)
@@ -15,6 +17,7 @@ erode = cv.erode(img_binary, kernel, iterations = 1)
 # cv.imshow("erode", erode)
 # cv.waitKey(0)
 
+# 노이즈 제거
 # morph = cv.morphologyEx(erode, cv.MORPH_OPEN, cv.getStructuringElement(cv.MORPH_ELLIPSE, (2,2)), iterations=2)
 morph = cv.morphologyEx(erode, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_ELLIPSE, (2,2)), iterations=2)
 cv.imshow("morph", morph)
@@ -67,7 +70,8 @@ print(digit_arr2[0][3])
 
 #리스트에 저장된 이미지를 32x32의 크기로 리사이즈해서 순서대로 저장
 for i in range(0,len(digit_arr2)) :
-    print("i ", i)  # 사각형으로 자른 이미지 하나 하나
+    print("i ", i)  # 전체 이미지 하나
+    
     for j in range(len(digit_arr2[i])) :
         count += 1 
         print("j ", j)
@@ -80,25 +84,14 @@ for i in range(0,len(digit_arr2)) :
                 mask = np.zeros((height,height))
                 tmp = (height - width)/2
                 mask[0:height, int(tmp):int(tmp)+width] = digit_arr2[i][j]
-                digit_arr2[i][j] = cv.resize(mask,(32,32))
+                digit_arr2[i][j] = cv.resize(mask,(64,64))
             else :
                 mask = np.zeros((width, width))
                 tmp = (width - height)/2
                 mask[int(tmp):int(tmp)+height, 0:width] = digit_arr2[i][j]
-                digit_arr2[i][j] = cv.resize(mask,(32,32))
+                digit_arr2[i][j] = cv.resize(mask,(64,64))
         else:
-            digit_arr2[i][j] = cv.resize(digit_arr2[i][j],(32,32))
+            digit_arr2[i][j] = cv.resize(digit_arr2[i][j],(64,64))
         if i == 9 : i = -1
-        cv.imwrite('../data/DACON_vision2/contour/'+str(i+1)+'_'+str(j)+'.png',digit_arr2[i][j])
+        cv.imwrite('../data/DACON_vision2/contour/64_'+str(i+1)+'_'+str(j)+'.png',digit_arr2[i][j])
 
-'''
-cv.imshow("result_color", img_color)
-# cv.waitKey(0)
-
-for cnt in contours :
-    area = cv.contourArea(cnt)
-    print(area)
-
-cv.imshow("result_color2", img_color)
-cv.waitKey(0)
-'''

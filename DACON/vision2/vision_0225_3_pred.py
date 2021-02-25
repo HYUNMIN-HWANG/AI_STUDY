@@ -75,14 +75,11 @@ print(x_train224.shape)    # (2048, 56, 56, 3)
 '''
 x_train224 = np.load('../data/DACON_vision2/npy/vision1_image.npy')
 
-idg = ImageDataGenerator(height_shift_range=(-1,1), 
-                        width_shift_range=(-1,1),
-                        rotation_range=120,
-                        fill_mode='nearest'
-                        )
+
+idg = ImageDataGenerator(height_shift_range=(-1,1), width_shift_range=(-1,1))
 idg2 = ImageDataGenerator()
 
-
+'''
 # y
 y = train['letter']
 # y_train = np.zeros((len(y), 1))  # 총 행의수 26
@@ -110,8 +107,8 @@ print(x_train.shape, x_test.shape, x_valid.shape)
 train_generator = idg.flow(x_train, y_train, batch_size=16)
 test_generator = idg2.flow(x_test, y_test, batch_size=16)
 valid_generator = idg2.flow(x_valid, y_valid)
-
-
+'''
+"""
 #2 modeling
 # def modeling(activation1='relu', activation2='relu', activation3='relu', activation4='relu', activation5='relu', activation6='relu') :
 # def modeling(lr=0.01) :
@@ -208,18 +205,40 @@ print("acc : ", acc)
 # loss :  0.6132016181945801
 # acc :  0.8341463208198547
 
+"""
+
+model = load_model('../data/DACON_vision2/cp/vision_0225_1_vison1_0.5535.hdf5') # <<-- 여기에 데이콘2 테스트 데이터를 넣어서 숫자를 예측한다.
+# 실제 알파벳 : 0,1,3,5,10,11,14,15,17,18,20,23,24,25 (14개 중, 8개 맞춤)
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_0.png')  # >> 20
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_1.png')  # >> 25
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_2.png')  # >> 20
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_3.png')  # >> 10
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_4.png')  # >> 19
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_5.png')  # >> 1 
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_6.png')  # >> 15
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_7.png')  # >> 22
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_8.png')  # >> 11
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_9.png')  # >> 5
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_10.png')  # >> 24
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_11.png')  # >> 18
+# pred_img = cv2.imread('../data/DACON_vision2/contour/64_1_12.png')  # >> 3
 
 
-model = load_model('../data/DACON_vision2/cp/vision_0225_1_vison1_0.3318.hdf5') # <<-- 여기에 데이콘2 테스트 데이터를 넣어서 숫자를 예측한다.
+pred_img = pred_img.astype('float32')
+# cv2.imshow("pred_img1", pred_img)
+# cv2.waitKey(0)
 
-# 테스트 : 40번째 있는 문자를 예측해보자
-pred_img = x_train224[49]
-# pred_img = cv2.imread('../data/DACON_vision2/contour/1_1.png')
-cv2.imshow("pred_img1", pred_img)
-cv2.waitKey(0)
+pred_img = cv2.resize(pred_img, (56,56)) # (56, 56)으로 리사이즈
+# cv2.imshow("pred_img2", pred_img)
+# cv2.waitKey(0)
+print(pred_img.shape)   # (56, 56, 3)
+ 
+pred_img = pred_img.reshape(1, pred_img.shape[0], pred_img.shape[1], pred_img.shape[2])/255.
+print(pred_img.shape)   # (1, 56, 56, 3)
 
-pred_img = pred_img.reshape(1, pred_img.shape[0], pred_img.shape[1], pred_img.shape[2])
 pred_generator = idg2.flow(pred_img, shuffle=False)
 
 result = model.predict_generator(pred_generator, verbose=True)
 print(result.argmax(1))
+
+# 예측을 잘 하는 것도 있고 이상하게 하는 것도 있다.

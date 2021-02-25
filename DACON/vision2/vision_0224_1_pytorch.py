@@ -73,8 +73,8 @@ transforms_test = transforms.Compose([
 trainset = MnistDataset('data/train', '../data/DACON_vision2/dirty_mnist_2nd_answer.csv', transforms_train)
 testset = MnistDataset('data/test', '../data/DACON_vision2/sample_submission.csv', transforms_test)
 
-train_loader = DataLoader(trainset, batch_size=2, num_workers=8)
-test_loader = DataLoader(testset, batch_size=2, num_workers=4)
+train_loader = DataLoader(trainset, batch_size=1, num_workers=8)
+test_loader = DataLoader(testset, batch_size=1, num_workers=4)
 
 
 class MnistModel(nn.Module):
