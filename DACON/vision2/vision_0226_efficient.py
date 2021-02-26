@@ -112,7 +112,7 @@ class EfficientNet_MultiLabel(nn.Module):
 
 # 해당 코드에서는 1fold만 실행
 
-kf = KFold(n_splits=2, shuffle=True, random_state=42)
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
 folds=[]
 for train_idx, valid_idx in kf.split(imgs):
     folds.append((train_idx, valid_idx))
@@ -120,7 +120,7 @@ for train_idx, valid_idx in kf.split(imgs):
 ### seed_everything(42)
 
 # 5개의 fold 모두 실행하려면 for문을 5번 돌리면 됩니다.
-for fold in range(1):
+for fold in range(5):
     model = EfficientNet_MultiLabel(in_channels=3).to(device)
 #     model = nn.DataParallel(model)
     train_idx = folds[fold][0]
@@ -138,7 +138,7 @@ for fold in range(1):
         ])
 
 
-    epochs=30
+    epochs=50
     batch_size=8        # 자신의 VRAM에 맞게 조절해야 OOM을 피할 수 있습니다.
     
     
@@ -212,7 +212,7 @@ for fold in range(1):
             valid_accuracy.append(np.mean(valid_batch_accuracy))
             
         if np.mean(valid_batch_accuracy)>valid_best_accuracy:
-            torch.save(model.state_dict(), '../data/DACON_vision2/cp/EfficientNetB0-fold{}.pt'.format(fold))
+            torch.save(model.state_dict(), '../data/DACON_vision2/cp/0226_EfficientNetB0-fold{}.pt'.format(fold))
             valid_best_accuracy = np.mean(valid_batch_accuracy)
         print('fold : {}\tepoch : {:02d}\ttrain_accuracy / loss : {:.5f} / {:.5f}\tvalid_accuracy / loss : {:.5f} / {:.5f}\ttime : {:.0f}'.format(fold+1, epoch+1,
                                                                                                                                               np.mean(batch_accuracy_list),
@@ -236,7 +236,7 @@ submission = pd.read_csv('../data/DACON_vision2/sample_submission.csv')
 with torch.no_grad():
     for fold in range(1):
         model = EfficientNet_MultiLabel(in_channels=3).to(device)
-        model.load_state_dict(torch.load('../data/DACON_vision2/cp/EfficientNetB0-fold{}.pt'.format(fold)))
+        model.load_state_dict(torch.load('../data/DACON_vision2/cp/0226_EfficientNetB0-fold{}.pt'.format(fold)))
         model.eval()
 
         test_dataset = MnistDataset_v2(imgs = test_imgs, transform=test_transform, train=False)
@@ -250,7 +250,7 @@ with torch.no_grad():
                 submission.iloc[n*32:(n+1)*32,1:] += pred_test
 
 submission.iloc[:,1:] = np.where(submission.values[:,1:]>=0.5, 1,0)
-submission.to_csv('../data/DACON_vision2/EfficientNetB0-fold0.csv', index=False)
+submission.to_csv('../data/DACON_vision2/sub0226_EfficientNetB0-fold0.csv', index=False)
 print("===Done===")
-# sub_0226_1_EfficientNetB0-fold0.csv
-# score 0.5115846154	
+# sub	sub_0226_1_EfficientNetB0-fold0.csv
+# score 	0.5115846154

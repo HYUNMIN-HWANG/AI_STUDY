@@ -34,7 +34,6 @@ print(test.shape)   # (20480, 786)
 # vision1에 나온 알파벳들을 훈련시켜보자
 
 # x
-
 def x_preprocess (x) :
     x_train = np.where((x<=20)&(x!=0) ,0.,x)  # 특징이 낮은 것들은 모두 0으로 반환
     x_train = np.where((x>=80) ,252.,x)  # 알파벳만 강조
