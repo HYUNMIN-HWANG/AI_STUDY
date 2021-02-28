@@ -17,22 +17,19 @@ import matplotlib.pyplot as plt
 from torch_poly_lr_decay import PolynomialLRDecay
 import random
 
-########################################
-
-
 torch.set_num_threads(1)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-labels_df = pd.read_csv('../data/DACON_vision2/dirty_mnist_2nd_answer.csv')[:]
+# ======================== Dacon Dataset Load ==========================
+labels_df = pd.read_csv('../data/DACON_vision2/dirty_mnist_2nd_answer.csv')[:] # 전체 다 사용
 imgs_dir = np.array(sorted(glob.glob('../data/DACON_vision2/dirty_mnist_2nd/*')))[:]
-labels = np.array(labels_df.values[:,1:])
+labels = np.array(labels_df.values[:,1:]) # index제외
 
 test_imgs_dir = np.array(sorted(glob.glob('../data/DACON_vision2/test_dirty_mnist_2nd/*')))
 
-imgs=[]
+imgs=[]#x
 for path in tqdm(imgs_dir[:]):
     img=cv2.imread(path, cv2.IMREAD_COLOR)
-    img = cv2.resize(img, (56,56)) # (56, 56)으로 리사이즈
     imgs.append(img)
 imgs=np.array(imgs)
 
@@ -45,11 +42,11 @@ class MnistDataset_v1(Dataset):
         self.train = train
         pass
     
-    def __len__(self):
+    def __len__(self): #dataset의 전체 개수를 알려준다.
         # 데이터 총 샘플 수
         return len(self.imgs)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx): # parameter로 idx를 넘겨주면 idx번째의 데이터를 반환한다.
         # 1개 샘플 get
         img = cv2.imread(self.imgs_dir[idx], cv2.IMREAD_COLOR)
         img = self.transform(img)
@@ -61,7 +58,6 @@ class MnistDataset_v1(Dataset):
         
         pass
     
-
 
 # 메모리에서 load
 class MnistDataset_v2(Dataset):
@@ -87,6 +83,8 @@ class MnistDataset_v2(Dataset):
         else:
             return img
 
+# ========================= reproduction을 위한 seed 설정=====================
+# https://dacon.io/competitions/official/235697/codeshare/2363?page=1&dtype=recent&ptype=pub
 def seed_everything(seed: int = 42):
     random.seed(seed)
     np.random.seed(seed)
@@ -96,7 +94,8 @@ def seed_everything(seed: int = 42):
     torch.backends.cudnn.deterministic = True  # type: ignore
     torch.backends.cudnn.benchmark = True  
 
-# EfficientNet -b3(pretrained)
+# ==================== model 정의 ==================================
+# EfficientNet -b0(pretrained)
 # MultiLabel output
 
 class EfficientNet_MultiLabel(nn.Module):
@@ -110,6 +109,7 @@ class EfficientNet_MultiLabel(nn.Module):
         x = torch.sigmoid(self.output_layer(x))
         return x
 
+# ============== 데이터 분리====================================
 # 해당 코드에서는 1fold만 실행
 
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -127,7 +127,6 @@ for fold in range(5):
     valid_idx = folds[fold][1]
 
 
-
     train_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.RandomHorizontalFlip(),
@@ -138,10 +137,8 @@ for fold in range(5):
         ])
 
 
-    epochs=50
-    batch_size=8        # 자신의 VRAM에 맞게 조절해야 OOM을 피할 수 있습니다.
-    
-    
+    epochs=30
+    batch_size=8         # 자신의 VRAM에 맞게 조절해야 OOM을 피할 수 있습니다.
     
     # Data Loader
     train_dataset = MnistDataset_v2(imgs = imgs[train_idx], labels=labels[train_idx], transform=train_transform)
@@ -150,17 +147,15 @@ for fold in range(5):
     valid_dataset = MnistDataset_v2(imgs = imgs[valid_idx], labels = labels[valid_idx], transform=valid_transform)
     valid_loader = DataLoader(dataset=valid_dataset, batch_size=batch_size, shuffle=False)       
     
-    
     # optimizer
     # polynomial optimizer를 사용합니다.
-    # 
+
     optimizer = torch.optim.Adam(model.parameters(), lr = 1e-3)
     decay_steps = (len(train_dataset)//batch_size)*epochs
     scheduler_poly_lr_decay = PolynomialLRDecay(optimizer, max_decay_steps=decay_steps, end_learning_rate=1e-6, power=0.9)
 
     criterion = torch.nn.BCELoss()
-    
-    
+       
     epoch_accuracy = []
     valid_accuracy = []
     valid_losses=[]
@@ -212,7 +207,7 @@ for fold in range(5):
             valid_accuracy.append(np.mean(valid_batch_accuracy))
             
         if np.mean(valid_batch_accuracy)>valid_best_accuracy:
-            torch.save(model.state_dict(), '../data/DACON_vision2/cp/0227_EfficientNetB3-fold{}.pt'.format(fold))
+            torch.save(model.state_dict(), '../data/DACON_vision2/cp/0228_EfficientNetB3-fold{}.pt'.format(fold))
             valid_best_accuracy = np.mean(valid_batch_accuracy)
         print('fold : {}\tepoch : {:02d}\ttrain_accuracy / loss : {:.5f} / {:.5f}\tvalid_accuracy / loss : {:.5f} / {:.5f}\ttime : {:.0f}'.format(fold+1, epoch+1,
                                                                                                                                               np.mean(batch_accuracy_list),
@@ -221,6 +216,7 @@ for fold in range(5):
                                                                                                                                               np.mean(valid_batch_loss),
                                                                                                                                               time.time()-start))
 
+# ===================== Test Image 로드 ==========================
 test_imgs=[]
 for path in tqdm(test_imgs_dir):
     test_img=cv2.imread(path, cv2.IMREAD_COLOR)
@@ -231,12 +227,13 @@ test_transform = transforms.Compose([
         transforms.ToTensor(),
         ])
 
+# ================ Test 추론 =============================
 submission = pd.read_csv('../data/DACON_vision2/sample_submission.csv')
 
 with torch.no_grad():
     for fold in range(1):
         model = EfficientNet_MultiLabel(in_channels=3).to(device)
-        model.load_state_dict(torch.load('../data/DACON_vision2/cp/0227_EfficientNetB3-fold{}.pt'.format(fold)))
+        model.load_state_dict(torch.load('../data/DACON_vision2/cp/0228_EfficientNetB3-fold{}.pt'.format(fold)))
         model.eval()
 
         test_dataset = MnistDataset_v2(imgs = test_imgs, transform=test_transform, train=False)
@@ -249,9 +246,7 @@ with torch.no_grad():
                 pred_test = model(X_test).cpu().detach().numpy()
                 submission.iloc[n*32:(n+1)*32,1:] += pred_test
 
+# ==================== 제출물 생성 ====================
 submission.iloc[:,1:] = np.where(submission.values[:,1:]>=0.5, 1,0)
-submission.to_csv('../data/DACON_vision2/sub0227_EfficientNetB3-fold0.csv', index=False)
-print("===Done===")
+submission.to_csv('../data/DACON_vision2/sub0228_EfficientNetB3-fold0.csv', index=False)
 
-# sub	
-# score 	
