@@ -1,11 +1,11 @@
 # cifar10 으로  vgg16을 넣어서 만든다.
 # 결과치 비교
 
+from tensorflow.keras.applications import VGG16
 from tensorflow.keras.datasets import cifar10
 import numpy as np
 import pandas as pd
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.applications import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.models import Sequential
@@ -56,9 +56,12 @@ loss, acc = model.evaluate(x_test, y_test, batch_size=32)
 print("loss : ", loss)
 print("acc : ", acc)
 
-# loss :  1.9435967206954956
-# acc :  0.604200005531311
-
 ## CNN
 # loss :  1.7849451303482056
 # acc :  0.5971999764442444
+
+###### 전이학습 ######
+# VGG16 
+# loss :  1.9435967206954956
+# acc :  0.604200005531311
+

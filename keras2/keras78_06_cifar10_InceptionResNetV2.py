@@ -1,6 +1,6 @@
-# VGG19
+# InceptionResNetV2
 
-from tensorflow.keras.applications import VGG19
+from tensorflow.keras.applications import InceptionResNetV2
 from tensorflow.keras.datasets import cifar10
 import numpy as np
 import pandas as pd
@@ -26,12 +26,12 @@ print(x_test.shape, y_test.shape)
 
 #2. Modeling
 
-vgg19 = VGG19(weights='imagenet', include_top=False, input_shape=(32,32,3))
+icrv2 = InceptionResNetV2(weights='imagenet', include_top=False, input_shape=(32,32,3))
 
-vgg19.trainable = False
+icrv2.trainable = False
 
 model = Sequential()
-model.add(vgg19)
+model.add(icrv2)
 model.add(Flatten())
 model.add(Dense(512, activation='relu'))
 model.add(Dense(32, activation='relu'))
@@ -63,3 +63,20 @@ print("acc : ", acc)
 # VGG19
 # loss :  1.9104373455047607
 # acc :  0.5917999744415283
+
+# Xception
+# ValueError: Input size must be at least 71x71; got `input_shape=(32, 32, 3)`
+
+# ResNet50
+# loss :  2.302600860595703
+# acc :  0.10000000149011612
+
+# ResNet101
+# loss :  2.3026106357574463
+# acc :  0.09989999979734421
+
+# InceptionV3
+# ValueError: Input size must be at least 75x75; got `input_shape=(32, 32, 3)`
+
+# InceptionResNetV2
+# ValueError: Input size must be at least 75x75; got `input_shape=(32, 32, 3)`
