@@ -250,3 +250,5 @@ with torch.no_grad():
 submission.iloc[:,1:] = np.where(submission.values[:,1:]>=0.5, 1,0)
 submission.to_csv('../data/DACON_vision2/sub0228_EfficientNetB3-fold0.csv', index=False)
 
+# sub	sub0228_EfficientNetB3-fold0.csv
+# score 0.8271384615
