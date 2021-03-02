@@ -66,6 +66,9 @@ print("acc : ", acc)
 
 # Xception
 # ValueError: Input size must be at least 71x71; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  2.4691503047943115
+# acc :  0.7441999912261963
 
 # ResNet50
 # loss :  2.302600860595703
@@ -91,6 +94,9 @@ print("acc : ", acc)
 
 # NasNetMobile
 # ValueError: When setting `include_top=True` and loading `imagenet` weights, `input_shape` should be (224, 224, 3).
+# >>> input_tensor 추가
+# loss :  5.635591506958008
+# acc :  0.39809998869895935
 
 # EfficientB0
 # loss :  2.302603244781494

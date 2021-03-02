@@ -66,6 +66,9 @@ print("acc : ", acc)
 
 # Xception
 # ValueError: Input size must be at least 71x71; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  2.4691503047943115
+# acc :  0.7441999912261963
 
 # ResNet50
 # loss :  2.302600860595703

@@ -66,6 +66,9 @@ print("acc : ", acc)
 
 # Xception
 # ValueError: Input size must be at least 71x71; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  2.4691503047943115
+# acc :  0.7441999912261963
 
 # ResNet50
 # loss :  2.302600860595703
@@ -77,9 +80,15 @@ print("acc : ", acc)
 
 # InceptionV3
 # ValueError: Input size must be at least 75x75; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  3.1279196739196777
+# acc :  0.6664999723434448
 
 # InceptionResNetV2
 # ValueError: Input size must be at least 75x75; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  2.2648801803588867
+# acc :  0.7383000254631042
 
 # DenseNet121
 # loss :  3.079972982406616

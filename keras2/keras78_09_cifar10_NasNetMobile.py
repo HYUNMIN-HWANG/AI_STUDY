@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.applications.vgg16 import preprocess_input
-from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.layers import Dense, Flatten, Input
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 
@@ -26,8 +26,8 @@ print(x_test.shape, y_test.shape)
 
 #2. Modeling
 
-nas = NASNetMobile(weights='imagenet', include_top=False, input_shape=(32,32,3))
-
+input_tensor = Input(shape=(32,32,3))
+nas = NASNetMobile(weights='imagenet', include_top=False, input_tensor=input_tensor)
 nas.trainable = False
 
 model = Sequential()
@@ -66,6 +66,9 @@ print("acc : ", acc)
 
 # Xception
 # ValueError: Input size must be at least 71x71; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  2.4691503047943115
+# acc :  0.7441999912261963
 
 # ResNet50
 # loss :  2.302600860595703
@@ -77,9 +80,15 @@ print("acc : ", acc)
 
 # InceptionV3
 # ValueError: Input size must be at least 75x75; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  3.1279196739196777
+# acc :  0.6664999723434448
 
 # InceptionResNetV2
 # ValueError: Input size must be at least 75x75; got `input_shape=(32, 32, 3)`
+# >> UpSampling2D & input_shape = (96, 96,3)으로 바꿔줌
+# loss :  2.2648801803588867
+# acc :  0.7383000254631042
 
 # DenseNet121
 # loss :  3.079972982406616
@@ -91,4 +100,6 @@ print("acc : ", acc)
 
 # NasNetMobile
 # ValueError: When setting `include_top=True` and loading `imagenet` weights, `input_shape` should be (224, 224, 3).
-
+# >>> input_tensor 추가
+# loss :  5.635591506958008
+# acc :  0.39809998869895935
