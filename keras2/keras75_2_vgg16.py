@@ -1,5 +1,5 @@
 # 전이학습 VGG16 (layer 총 16개)
-# 당겨온다음에 output shape을 바꿔본다.
+# 당겨온 다음에 output shape을 바꿔본다.
 
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Dense, Flatten

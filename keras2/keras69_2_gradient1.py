@@ -10,7 +10,7 @@ y = f(x)
 # 시각화
 plt.plot(x, y, 'k-')    # 'k-' 색깔 지정
 plt.plot(2, 2, 'sk')    # (2,2) 에 해당하는 지점에 점을 찍는다.
-# plt.plot(2, 2, 'bx')    # (2,2) 에 해당하는 지점에 x을 찍는다.
+# plt.plot(2, 2, 'bx')    # (2,2) 에 해당하는 지점에 blue색 x을 찍는다.
 plt.grid()
 plt.xlabel('x')
 plt.ylabel('y')
