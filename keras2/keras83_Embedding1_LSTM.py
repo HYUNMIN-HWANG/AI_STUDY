@@ -47,8 +47,8 @@ from tensorflow.keras.layers import Embedding, Dense, LSTM, Flatten, Conv1D, Bat
 model = Sequential()
 # [1] Embedding
 model.add(Embedding(input_dim=28, output_dim=11, input_length=5))  
-# model.add(Embedding(input_dim=8, output_dim=11, input_length=5))  # 28개보다 작을 때 >>  안된다. >> 데이터의 개수를 판단해서 28개보다 작으면 통과안시킴
-# model.add(Embedding(input_dim=80, output_dim=11, input_length=5)) # 28개보다 클 때 >> 된다. >> 28개보다 더 많은 건 상관없다.
+# model.add(Embedding(input_dim=8, output_dim=11, input_length=5))  # input_dim 28개보다 작을 때 >>  안된다. >> 데이터의 개수를 판단해서 28개보다 작으면 통과안시킴
+# model.add(Embedding(input_dim=80, output_dim=11, input_length=5)) # input_dim 28개보다 클 때   >>  된다.   >> 28개보다 더 많은 건 상관없다.
 # input_dim=28 : 워드 사이즈, 총 단어의 개수를 명시해준다. >> 실제 단어사전의 개수보다 같거나 커야 한다.
 # output_dim : output, 다음 레이어로 전달하는 파라미터의 개수
 # input_length=5 : 단어의 자릿수를 넣어준다. 컬럼 수
@@ -65,7 +65,7 @@ _________________________________________________________________
 '''
 # 3차원으로 아웃풋 나온다.
 
-# [2] Embedding - 뒤에 파라미터를 명확히 명시하지 않아도 됨 / input_length=None
+# [2] Embedding - 뒤에 파라미터를 명시하지 않아도 됨 / input_length=None
 # model.add(Embedding(28, 11))
 '''
 _________________________________________________________________
