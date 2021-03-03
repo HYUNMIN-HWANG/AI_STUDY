@@ -1,6 +1,3 @@
-# loss='sparse_categorical_crossentropy'
-# >> to_cateogorical & loss='categorical_crossentropy' 함께 사용한 것과 동일한 기능을 한다.
-
 from tensorflow.keras.datasets import reuters
 import numpy as np
 import pandas as pd
@@ -20,12 +17,21 @@ print("============================================================")
 print(x_train.shape, x_test.shape)  # (8982,) (2246,)
 print(y_train.shape, y_test.shape)  # (8982,) (2246,)
 
+
 # x
 print("뉴스기사 최대 길이 : ", max(len(l) for l in x_train))            # 2376
 print("뉴스기사 평균 길이 : ", sum(map(len, x_train)) / len(x_train))   # 145.5398574927633
+# map : 원래 for문을 사용해서 작업해야 할 것을 map 한 줄로 한꺼번에 처리할 수 있다.
+# map(len, x_train) : x_train 리스트에 있는 모든 요소의 len을 반환한다.
 
 # plt.hist([len(s) for s in x_train], bins=50)    # x 데이터의 길이
 # plt.show()
+
+# y 
+from tensorflow.keras.utils import to_categorical
+y_train = to_categorical(y_train)
+y_test = to_categorical(y_test)
+print(y_train.shape, y_test.shape)  # (8982, 46) (2246, 46)
 
 
 # y 분포
@@ -37,7 +43,7 @@ print("y 분포 : ", dict(zip(unique_elements, counts_elements)))
 # 40: 36, 41: 30, 42: 13, 43: 21, 44: 12, 45: 18} >> 총 46개의 카테고리
 print("=================================")
 
-# plt.hist(y_train, bins=46)
+# plt.hist(y_train, bins=46)    # bins : 가로를 bins로 나눈 값으로 히스토그램의 막대 너비가 정해진다.
 # plt.show()
 
 # x 단어들 분포
@@ -67,53 +73,42 @@ print(x_train[0])
 # print(' '.join([index_to_word[index] for index in x_train[0]]))
 # the wattie nondiscriminatory mln loss for plc said at only ended said commonwealth could 1 traders now april 0 a after said from 1985 and from foreign 000 april 0 prices its account year a but in this mln home an states earlier and rise and revs vs 000 its 16 vs 000 a but 3 psbr oils several and shareholders and dividend vs 000 its all 4 vs 000 1 mln agreed largely april 0 are 2 states will billion total and against 000 pct dlrs  
 
-# y 카테고리 개수 출력
-category = np.max(y_train) + 1  # 전체 카테고리 개수 46개
-print("y 카테고리 개수 :", category)    # 46
-
-# y의 유니크한 값 출력
-y_bunpo = np.unique(y_train)
-print(y_bunpo)
-# [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
-#  24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45]
-
-# preprocessing
 
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.utils import to_categorical
+pad_x_train = pad_sequences(x_train, padding='pre', maxlen=250)
+pad_x_test = pad_sequences(x_test, padding='pre', maxlen=250)
 
-# x
-x_train = pad_sequences(x_train, maxlen=100, padding='pre')
-x_test = pad_sequences(x_test, maxlen=100, padding='pre')
-print(x_train.shape, x_test.shape)  # (8982, 100) (2246, 100)
+print(pad_x_train)
+print(pad_x_train.shape)    
+print(pad_x_test.shape)    
 
-# y
-# y_train = to_categorical(y_train)
-# y_test = to_categorical(y_test)
-# print(y_train.shape, y_test.shape)  # (8982, 46) (2246, 46)
+print(len(np.unique(pad_x_train)))  # 9908
 
-# Modeling
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, Dense, LSTM, Conv1D, Flatten
+from tensorflow.keras.layers import Embedding, Dense, LSTM, Flatten
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 model = Sequential()
-model.add(Embedding(input_dim=10000, output_dim=64, input_length=100))
-# model.add(Embedding(10000, 64))
-model.add(LSTM(32))
+
+model.add(Embedding(input_dim=10000, output_dim=150, input_length=250))
+model.add(LSTM(128))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
 model.add(Dense(46, activation='softmax'))
 
 model.summary()
 
 # Compile, Train
-# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
-model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['acc'])
-model.fit(x_train, y_train, epochs=10, batch_size=32, verbose=1)
 
-# Evaluate
-results = model.evaluate(x_test, y_test)
+es = EarlyStopping(monitor='val_loss', patience=30, mode='min')
+lr = ReduceLROnPlateau(monitor='val_loss', patience=15, mode='min')
 
-print('loss :', results[0])
-print('acc :', results[1])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
+model.fit(pad_x_train, y_train, batch_size=8, epochs=50, validation_split=0.1, callbacks=[es, lr])
 
-# loss : 1.5189306735992432
-# acc : 0.6611754298210144
+loss, acc = model.evaluate(pad_x_test, y_test)
+print("loss : ", loss)
+print("acc : ", acc)
+
+# loss :  2.330373525619507
+# acc :  0.7284060716629028

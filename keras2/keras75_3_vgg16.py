@@ -47,7 +47,7 @@ _________________________________________________________________
 ### Layer 확인 ###
 
 import pandas as pd 
-pd.set_option('max_colwidth', -1)   # set_option('max_colwidth', -1) : 
+pd.set_option('max_colwidth', -1)   # set_option('max_colwidth', -1) : 출력할 컬럼의 길이 지정
 layers = [(layer, layer.name, layer.trainable) for layer in model.layers]           # layer, layer.name, layer.trainable 값을 layers로 반환한다.
 aaa = pd.DataFrame(layers, columns=['Layer Type', 'Layer Name', 'Layer Trainable'])
 

@@ -40,6 +40,7 @@ print(arr_dog.shape)    # (224, 224, 3)
 # 4개를 다 합쳐서 4차원으로 만들어준다.
 arr_input = np.stack([arr_dog, arr_cat, arr_lion, arr_suit])
 print(arr_input.shape)  # (4, 224, 224, 3)
+# np.stack : 동일한 shape을 가진 배열들을 합친다.
 
 #2. Modeling
 model = VGG16()
