@@ -48,8 +48,10 @@ def solution_model():
     model = Sequential()
     model.add(Conv1D(filters=32, kernel_size=3, activation='relu', input_shape=(28,28)))
     model.add(Conv1D(filters=32, kernel_size=3, activation='relu'))
+
     model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
     model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+    
     model.add(Flatten())
     model.add(Dense(64))
     model.add(Dense(32))
@@ -66,6 +68,7 @@ def solution_model():
     print("acc : ", results[1])
     # loss :  0.38713741302490234
     # acc :  0.8842999935150146
+
     return model
 
 
