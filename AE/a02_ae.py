@@ -44,28 +44,28 @@ output = model.predict(x_test)
 from matplotlib import pyplot as plt
 import random
 fig, ((ax1, ax2, ax3, ax4, ax5), (ax6, ax7, ax8, ax9, ax10)) = \
-    plt.subplots(2, 5, figsize=(20,7))
+    plt.subplots(2, 5, figsize=(20,7))                  # subplots : 한번에 여러 그래프를 그릴 수 있다. (nrows=행 개수, ncols=열 개수)
 
 # 이미지 다섯 개를 무작위로 고른다.
-random_images = random.sample(range(output.shape[0]),5)
+random_images = random.sample(range(output.shape[0]),5) # random.sample(데이터,랜덤하게 뽑을 인자 개수) 
 
 # 원본(입력) 이미지를 맨 위에 그린다.
 for i, ax in enumerate([ax1, ax2, ax3, ax4, ax5]) :
     ax.imshow(x_test[random_images[i]].reshape(28,28), cmap='gray')
     if i == 0 :
-        ax.set_ylabel("INPUT", size=20)
-    ax.grid(False)
-    ax.set_xticks([])
-    ax.set_yticks([])
+        ax.set_ylabel("INPUT", size=20) # y축 이름
+    ax.grid(False)      # grid 선을 그릴 것인가?
+    ax.set_xticks([])   # ax.set_xticks x축 눈금 이름
+    ax.set_yticks([])   # ax.set_yticks y축 눈금 이름
 
 # autoencoder가 출력한 이미지를 아래에 그린다.
 for i, ax in enumerate([ax6, ax7, ax8, ax9, ax10]) :
     ax.imshow(output[random_images[i]].reshape(28,28), cmap='gray')
     if i == 0 :
         ax.set_ylabel("OUTPUT", size=20)
-    ax.grid(False)
+    ax.grid(False)  
     ax.set_xticks([])
     ax.set_yticks([])
 
-plt.tight_layout()
+plt.tight_layout()  # subplot의 subplot간에 올바른 간격을 자동으로 유지해준다.
 plt.show()
