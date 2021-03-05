@@ -69,15 +69,16 @@ def autoencoder(hidden_layer_size) :
     x = Conv2D(128,3,padding='same', activation='relu') (x)
     x = MaxPool2D(2, padding='same')(x)
     x = Conv2D(64,3,padding='same', activation='relu') (x)
+    # encode = Conv2D(64,3,padding='same', activation='relu') (x)
     encode = MaxPool2D(2, padding='same')(x)
 
-    x = Conv2DTranspose(64,3,padding='same', activation='relu') (encode)
-    x = UpSampling2D(2)(x)
-    x = Conv2D(128,3,padding='same', activation='relu') (x)
-    x = UpSampling2D(2)(x)
-    x = Conv2D(256,3, activation='relu') (x)
-    x = UpSampling2D(2)(x)
-    decode = Conv2D(1, 3, activation='sigmoid', padding='same')(x)
+    x = Conv2DTranspose(64,3,padding='same', activation='relu',use_bias=False) (encode)
+    # x = UpSampling2D(2)(x)
+    x = Conv2DTranspose(128,3,padding='same', activation='relu') (x)
+    # x = UpSampling2D(2)(x)
+    x = Conv2DTranspose(256,3, activation='relu') (x)
+    # x = UpSampling2D(2)(x)
+    decode = Conv2DTranspose(1, 3, activation='sigmoid', padding='same')(x)
 
     model = Model (input_img, decode)
     return model
