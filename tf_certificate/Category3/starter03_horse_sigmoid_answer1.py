@@ -118,7 +118,6 @@ def solution_model():
 
     return model
 
-    
     # NOTE: If training is taking a very long time, you should consider setting the batch size
     # appropriately on the generator, and the steps per epoch in the model.fit() function.
 

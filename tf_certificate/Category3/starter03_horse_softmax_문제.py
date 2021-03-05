@@ -59,15 +59,14 @@ def solution_model():
         # This is the last layer. You should not change this code.
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
-    return model
-
-
+    
     model.compile(#Your Code Here#)
 
     model.fit(#Your Code Here#)
 
     # NOTE: If training is taking a very long time, you should consider setting the batch size
     # appropriately on the generator, and the steps per epoch in the model.fit() function.
+    return model
 
 # Note that you'll need to save your model as a .h5 like this.
 # When you press the Submit and Test button, your saved .h5 model will
