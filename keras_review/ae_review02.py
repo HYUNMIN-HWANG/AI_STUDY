@@ -56,7 +56,7 @@ model.fit(x_train_noised_c, x_train_c, epochs=10)
 result = model.evaluate(x_test_noised_c, x_test_c)
 print(result)
 
-output = model.predict(x_test_noised)
+output = model.predict(x_test_noised_c)
 print(output)
 
 # image
@@ -67,6 +67,7 @@ fig, ((ax1, ax2, ax3, ax4, ax5), (ax6, ax7, ax8, ax9, ax10),(ax11, ax12, ax13, a
     
 random_images = random.sample(range(output.shape[0]),5)
 
+# 원본
 for i , ax in enumerate([ax1, ax2, ax3, ax4, ax5]) :
     ax.imshow(x_test[random_images[i]].reshape(28,28), cmap='gray')
     if i == 1 :
@@ -75,6 +76,23 @@ for i , ax in enumerate([ax1, ax2, ax3, ax4, ax5]) :
     ax.set_xticks([])
     ax.set_yticks([])
 
+# 노이지
+for i , ax in enumerate([ax6, ax7, ax8, ax9, ax10]) :
+    ax.imshow(x_test_noised_c[random_images[i]].reshape(28,28), cmap='gray')
+    if i == 1 :
+        ax.set_ylabel("NOISE", size=20)
+    ax.grid(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+# autoencoder
+for i , ax in enumerate([ax11, ax12, ax13, ax14, ax15]) :
+    ax.imshow(output[random_images[i]].reshape(28,28), cmap='gray')
+    if i == 1 :
+        ax.set_ylabel("OUTPUT", size=20)
+    ax.grid(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
 
 plt.tight_layout()
 plt.show()
