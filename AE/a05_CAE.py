@@ -15,7 +15,7 @@ from tensorflow.keras.datasets import mnist
 print(x_train.shape, x_test.shape)  # (60000, 28, 28) (10000, 28, 28)
 
 x_train = x_train.reshape(60000, 28, 28, 1).astype('float32')/255
-x_train_2 = x_train.reshape(60000, 784).astype('float32')/255
+x_train_2 = x_train.reshape(60000, 784).astype('float32')
 x_test = x_test.reshape(10000, 28, 28, 1).astype('float32')/255
 print(x_train.shape, x_test.shape)
 
@@ -25,9 +25,9 @@ print(x_train.shape, x_test.shape)
 
 # Modeling
 from tensorflow.keras.models import Sequential, Model 
-from tensorflow.keras.layers import Input, Dense, Conv2D, Flatten, Dropout, MaxPool2D, UpSampling2D, Conv2DTranspose
+from tensorflow.keras.layers import Input, Dense, Conv2D,LeakyReLU, Flatten, Dropout, MaxPool2D, UpSampling2D, Conv2DTranspose, BatchNormalization
 
-# [1] 원칙 : encoder 부분과 decoder 부분 구성을 동일하게 짜야 한다.
+# [1] Conv2D -> Dense
 # def autoencoder(hidden_layer_size) :
 #     model = Sequential()
 #     model.add(Conv2D(filters=hidden_layer_size, kernel_size=3, padding='same', activation='relu', input_shape=(28,28,1)))
@@ -40,6 +40,7 @@ from tensorflow.keras.layers import Input, Dense, Conv2D, Flatten, Dropout, MaxP
 #     model.add(Dense(units=784, activation='sigmoid'))
 #     return model
 
+# [2] Conv2D
 # def autoencoder(hidden_layer_size) :
 #     input_img = Input(shape=(28, 28, 1))
 
@@ -61,26 +62,28 @@ from tensorflow.keras.layers import Input, Dense, Conv2D, Flatten, Dropout, MaxP
 #     model = Model (input_img, decode)
 #     return model
 
+# [3] Conv2D -> Conv2DTranspose
 def autoencoder(hidden_layer_size) :
     input_img = Input(shape=(28, 28, 1))
 
-    x = Conv2D(filters=hidden_layer_size, kernel_size=3, padding='same', activation='relu') (input_img)
-    x = MaxPool2D(2, padding='same')(x)
-    x = Conv2D(128,3,padding='same', activation='relu') (x)
-    x = MaxPool2D(2, padding='same')(x)
-    x = Conv2D(64,3,padding='same', activation='relu') (x)
-    # encode = Conv2D(64,3,padding='same', activation='relu') (x)
-    encode = MaxPool2D(2, padding='same')(x)
+    x = Conv2D(filters=hidden_layer_size, kernel_size=3, padding='same') (input_img)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x_1 = x
 
-    x = Conv2DTranspose(64,3,padding='same', activation='relu',use_bias=False) (encode)
-    # x = UpSampling2D(2)(x)
-    x = Conv2DTranspose(128,3,padding='same', activation='relu') (x)
-    # x = UpSampling2D(2)(x)
-    x = Conv2DTranspose(256,3, activation='relu') (x)
-    # x = UpSampling2D(2)(x)
-    decode = Conv2DTranspose(1, 3, activation='sigmoid', padding='same')(x)
+    x = Conv2D(64,3,padding='same') (x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
+    x_2 = x
 
-    model = Model (input_img, decode)
+    x = Conv2DTranspose(64,3,padding='same', activation='relu',use_bias=False) (x+x_2)
+    x = Dropout(0.4)(x)
+    x = x
+
+    x = Conv2DTranspose(1, 3, activation='sigmoid', padding='same')(x+x_1)
+    outputs = x
+
+    model = Model (input_img, outputs)
     return model
 
 #####################################################################################
@@ -99,7 +102,7 @@ def autoencoder(hidden_layer_size) :
 # 1875/1875 [==============================] - 2s 1ms/step - loss: 0.0833 - acc: 0.0138
 
 # 중간 레이어를 크게 잡을 수록 원본 이미지와 유사함, 작게 잡을수록 손실이 많아진다.
-model = autoencoder(hidden_layer_size=256)  
+model = autoencoder(hidden_layer_size=64)  
 model.summary()
 
 model.compile(optimizer='adam', loss='binary_crossentropy',metrics=['acc'])

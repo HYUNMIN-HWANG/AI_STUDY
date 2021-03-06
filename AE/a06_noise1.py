@@ -17,7 +17,7 @@ print(x_train.shape, x_test.shape)
 # 노이즈 만들기 : 
 x_train_noised = x_train + np.random.normal(0, 0.1, size=x_train.shape) # 0부터 0.1 사이 밝기를 가진 점을 이미지에 랜덤하게 찍어준다. 
 x_test_noised = x_test + np.random.normal(0, 0.1, size=x_test.shape)
-# 문제점 >> MinMax가 안 맞게 된다.
+# 문제점 >> MinMax가 안 맞게 된다. >> 0 ~ 1 사이로 맞춰준다.
 x_train_noised = np.clip(x_train_noised, a_min=0, a_max=1)      # np.clip : 0과 1사이로 값을 고정시키겠다. 
 x_test_noised = np.clip(x_test_noised, a_min=0, a_max=1)
 

@@ -40,7 +40,7 @@ def autoencoder(hidden_layer_size) :
 
 #####################################################################################
 
-# [2] 변이 : 마음대로 모델을 짠다.
+# [2] 변이 : 마음대로 모델을 짠다. >> 가능함
 # def autoencoder(hidden_layer_size) :
 #     model = Sequential()
 #     model.add(Dense(units=hidden_layer_size, input_shape=(784,),activation='relu'))

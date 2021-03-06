@@ -52,7 +52,7 @@ random_images = random.sample(range(output.shape[0]),5) # random.sample(데이�
 # 원본(입력) 이미지를 맨 위에 그린다.
 for i, ax in enumerate([ax1, ax2, ax3, ax4, ax5]) :
     ax.imshow(x_test[random_images[i]].reshape(28,28), cmap='gray')
-    if i == 0 :
+    if i == 0 :                         # 0번째 이미지일 때
         ax.set_ylabel("INPUT", size=20) # y축 이름
     ax.grid(False)      # grid 선을 그릴 것인가?
     ax.set_xticks([])   # ax.set_xticks x축 눈금 이름

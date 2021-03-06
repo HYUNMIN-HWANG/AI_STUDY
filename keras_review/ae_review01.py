@@ -6,17 +6,26 @@ from tensorflow.keras.datasets import mnist
 print(x_train.shape, x_test.shape)  # (60000, 28, 28) (10000, 28, 28)
 
 # preprocessing
-x_train = x_train.reshape(60000, 784).astype('float32')/255
-x_test = x_test.reshape(10000, 784).astype('float32')/255
+
+x_train_d = x_train.reshape(60000, 784).astype('float32')/255
+x_test_d = x_test.reshape(10000, 784).astype('float32')/255
+x_train_c = x_train.reshape(60000, 28, 28, 1).astype('float32')/255
+x_test_c = x_test.reshape(10000, 28, 28, 1).astype('float32')/255
 
 #2. Modeling
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.layers import *
 
 def autoencoder(size) :
-    input_img = Input(shape=(784,))
+    # input_img = Input(shape=(784,))
+    input_img = Input(shape=(28,28,1))
 
-    x = Dense(size, activation='relu') (input_img)
+    # x = Dense(size, activation='relu') (input_img)
+    x = Conv2D(size, 3, padding='same', activation='relu') (input_img)
+    x = Dropout(0.2)(x)
+    x = Conv2D(100, 3)(x)
+    x = Dropout(0.2)(x)
+    x = Flatten()(x)
     decoder = Dense(784, activation='sigmoid') (x)
 
     model = Model(input_img, decoder)
@@ -27,13 +36,13 @@ model = autoencoder(128)
 
 #3. Compile, Train
 model.compile(loss='binary_crossentropy', optimizer='adam')
-model.fit(x_train, x_train, batch_size=16, epochs=5)
+model.fit(x_train_c, x_train_d, batch_size=16, epochs=5)
 
 #4. Evaluate, Predict
-result = model.evaluate(x_test, x_test, batch_size=16)
+result = model.evaluate(x_test_c, x_test_d, batch_size=16)
 print(result)
 
-output = model.predict(x_test)
+output = model.predict(x_test_c)
 
 from matplotlib import pyplot as plt
 import random
@@ -44,8 +53,8 @@ random_images = random.sample(range(output.shape[0]),5)
 
 # 원본
 for i , ax in enumerate([ax1, ax2, ax3, ax4, ax5]) :
-    print(i, ax)
-    ax.imshow(x_test[random_images[i]].reshape(28,28), cmap='gray')
+    # print(i, ax)
+    ax.imshow(x_test_c[random_images[i]].reshape(28,28), cmap='gray')
     if i == 0 :
         ax.set_ylabel("INPUT", size=15)
     ax.grid(False)
