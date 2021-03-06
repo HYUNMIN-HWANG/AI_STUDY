@@ -43,30 +43,65 @@ def solution_model():
     '''
 
     train_datagen = ImageDataGenerator(
-        #Your code here. Should at least have a rescale. Other parameters can help with overfitting.)
+        #Your code here. Should at least have a rescale. Other parameters can help with overfitting.
+        rescale=1./255,
+        horizontal_flip=True,
+        vertical_flip=True,
+        width_shift_range=(-1,1),
+        height_shift_range=(-1,1),
+        fill_mode='nearest'
+    )
 
-    validation_datagen = ImageDataGenerator(#Your Code here)
+    validation_datagen = ImageDataGenerator(#Your Code here
+        rescale=1./255
+    )
+
+    TRAIN_DIR = './tf_certificate/Category3/tmp/horse-or-human/'
+    VALID_DIR = './tf_certificate/Category3/tmp/testdata/'
+    batch = 16
 
     train_generator = train_datagen.flow_from_directory(
-        #Your Code Here)
+        #Your Code Here
+        TRAIN_DIR, target_size=(300,300), batch_size=batch, class_mode='binary'
+    )
 
     validation_generator = validation_datagen.flow_from_directory(
-        #Your Code Here)
-
+        #Your Code Here
+        VALID_DIR, target_size=(300,300), batch_size=batch, class_mode='binary'
+    )
 
     model = tf.keras.models.Sequential([
         # Note the input shape specified on your first layer must be (300,300,3)
         # Your Code here
-
+        tf.keras.layers.Conv2D(128, 3, padding='same', activation='relu', input_shape=(300,300,3)),
+        tf.keras.layers.Conv2D(128, 3, padding='same', activation='relu'),
+        tf.keras.layers.MaxPool2D(3,padding='same'),
+        tf.keras.layers.Conv2D(64, 2, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(64, 2, padding='same', activation='relu'),
+        tf.keras.layers.MaxPool2D(3,padding='same'),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(32, activation='relu'),
         # This is the last layer. You should not change this code.
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
     
+    rl = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', patience=30, factor=0.4, mode='min')
+    es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, mode='min')
+    model.compile(#Your Code Here#
+        loss='binary_crossentropy', optimizer='adam', metrics=['acc']
+    )
 
-    model.compile(#Your Code Here#)
+    model.fit(#Your Code Here#
+        train_generator, epochs=100, validation_data=validation_generator, callbacks=[es,rl]
+    )
 
-    model.fit(#Your Code Here#)
-
+    results = model.evaluate(validation_generator)
+    print("loss : ", results[0])
+    print("acc : ", results[1])
+    # loss :  3.646151304244995
+    # acc :  0.81640625
+    
     # NOTE: If training is taking a very long time, you should consider setting the batch size
     # appropriately on the generator, and the steps per epoch in the model.fit() function.
     return model
