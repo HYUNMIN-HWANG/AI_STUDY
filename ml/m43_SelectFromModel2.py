@@ -99,6 +99,7 @@ print("Thresh=%.3f, n=%d, R2: %.2f%%" % (best_tmp[0], best_tmp[1], best_r2*100))
 print("[3] After SelectFromModel==============================")
 
 '''
+# 가장 결과가 좋은 컬럼만 남기고 다시 훈련시키는 방법
 X = x[:,best_feature]
 print(X.shape)
 x_train, x_test, y_train, y_test = train_test_split(X, y, train_size=0.8, shuffle=True, random_state=66)

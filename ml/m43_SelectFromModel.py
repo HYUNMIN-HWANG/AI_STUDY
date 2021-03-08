@@ -1,4 +1,5 @@
 # SelectFromModel
+
 from xgboost import XGBClassifier, XGBRegressor
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
@@ -26,7 +27,7 @@ for thresh in thresholds :   # 13번 반복
     # selection = SelectFromModel(model, threshold=thresh, prefit=True)
     selection = SelectFromModel(model, threshold=thresh, prefit=True)
     # threshold : 그 값 이상의 것을 전부 사용하겠다.
-    # prefit : ???? 있는 경우, 없는 경우, 디폴트 조사
+    # prefit=True : 바로 transform 해줘야 하며 cross_val_score, GridSearchCV 같이 estimator를 복제하는 명령어는 사용할 수 없다.
 
     select_x_train = selection.transform(x_train)
     print(select_x_train.shape)
