@@ -23,6 +23,7 @@ print(thresholds)
 #  0.42848358]
 
 for thresh in thresholds :   # 13번 반복
+    # selection = SelectFromModel(model, threshold=thresh, prefit=True)
     selection = SelectFromModel(model, threshold=thresh, prefit=True)
     # threshold : 그 값 이상의 것을 전부 사용하겠다.
     # prefit : ???? 있는 경우, 없는 경우, 디폴트 조사
