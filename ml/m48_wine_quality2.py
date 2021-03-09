@@ -8,6 +8,7 @@ wine = pd.read_csv('../data/csv/winequality-white.csv', header=0, sep=';',index_
 print(np.unique(wine['quality']))   # [3 4 5 6 7 8 9]
 
 count_data = wine.groupby('quality')['quality'].count()
+# groupby : 
 print(count_data)
 '''
 quality

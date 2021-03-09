@@ -59,6 +59,7 @@ for i in list(y) :
 y = newlist
 print(np.unique(y)) # [0 1 2]
 
+y = np.asarray(y)
 
 import matplotlib.pyplot as plt
 # plt.boxplot(x)
@@ -135,3 +136,7 @@ print("acc ", result[1])
 # y컬럼 이진분류
 # loss  0.6676238775253296
 # acc  0.8480725884437561
+
+# y컬럼 3개로 분류
+# loss  0.4916940927505493
+# acc  0.9285714030265808
