@@ -34,17 +34,22 @@ print(np.max(x[0])) # max = 396.9 ??? 최댓값 711 인데 왜 396 이 나왔을
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, QuantileTransformer
 from sklearn.preprocessing import MaxAbsScaler, PowerTransformer
+from sklearn.pipeline import Pipeline
 
-# scaler = MinMaxScaler()
+scaler = MinMaxScaler(feature_range=(1,2))
 # scaler = StandardScaler()
 # scaler = RobustScaler()
 # scaler = QuantileTransformer()  # 디폴트 : 균등분포
 # scaler = QuantileTransformer(output_distribution='normal') # output_distribution='normal' : 정규분포
 # scaler = MaxAbsScaler()
 # scaler = PowerTransformer(method='yeo-johnson')
-scaler = PowerTransformer(method='box-cox')
-scaler.fit(x)
-x = scaler.transform(x)
+
+power = PowerTransformer(method='box-cox')  
+pipeline = Pipeline(steps=[('s',scaler),('p',power)])
+x = pipeline.fit_transform(x)
+
+# scaler.fit(x)
+# x = scaler.transform(x)
 
 # MinMaxscaler
 # print(np.max(x), np.min(x)) # 최댓값 711.0, 최솟값 0.0     ----> 최댓값 1.0 , 최솟값 0.0
@@ -67,11 +72,12 @@ x = scaler.transform(x)
 # print(np.max(x[0]))         # 1.0
 
 # PowerTransformer(method='yeo-johnson')
-print(np.max(x), np.min(x)) # 최댓값 711.0, 최솟값 0.0     ----> 최댓값 1.0 0.
-print(np.max(x[0]))         # 1.0
+# print(np.max(x), np.min(x)) # 최댓값 711.0, 최솟값 0.0     ----> 최댓값 1.0 0.
+# print(np.max(x[0]))         # 1.0
 
 # PowerTransformer(method='box-cox') >> 안됨
-
+print(np.max(x), np.min(x)) # 최댓값 711.0, 최솟값 0.0     ----> 최댓값 3.6683978597124485 -4.484563578465139
+print(np.max(x[0]))         # 1.3521241667177808
 
 
 # train_test_split
@@ -168,4 +174,8 @@ print("R2 : ", R2)
 # RMSE :  3.0954733669751566
 # R2 :  0.8853599111070307
 
-# PowerTransformer(method='box-cox') >> 안됨
+# PowerTransformer(method='box-cox') >> 음수일 때는 돌아가지 않는다. MinMaxScaler를 한 다음에 box-cox를 해줘야 한다.
+# loss :  6.949198246002197
+# mae :  1.9127541780471802
+# RMSE :  2.636133317877414
+# R2 :  0.9168586425476116
