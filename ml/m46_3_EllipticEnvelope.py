@@ -12,7 +12,7 @@ aaa = np.array([[1,2,10000,3,4,6,7,8,90,100,5000],
 aaa = np.transpose(aaa)
 print(aaa.shape)    # (11, 2)
 
-outlier = EllipticEnvelope(contamination=.1)
+outlier = EllipticEnvelope(contamination=.2)
 # contamination : 전체 데이터의 몇 퍼센트의 오염도, 몇 퍼센트를 아웃라이어로 잡을 것인가 (0.1이 디폴트)
 outlier.fit(aaa)
 
