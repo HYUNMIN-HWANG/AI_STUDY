@@ -1,6 +1,6 @@
 # y = wx + b
 # optimizer 한 줄로
-# session 열고 닫기
+# with문으로 session 열고 닫기
 
 import tensorflow as tf
 
@@ -36,7 +36,8 @@ train = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(cost)
 #                     # loss          # weight     # bias
 #         print(step, sess.run(cost), sess.run(W), sess.run(b))   # verbose 처럼 출력시키는 부분
 
-# # 세션 닫기 - 세션이 계속 열려있으면 메모리를 차지하기 때문에, 파일 실행이 끝나면 세션을 닫아줘야 한다. >> 귀찮아 자동으로 세션을 열고 닫는 기능 : with
+# # 세션 닫기 - 세션이 계속 열려있으면 메모리를 차지하기 때문에, 파일 실행이 끝나면 세션을 닫아줘야 한다. 
+# >> 귀찮아 자동으로 세션을 열고 닫는 기능 : with 문을 사용한다.
 # sess.close()
 
 
