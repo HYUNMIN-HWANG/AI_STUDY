@@ -36,7 +36,7 @@ hypothesis = tf.matmul(x, w) + b
 
 cost = tf.reduce_mean(tf.square(hypothesis - y))
 
-train = tf.train.AdamOptimizer(learning_rate=0.08).minimize(cost)
+train = tf.train.AdamOptimizer(learning_rate=0.085).minimize(cost)
 
 
 with tf.Session() as sess :

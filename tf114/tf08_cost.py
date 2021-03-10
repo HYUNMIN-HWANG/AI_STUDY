@@ -18,11 +18,11 @@ with tf.compat.v1.Session() as sess :
     # Variable이라고 따로 선언해준 것이 없기 떄문에 초기화를 하지 않아도 작동이 된다.
 
     for i in range (-30, 50) :
-        curr_w = i * 0.1    # -3 부터 5까지 0.1간격으로
-        curr_cost = sess.run(cost, feed_dict={w:curr_w})
+        curr_w = i * 0.1    # -3 부터 5까지 0.1 간격으로
+        curr_cost = sess.run(cost, feed_dict={w:curr_w})    # curr_w값을 넣은 hypothesis로 cost를 구한다.
 
-        w_history.append(curr_w)
-        cost_history.append(curr_cost)
+        w_history.append(curr_w)    # weight 축적 -> x축
+        cost_history.append(curr_cost)  # cost 축적 -> y축
 
 print("==================================")
 print(w_history)

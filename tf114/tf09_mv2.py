@@ -23,10 +23,10 @@ y = tf.placeholder(tf.float32, shape=[None,1])
 w = tf.Variable(tf.random_normal([3,1]), name='weight') 
 # x의 shape(5,3)와 행렬 곱할 수 있는 shape으로 맞춰줘야 한다. >> (3,None)
 b = tf.Variable(tf.random_normal([1]), name='bias') 
-# y_data(5,1) 와 shape를 맞추는 형태를 갖춰야 한다.  >> (1)
+# y_data(5,1) 와 shape를 맞추는 형태를 갖춰야 한다. bias는 한 개의 값을 갖는다.  >> (1)
 
 # hypothesis = x * w + b
-hypothesis = tf.matmul(x, w) + b    # tf.matmul : matrics multiply
+hypothesis = tf.matmul(x, w) + b    # tf.matmul : matrics multiply 행렬간의 곱셈을 할 때 사용
 
 cost = tf.reduce_mean(tf.square(hypothesis - y))
 

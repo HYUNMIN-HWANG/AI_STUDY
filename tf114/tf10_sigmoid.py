@@ -17,7 +17,7 @@ w = tf.Variable(tf.random_normal([2,1]), name='weight')
 b = tf.Variable(tf.random_normal([1]), name='bias')
 
 # sigmoid를 사용해서 결과값을 0과 1사이로 바꾼다. (sigmoid)
-hypothesis = tf.sigmoid(tf.matmul(x, w) + b)    # acc = sigmoid
+hypothesis = tf.sigmoid(tf.matmul(x, w) + b)    # activation = sigmoid
 
 # cost = tf.reduce_mean(tf.square(hypothesis - y))    # mse
 cost = -tf.reduce_mean(y*tf.log(hypothesis)+(1-y)*tf.log(1-hypothesis)) # binary_crossenropy
@@ -25,10 +25,9 @@ cost = -tf.reduce_mean(y*tf.log(hypothesis)+(1-y)*tf.log(1-hypothesis)) # binary
 train = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(cost)
 
 predicted = tf.cast(hypothesis > 0.5, dtype=tf.float32)
+# tf.cast :  (hypothesis > 0.5 기준) True이면 1, False이면 0을 출력
 accuracy = tf.reduce_mean(tf.cast(tf.equal(predicted,y), dtype=tf.float32)) # acc
-# tf.equal
-# 기존 값과 accuracy 낮다.
-# 부동소수점형에서 정수형으로 바꾼 경우 소수점 버린을 한다.
+# tf.equal : 두 변수가 같으면 True >> 예측한 값이 맞는지 틀린지를 알 수 있다.
 # Boolean형태인 경우 True이면 1, False이면 0을 출력한다.
 
 with tf.Session() as sess :

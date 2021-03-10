@@ -33,7 +33,7 @@ hypothesis = tf.matmul(x, w) + b
 
 cost = tf.reduce_mean(tf.square(hypothesis - y))
 
-train = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost)
+train = tf.train.AdamOptimizer(learning_rate=0.8).minimize(cost)
 
 with tf.Session() as sess :
     sess.run(tf.global_variables_initializer()) 
@@ -45,4 +45,4 @@ with tf.Session() as sess :
     y_predict = sess.run(hypothesis, feed_dict={x:x_test})
     print("r2 : ", r2_score(y_test, y_predict))
 
-# r2 :  0.3091480858805067
+# r2 :  0.5525061772447317
