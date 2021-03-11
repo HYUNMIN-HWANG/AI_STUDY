@@ -16,7 +16,7 @@ y_data = dataset.target
 y_data = y_data.reshape(-1,1)
 print(x_data.shape, y_data.shape) # (506, 13) (506, 1)
 
-x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, train_size=0.9, shuffle=True, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, train_size=0.9, shuffle=True, random_state=66)
 
 scaler = MinMaxScaler()
 scaler.fit(x_train)
@@ -36,7 +36,7 @@ hypothesis = tf.matmul(x, w) + b
 
 cost = tf.reduce_mean(tf.square(hypothesis - y))
 
-train = tf.train.AdamOptimizer(learning_rate=0.085).minimize(cost)
+train = tf.train.AdamOptimizer(learning_rate=0.8).minimize(cost)
 
 
 with tf.Session() as sess :
@@ -49,5 +49,5 @@ with tf.Session() as sess :
     y_predict = sess.run(hypothesis, feed_dict={x:x_test})
     print("r2 : ", r2_score(y_test, y_predict))
 
-# r2 :  0.759823115046879
+#r2 :  0.7795056735976673
 

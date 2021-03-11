@@ -26,6 +26,7 @@ train = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(cost)
 
 predicted = tf.cast(hypothesis > 0.5, dtype=tf.float32)
 # tf.cast :  (hypothesis > 0.5 기준) True이면 1, False이면 0을 출력
+# 부동소수점에서 정수형으로 바꾼 경우 소수점 버림을 한다.
 accuracy = tf.reduce_mean(tf.cast(tf.equal(predicted,y), dtype=tf.float32)) # acc
 # tf.equal : 두 변수가 같으면 True >> 예측한 값이 맞는지 틀린지를 알 수 있다.
 # Boolean형태인 경우 True이면 1, False이면 0을 출력한다.

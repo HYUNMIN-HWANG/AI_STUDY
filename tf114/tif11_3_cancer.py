@@ -53,4 +53,4 @@ with tf.Session() as sess :
     print("accuracy_score : ", accuracy_score(y_test, sess.run(predicted, feed_dict={x:x_test})))   
 
 # Accuracy  0.9298246
-# accuracy_score :  0.9298245614035088
+# accuracy_score :  0.9298245614035088  (그냥 Accuracy 구한 것과 동일한 값이 나온다.)
