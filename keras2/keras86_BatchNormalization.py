@@ -61,14 +61,19 @@ model.add(Conv2D(32,(2,2), kernel_initializer='he_normal'))
     Xavier Initialization : sigmoid, tanh
 
 [bias_initializer]
+    예전에는 bias를 0.01 혹은 0.1 정도로 사용했지만, 최근에는 0으로 초기화한다.
+    bias_initializer='zeros'
 
 [kernel_regularizer] 
+    과적합을 예방하고 일반화하는 성능을 높인다.
+    l1 : 가중치의 절댓값에 비례하는 비용이 추가됨
+    l2 : 가중치의 제곱에 비례하는 비용이 추가됨
 
 [BathNormalization]
+    평균과 분산을 조정하는 과정이 신경망 안에 포함되어 학습 시 평균과 분산을 조정하는 과정이 같이 조절된다.
 
 [Dropout]
-
-
+    입력 노드 중 일부를 무작위로 0으로 바꿈
 '''
 model.add(BatchNormalization())
 model.add(Activation('relu'))

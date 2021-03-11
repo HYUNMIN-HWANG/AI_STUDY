@@ -3,6 +3,7 @@ import numpy as np
 
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.utils import to_categorical
+from sklearn.metrics import accuracy_score
 
 #1. DATA
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -38,5 +39,9 @@ with tf.Session() as sess :
         if step % 20 == 0 :
             print(step, " / loss : ", cost_val)
     # predict
-    a = sess.run(hypothesis, feed_dict={x:x_test})
-    print("a >> ", a, sess.run(tf.argmax(a,1))) 
+    y_pred = sess.run(tf.argmax(hypothesis, axis=1), feed_dict={x:x_test})
+    y_test_arg = sess.run(tf.argmax(y_test, 1))
+    print("acc score : ", accuracy_score(y_test_arg, y_pred))
+# 2000  / loss :  0.5915186
+# acc score :  0.8629
+
