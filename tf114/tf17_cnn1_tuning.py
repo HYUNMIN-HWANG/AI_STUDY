@@ -129,3 +129,6 @@ prediction = tf.equal(tf.argmax(hypothesis,1), tf.argmax(y, 1))
 accuracy = tf.reduce_mean(tf.cast(prediction, tf.float32))
 
 print("ACC : ", sess.run(accuracy, feed_dict={x:x_test, y:y_test}))
+
+# epoch : 015 loss = 0.057148884
+# acc :  0.8259

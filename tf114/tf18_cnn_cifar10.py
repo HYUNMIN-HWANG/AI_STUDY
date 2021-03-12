@@ -79,7 +79,7 @@ loss = tf.reduce_mean(-tf.reduce_mean(y*tf.math.log(hypothesis), axis=1)) # cate
 optimizer = tf.compat.v1.train.AdamOptimizer(1e-4).minimize(loss)
 
 # Train
-training_epochs = 30
+training_epochs = 28
 batch_size = 100
 total_batch = int(len(x_train)/batch_size)  # 60000 / 100 = 600
 
@@ -108,5 +108,5 @@ accuracy = tf.reduce_mean(tf.cast(prediction, tf.float32))
 
 print("ACC : ", sess.run(accuracy, feed_dict={x:x_test, y:y_test}))
 
-#epoch :  0030 loss = 0.039017359
-#ACC :  0.6591
+# epoch :  0025 loss = 0.021565290
+# ACC :  0.6314
