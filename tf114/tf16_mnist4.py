@@ -1,7 +1,8 @@
+# DNN mnist
 # dropout 적용, 다층 레이어 적용
-# xavier_initializer etc
+# xavier_initializer / he_uniform / regularizer / dropout / 
 # batch size
-
+    
 import tensorflow as tf
 import numpy as np
 
@@ -34,6 +35,7 @@ y = tf.placeholder('float', [None, 10])
 w1 = tf.get_variable('weight1', shape=[784, 100],
                         # initializer=tf.contrib.layers.xavier_initializer(),regularizer=regularizer) # kernel initializer >> xavier_initializer(), he_normal   
                         initializer=tf.keras.initializers.he_uniform(), regularizer=regularizer) # kernel initializer >> xavier_initializer(), he_normal   
+# initializer=tf.compat.v1.initializers.he_normal()
 # print("w1 : ", w1)
 # w1 :  <tf.Variable 'weight1:0' shape=(784, 100) dtype=float32_ref>
 
