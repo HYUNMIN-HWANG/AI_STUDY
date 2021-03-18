@@ -21,24 +21,24 @@ start_now = datetime.datetime.now()
 
 #1. DATA
 ### npy load
-x_train = np.load('../data/LPD_competition/npy/data_x_train2.npy', allow_pickle=True)
+x_train = np.load('../data/LPD_competition/npy/data_x_train3.npy', allow_pickle=True)
 print(x_train.shape)    # (39000, 100, 100, 3)
-y_train = np.load('../data/LPD_competition/npy/data_y_train2.npy', allow_pickle=True)
-print(y_train.shape)    # (39000, )
+y_train = np.load('../data/LPD_competition/npy/data_y_train3.npy', allow_pickle=True)
+print(y_train.shape)    # (39000, 1000 )
 
-x_val = np.load('../data/LPD_competition/npy/data_x_val2.npy', allow_pickle=True)
+x_val = np.load('../data/LPD_competition/npy/data_x_val3.npy', allow_pickle=True)
 print(x_val.shape)  # (9000, 100, 100, 3)
-y_val = np.load('../data/LPD_competition/npy/data_y_val2.npy', allow_pickle=True)
-print(y_val.shape)  # (9000, )
+y_val = np.load('../data/LPD_competition/npy/data_y_val3.npy', allow_pickle=True)
+print(y_val.shape)  # (9000, 1000 )
 
-x_pred = np.load('../data/LPD_competition/npy/data_x_pred2.npy', allow_pickle=True)
+x_pred = np.load('../data/LPD_competition/npy/data_x_pred3.npy', allow_pickle=True)
 print(x_pred.shape) # (72000, 100, 100, 3)
 
 x_train = preprocess_input(x_train)
 x_val = preprocess_input(x_val)
 x_pred = preprocess_input(x_pred)
 
-'''
+
 #2. Modeling
 mobile_net = MobileNet(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
 for layer in mobile_net.layers:
@@ -56,49 +56,48 @@ model.summary()
 #3. Compile, Train, Evaluate
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.06)
-path = '../data/LPD_competition/cp/cp_0318_2_mobile.hdf5'
+path = '../data/LPD_competition/cp/cp_0318_3_mobile_{accuracy:.4f}.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
 
 batch = 16
 
-model.compile(loss='sparse_categorical_crossentropy', optimizer=RMSprop(lr=0.0001), metrics=['acc'])
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001), metrics=['accuracy'])
 model.fit(x_train, y_train, epochs=500, batch_size=batch ,
     validation_data=(x_val, y_val), callbacks=[es, lr, cp])
+
+model.save('../data/LPD_competition/cp/cp_0318_3_mobile_model.hdf5')
+model.save_weights('../data/LPD_competition/cp/cp_0318_3_mobile_weights.h5')
 
 result = model.evaluate(x_val, y_val, batch_size=batch)
 print("loss ", result[0])
 print("acc ", result[1])
 
-# loss  0.02675320766866207
-# acc  0.9941111207008362
-
-'''
 
 #4. Predict
 submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
 # print(submission.shape) # (72000, 2)
 
-model = load_model('../data/LPD_competition/cp/cp_0318_2_mobile.hdf5')
+model = load_model('../data/LPD_competition/cp/cp_0318_3_mobile_last.hdf5')
+model.summary()
+
 result = model.evaluate(x_val, y_val, batch_size=16)
 print("loss ", result[0])
 print("acc ", result[1])
 
-# loss  0.02401334047317505
-# acc  0.0010000000474974513
+
 
 print("predict >>>>>>>>>>>>>> ")
-'''
+
 result = model.predict(x_pred, verbose=True)
 print(result.shape) # (72000, 1000)
 print(np.argmax(result, axis = 1))
 
 submission['prediction'] = np.argmax(result, axis = 1)
-submission.to_csv('../data/LPD_competition/sub_0318_2.csv',index=True)
+submission.to_csv('../data/LPD_competition/sub_0318_3.csv',index=True)
 
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
-print("time >> " , time)    # time >  0:51:44.348498
+print("time >> " , time)    # time >
 
-# score 0.111
-'''
+# score 
