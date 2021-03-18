@@ -1,5 +1,4 @@
 import numpy as np
-from numpy import asarray
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img
 from sklearn.model_selection import train_test_split, KFold, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
@@ -7,14 +6,15 @@ import cv2 as cv
 from glob import glob
 import matplotlib.pyplot as plt
 import os
-from tensorflow.keras.applications import EfficientNetB7
-from tensorflow.keras.applications.efficientnet import preprocess_input
+from tensorflow.keras.applications import EfficientNetB7, InceptionV3
+# from tensorflow.keras.applications.efficientnet import preprocess_input
+from tensorflow.keras.applications.inception_v3 import preprocess_input
 import pandas as pd
-from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D
+from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
-from tensorflow.keras.optimizers import Adam
-from PIL import Image
+from tensorflow.keras.optimizers import Adam, RMSprop
+import datetime 
 
 ########### npy save
 
@@ -47,8 +47,11 @@ print(xy_data)  # <tensorflow.python.keras.preprocessing.image.DirectoryIterator
 print(" >>> npy save >>> ")
 np.save('../data/LPD_competition/npy/data_x3.npy', arr=xy_data[0][0], allow_pickle=True)
 np.save('../data/LPD_competition/npy/data_y3.npy', arr=xy_data[0][1], allow_pickle=True)
-
+'''
 ########### npy load
+'''
+start_now = datetime.datetime.now()
+nowDatetime = start_now.strftime('%m%d_%H%M%S')
 
 #1. DATA
 x_data = np.load('../data/LPD_competition/npy/data_x3.npy')
@@ -68,20 +71,21 @@ print(y_train.shape, y_test.shape, y_val.shape)  # (30720, ) (9600, ) (7680, )
 
 #2. Modeling
 def my_model() :
-    b7 = EfficientNetB7(weights='imagenet', include_top=False, input_shape=(128, 128,3))
-    b7.trainable = False
+    v3 = InceptionV3(weights='imagenet', include_top=False, input_shape=(128, 128,3))
+    for layer in v3.layers:
+        layer.trainable = False
     model = Sequential()
-    model.add(b7)
+    model.add(v3)
     model.add(GlobalAveragePooling2D())
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(64, activation='relu'))
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dropout(0.2))
     model.add(Dense(1000, activation='softmax'))
     return model
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.4)
-path = '../data/LPD_competition/cp/cp_0317_2_b7.hdf5'
+path = '../data/LPD_competition/cp/cp_0317_3_v3.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
 
 model = my_model()
@@ -89,53 +93,32 @@ model.summary()
 
 batch = 16
 
-model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=1e-5,epsilon=None), metrics=['acc'])
-model.fit(x_train, y_train, epochs=100, batch_size=batch , steps_per_epoch=len(x_train)//batch,\
+model.compile(loss='sparse_categorical_crossentropy', optimizer=RMSprop(lr=0.0001, decay=1e-6), metrics=['acc'])
+model.fit(x_train, y_train, epochs=500, batch_size=batch , steps_per_epoch=len(x_train)//batch,\
     validation_data=(x_val, y_val), callbacks=[es, lr, cp])
 
 result = model.evaluate(x_test, y_test, batch_size=batch)
 print("loss ", result[0])
 print("acc ", result[1])
-'''
 
+# loss  0.5845186710357666
+# acc  0.8924999833106995
+'''
 #4. Predict
 submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
 # print(submission.shape) # (72000, 2)
 
-test_image = glob('../data/LPD_competition/test/*.jpg')
-# print(len(test_image))      # 72000
-
-model = load_model('../data/LPD_competition/cp/cp_0317_2_b7.hdf5')
+model = load_model('../data/LPD_competition/cp/cp_0317_3_v3.hdf5')
 
 # model.summary()
 print("predict >>>>>>>>>>>>>> ")
 
-for img in test_image :
-    now_img = os.path.basename(img)
-    # print("\n", now_img)
-    copy_img = img 
-    img1 = load_img(copy_img , color_mode='rgb', target_size=(128,128)) 
-    img1 = img1.resize((128, 128))
-    img1 = asarray(img1)
-    img1 = img1.reshape(-1, 128, 128,3)
-    img1 = preprocess_input(img1)
-    # print(img1.shape)   # (1, 128, 128, 3)
-    pred = np.argmax(model.predict(img1))
-    # print(pred)
-    submission.loc[now_img,:] = pred
-    # print(submission.head())
+x_pred = np.load('../data/LPD_competition/npy/data_test.npy', allow_pickle=True)
+x_pred = preprocess_input(x_pred) 
 
-    # now_img = os.path.basename(img)
+result = model.predict(x_pred, verbose=True)
+print(result.shape)
+submission['prediction'] = np.argmax(result, axis = 1)
+submission.to_csv('../data/LPD_competition/sub_0317_5.csv',index=True)
 
-    # img1 = Image.open(img)
-    # img1 = img1.convert('RGB')
-    # img1 = img1.resize((128,128))
-    # img_data = asarray(img1)
-    # img_data = preprocess_input(img_data)
-    # pred = np.argmax(model.predict(img_data))
-    # submission.loc[now_img,:] = pred
-    print(pred)
-    submission.to_csv('../data/LPD_competition/sub_0317_3.csv', index=True)
-
-submission.to_csv('../data/LPD_competition/sub_0317_3.csv', index=True)
-
+# score 0.757

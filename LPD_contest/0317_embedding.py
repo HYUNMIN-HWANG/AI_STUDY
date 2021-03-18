@@ -68,9 +68,9 @@ print(y_train.shape, y_test.shape, y_val.shape)  # (30720,) (9600,) (7680,)
 def my_model() :
     model = Sequential()
     model.add(Embedding(input_dim=1000, output_dim=64, input_length=6400*3)) 
-    model.add(Conv1D(64, 2, padding='same', activation='relu')) 
+    model.add(Conv1D(1024, 2, padding='same', activation='relu')) 
     model.add(Flatten())
-    model.add(Dense(64, activation='relu'))
+    model.add(Dense(1024, activation='relu'))
     model.add(Dense(1000, activation='softmax'))
     return model
 
