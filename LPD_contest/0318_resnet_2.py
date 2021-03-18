@@ -51,11 +51,11 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator()
 
 batch = 16
-train_generator = train_datagen.flow(x_train, y_train, batch_size=batch, shuffle=False )
-valid_generator = test_datagen.flow(x_valid, y_valid, batch_size=batch, shuffle=False )
+train_generator = train_datagen.flow(x_train, y_train, batch_size=batch)
+valid_generator = test_datagen.flow(x_valid, y_valid, batch_size=batch)
 pred_generator = test_datagen.flow(x_pred, shuffle=False)
 
-'''
+
 #2. Modeling
 transfer = ResNet50(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
 for layer in transfer.layers:
@@ -70,36 +70,28 @@ model = Model(inputs=transfer.input, outputs = top_model)
 model.summary()
 
 #3. Compile, Train, Evaluate
-es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
-lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.06)
-path = '../data/LPD_competition/cp/cp_0318_4_resnet_{val_loss:.4f}.hdf5'
+es = EarlyStopping(monitor='val_loss', patience=10, mode='min')
+lr = ReduceLROnPlateau(monitor='val_loss', patience=8, factor=0.06)
+path = '../data/LPD_competition/cp/cp_0318_5_resnet.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
 
 model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=1e-5), metrics=['accuracy'])
 model.fit_generator(train_generator, epochs=10, steps_per_epoch = len(x_train) // batch ,
     validation_data=valid_generator, callbacks=[es, lr, cp])
 
-model.save('../data/LPD_competition/cp/cp_0318_4_resnet_model.hdf5')
-model.save_weights('../data/LPD_competition/cp/cp_0318_4_resnet_weights.h5')
+model.save('../data/LPD_competition/cp/cp_0318_5_resnet_model.hdf5')
+model.save_weights('../data/LPD_competition/cp/cp_0318_5_resnet_weights.h5')
 
 result = model.evaluate(valid_generator, batch_size=batch)
 print("loss ", result[0])
 print("acc ", result[1])
 
-'''
+
 #4. Predict
 submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
 # print(submission.shape) # (72000, 2)
 
-model = load_model('../data/LPD_competition/cp/cp_0318_4_resnet_0.6817.hdf5')
-model.summary()
-
-result = model.evaluate(valid_generator, batch_size=batch)
-print("loss ", result[0])
-print("acc ", result[1])
-
-# loss  0.6817045211791992
-# acc  0.8711458444595337
+model = load_model('../data/LPD_competition/cp/cp_0318_5_resnet.hdf5')
 
 print("predict >>>>>>>>>>>>>> ")
 
@@ -108,12 +100,12 @@ print(result.shape) # (72000, 1000)
 print(np.argmax(result, axis = 1))
 
 submission['prediction'] = np.argmax(result, axis = 1)
-submission.to_csv('../data/LPD_competition/sub_0318_4.csv',index=True)
+submission.to_csv('../data/LPD_competition/sub_0318_5.csv',index=True)
 
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
 print("time >> " , time)    # time >
 
-# train, valid, pred > shuffle=False
-# score 49.478
+# pred >> shuffle = False
+# score 49.697
