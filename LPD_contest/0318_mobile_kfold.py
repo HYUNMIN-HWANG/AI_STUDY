@@ -51,7 +51,6 @@ train_datagen = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator()
 
-
 def my_model () :
     transfer = MobileNet(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
     for layer in transfer.layers:
@@ -83,12 +82,13 @@ for train_index, valid_index in kf.split(x_data) :
     train_generator = train_datagen.flow(x_train, y_train, batch_size=batch)
     valid_generator = test_datagen.flow(x_valid, y_valid, batch_size=batch)
     pred_generator = test_datagen.flow(x_pred, shuffle=False)
-
+    
     model = my_model()
     model.summary()
 
     #3. Compile, Train, Evaluate
     model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=1e-5), metrics=['accuracy'])
+    '''
     hist = model.fit_generator(train_generator, epochs=100, steps_per_epoch = len(x_train) // batch ,
         validation_data=valid_generator, callbacks=[es, lr, cp])
 
@@ -98,9 +98,10 @@ for train_index, valid_index in kf.split(x_data) :
     print("loss ", result[0])
     print("acc ", result[1])
 
-
+    '''
     #4. Predict
-    model = load_model('../data/LPD_competition/cp/cp_0318_8_mobile_kf.hdf5')
+    # model = load_model('../data/LPD_competition/cp/cp_0318_8_mobile_kf.hdf5')
+    model.load_weights(f'../data/LPD_competition/cp/cp_0318_8_mobile_kf_weights_{i}.h5')
 
     print("predict >>>>>>>>>>>>>> ")
 
@@ -112,15 +113,21 @@ for train_index, valid_index in kf.split(x_data) :
     result_arg = np.argmax(result, axis = 1)
 
     submission['prediction'] = result_arg
-    submission.to_csv('../data/LPD_competition/sub_0318_8.csv',index=True)
+    submission.to_csv(f'../data/LPD_competition/sub_0318_8_{i}.csv',index=True)
+    # score 
+    # 1 > 67.949
+    # 2 > 67.136
+    # 3 > 67.192
+    # 4 > 68.479
+    # split 4에서 멈춤 =======
 
     result_list.append(result_arg)
 
     i += 1
 
-
 mean = sum(result_list) / n_split
 print(mean.shape)
+
 
 submission['prediction'] = mean
 submission.to_csv('../data/LPD_competition/sub_0318_8_mean.csv',index=True)
@@ -130,3 +137,5 @@ time = end_now - start_now
 print("time >> " , time)    # time >
 
 # score 
+
+
