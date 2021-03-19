@@ -22,9 +22,11 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, r2_score
 from xgboost import XGBClassifier
 
+start_now = datetime.datetime.now()
+
 ### npy load
 x_data = np.load('../data/LPD_competition/npy/data_x_train4.npy', allow_pickle=True)
-x_data = np.resize(x_data, (48000,100*100*3))
+x_data = np.resize(x_data, (48000, 100*100*3))
 print(x_data.shape)    # (48000, 100, 100, 3)
 y_data = np.load('../data/LPD_competition/npy/data_y_train4.npy', allow_pickle=True)
 print(y_data.shape)    # (48000,)
@@ -42,25 +44,26 @@ print(y_train.shape, y_valid.shape)
 x_train = x_train / 255.
 x_valid = x_valid / 255.
 
-train_datagen = ImageDataGenerator(
-    width_shift_range=0.1,
-    height_shift_range=0.1,
-    rotation_range=20,
-    fill_mode='nearest'
-)
+# train_datagen = ImageDataGenerator(
+#     width_shift_range=0.1,
+#     height_shift_range=0.1,
+#     rotation_range=20,
+#     fill_mode='nearest'
+# )
 
-test_datagen = ImageDataGenerator()
+# test_datagen = ImageDataGenerator()
 
 batch = 16
 # train_generator = train_datagen.flow(x_train, y_train, batch_size=batch)
 # valid_generator = test_datagen.flow(x_valid, y_valid, batch_size=batch)
 # pred_generator = test_datagen.flow(x_pred, shuffle=False)
 
-kf = KFold(n_splits=5, shuffle=True, random_state=45)
+# kf = KFold(n_splits=5, shuffle=True, random_state=45)
 
-model = XGBClassifier(n_jobs = -1, use_label_encoder=False)
+model = XGBClassifier(n_jobs = -1, use_label_encoder=False, learning_rate=0.01, n_estimators=100)
+    # tree_method = 'cpu_hist', predictor='cpu_predictor')
 
-model.fit(x_train, y_train, eval_metric='logloss')
+model.fit(x_train, y_train, verbose=1, eval_metric='mlogloss', eval_set =[(x_train, y_train), (x_valid, y_valid)], early_stopping_rounds=20)
 
 result = model.score(x_valid, y_valid)
 print("model.score : ", result)
@@ -68,6 +71,18 @@ print("model.score : ", result)
 
 y_pred = model.predict(x_pred)
 print(y_pred)
+print(y_pred.shape)
+
+
+submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
+submission['prediction'] = np.argmax(result, axis = 1)
+submission.to_csv('../data/LPD_competition/sub_0319_1.csv',index=True)
+
+
+end_now = datetime.datetime.now()
+time = end_now - start_now
+print("time >> " , time)    # time >
+
 
 # acc = accuracy_score(y_valid, y_pred)
 # print("acc score : ", acc)
