@@ -25,7 +25,14 @@ from xgboost import XGBClassifier
 start_now = datetime.datetime.now()
 result_list = []
 
+# submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
+
+# x_pred = np.load('../data/LPD_competition/npy/data_x_pred4.npy', allow_pickle=True)
+# print(x_pred.shape)     # (72000, 100, 100, 3)
+
+z = 0
 for i in range(50) :
+    print(z,">>>>>>>>>>>>>>>>>")
     start = i * 20
     end = start + 20
 
@@ -55,19 +62,87 @@ for i in range(50) :
 
     result_list.append(result)
 
+    # y_pred = model.predict(x_pred)
+    # print(y_pred[:40])
+    # print(y_pred.shape)
+
+    # submission['prediction'] = y_pred
+    # submission.to_csv('../data/LPD_competition/sub_0319_1.csv',index=True)
+    z += 1
+
+
 print(result_list)
 
-'''
-y_pred = model.predict(x_pred)
-print(y_pred[:40])
-print(y_pred.shape)
+
+for n, score in enumerate(result_list) : 
+    print(n, ":", score)
 
 
-submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
-submission['prediction'] = y_pred
-submission.to_csv('../data/LPD_competition/sub_0319_1.csv',index=True)
-'''
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
 print("time >> " , time)    # time >
+
+'''
+[0.9479166666666666, 
+0.9270833333333334, 
+0.96875, 
+0.9895833333333334, 
+0.9895833333333334, 
+0.9583333333333334, 
+0.8854166666666666, * (120 ~ 139)
+0.9895833333333334, 
+0.9583333333333334, 
+0.9479166666666666, 
+0.9895833333333334, 
+0.9583333333333334, 
+0.9375, 
+0.9895833333333334, 
+0.9375, 
+0.9583333333333334,
+0.96875, 
+0.9583333333333334, 
+0.9479166333334,
+0.9479166666666666, 
+0.9895833333333334666666666,
+0.96875, 
+0.9479166666666666, 
+0.9895833333333334, 
+0.96875,
+0.9270833333333334, 
+0.9791666666666666, 
+0.9375, 
+0.8854166666666666, * (560 ~ 579)
+0.9479166666666666, 
+0.958833333333334, 
+0.96875, 
+0.9270833333333334, 
+0.93333333333334,
+0.9791666666666666, 
+0.9583333333333334, 
+0.9583333333333334, 
+0.96875, 
+0.96875, 
+0.96875, 
+0.9895833333333334, 
+0.9583333333333334, 
+0.9375, 
+0.9479166666 
+0.96875, 
+0.9895833333333334, 
+0.95833333333333666666, 
+0.96875, 
+0.96875, 
+0.9375,
+0.96875, 
+0.9583333333333334, 
+0.9270833333333334, 
+0.9791666666666666, 
+0.9895833333333334, 
+0.96875, 
+0.9791666666666666, 
+0.96875  
+0.9791666666666666, 
+0.96875]
+'''
+# time >>  14:12:23.143077
