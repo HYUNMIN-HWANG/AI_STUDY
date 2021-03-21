@@ -13,7 +13,6 @@ import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
-
 #1. DATA
 dataset = load_iris()
 x = dataset.data

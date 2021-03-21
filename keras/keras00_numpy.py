@@ -1,3 +1,4 @@
+
 #numpy 사용하기
 
 import numpy as np 
