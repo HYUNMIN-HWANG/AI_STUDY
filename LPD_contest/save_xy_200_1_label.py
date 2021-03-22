@@ -17,7 +17,7 @@ from tensorflow.keras.optimizers import Adam
 from PIL import Image
 from tensorflow.keras.utils import to_categorical
 
-'''
+
 ### train data
 
 data = []
@@ -37,8 +37,8 @@ for i in range(1000) :
 data = np.array(data)
 label = np.array(label)
 
-print(data.shape)   # (48058, 200, 200, 3)
-print(label.shape)  # (48058,)
+print(data.shape)   # (48090, 200, 200, 3)
+print(label.shape)  # (48090,)
 
 np.save('../data/LPD_competition/npy/data_x_train5.npy', arr=data, allow_pickle=True)
 print('x save')
@@ -63,3 +63,4 @@ print(pred.shape)   # (72000, 200, 200, 3)
 
 np.save('../data/LPD_competition/npy/data_x_pred5.npy', arr=pred, allow_pickle=True)
 print('x save')
+'''
