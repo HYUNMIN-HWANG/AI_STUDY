@@ -73,10 +73,10 @@ for i in range(2) :
         x_valid = np.where((x_valid < 160/255.), 0, x_valid)
 
         # polynomial
+        print("polynomial ")
         poly = PolynomialFeatures(degree=2, include_bias=False)
         poly_x_train = poly.fit_transform(x_train)
         poly_x_valid = poly.fit_transform(x_valid)
-        print("polynomial ")
         print(poly_x_train.shape)   #(864, 296064)
         print(poly_x_valid.shape)   #(96, 296064)
 

@@ -63,12 +63,9 @@ for i in range (72000) :
     one_img = one_img.resize((100, 100))
     one_img = np.asarray(one_img)
     pred.append(one_img)
-
 pred = np.array(pred)
 print(pred.shape)   # (72000, 100, 100, 3)
-
 # pred_generator = test_datagen.flow(pred, shuffle=False)
-
 np.save('../data/LPD_competition/npy/data_pred_gen1.npy', arr=pred, allow_pickle=True)
 print('pred save')
 '''

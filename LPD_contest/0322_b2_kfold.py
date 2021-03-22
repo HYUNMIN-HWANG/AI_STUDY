@@ -6,10 +6,10 @@ import cv2 as cv
 from glob import glob
 import matplotlib.pyplot as plt
 import os
-from tensorflow.keras.applications import EfficientNetB0, InceptionV3, MobileNet, ResNet50, ResNet101
-# from tensorflow.keras.applications.efficientnet import preprocess_input
+from tensorflow.keras.applications import EfficientNetB2, InceptionV3, MobileNet, ResNet50, ResNet101
+from tensorflow.keras.applications.efficientnet import preprocess_input
 # from tensorflow.keras.applications.mobilenet import preprocess_input
-from tensorflow.keras.applications.resnet import preprocess_input
+# from tensorflow.keras.applications.resnet import preprocess_input
 import pandas as pd
 from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.models import Sequential, load_model, Model
@@ -40,7 +40,7 @@ x_pred = preprocess_input(x_pred)
 
 y_data = to_categorical(y_data)
 
-n_split = 9
+n_split = 8
 kf = KFold(n_splits=n_split, shuffle=True, random_state=42)
 
 train_datagen = ImageDataGenerator(
@@ -52,7 +52,7 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator()
 
 def my_model () :
-    transfer = ResNet101(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
+    transfer = EfficientNetB2(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
     for layer in transfer.layers:
             layer.trainable = True
     top_model = transfer.output
@@ -66,9 +66,9 @@ def my_model () :
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.06)
-path = '../data/LPD_competition/cp/cp_0321_1_resnet_kf.hdf5'
+path = '../data/LPD_competition/cp/cp_0322_1_b2_kf.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
-batch = 8
+batch = 16
 
 result_list = []
 i = 1
@@ -87,12 +87,12 @@ for train_index, valid_index in kf.split(x_data) :
     # model.summary()
 
     #3. Compile, Train, Evaluate
-    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=1e-6), metrics=['accuracy'])
-    
+    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=1e-5), metrics=['accuracy'])
+
     hist = model.fit_generator(train_generator, epochs=100, steps_per_epoch = len(x_train) // batch ,
         validation_data=valid_generator, callbacks=[es, lr, cp])
 
-    model.save_weights(f'../data/LPD_competition/cp/cp_0321_1_resnet_kf_weights_{i}.h5')
+    model.save_weights(f'../data/LPD_competition/cp/cp_0322_1_b2_kf_weights_{i}.h5')
 
     result = model.evaluate(valid_generator, batch_size=batch)
     print("loss ", result[0])
@@ -100,7 +100,7 @@ for train_index, valid_index in kf.split(x_data) :
     
     
     #4. Predict
-    model = load_model('../data/LPD_competition/cp/cp_0321_1_resnet_kf.hdf5')
+    model = load_model('../data/LPD_competition/cp/cp_0322_1_b2_kf.hdf5')
     # model.load_weights('../data/LPD_competition/cp/cp_0320_1_resnet_kf_weights_4.h5')
 
     print("predict >>>>>>>>>>>>>> ")
@@ -113,19 +113,19 @@ for train_index, valid_index in kf.split(x_data) :
     result_arg = np.argmax(result, axis = 1)
 
     submission['prediction'] = result_arg
-    submission.to_csv(f'../data/LPD_competition/sub_0321_1_{i}.csv',index=True)
+    submission.to_csv(f'../data/LPD_competition/sub_0322_1_{i}_weight.csv',index=True)
     # score 
 
 
-    result_list.append(result_arg)
+    # result_list.append(result_arg)
 
     i += 1
 
-mean = sum(result_list) / n_split
-print(mean.shape)
+# mean = sum(result_list) / n_split
+# print(mean.shape)
 
-submission['prediction'] = mean
-submission.to_csv('../data/LPD_competition/sub_0321_1_mean.csv',index=True)
+# submission['prediction'] = mean
+# submission.to_csv('../data/LPD_competition/sub_0322_1_mean.csv',index=True)
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
@@ -133,4 +133,5 @@ print("time >> " , time)    # time >
 
 # score 
 
-# 너무 느리고 스코어도 낮다.
+
+# 1 > 76.129
