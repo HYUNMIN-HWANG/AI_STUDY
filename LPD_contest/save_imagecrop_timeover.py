@@ -75,8 +75,8 @@ for i in range(1000) :
 data = np.array(data)
 label = np.array(label)
 
-print(data.shape)   # 
-print(label.shape)  # 
+print(data.shape)   # (48090, 100, 100, 3)
+print(label.shape)  # (48090,)
     
 np.save('../data/LPD_competition/npy/data_x_train5.npy', arr=data, allow_pickle=True)
 print('x save')
@@ -84,7 +84,6 @@ np.save('../data/LPD_competition/npy/data_y_train5.npy', arr=label, allow_pickle
 print('y save')
 
 '''
-
 ### test data
 
 pred = []

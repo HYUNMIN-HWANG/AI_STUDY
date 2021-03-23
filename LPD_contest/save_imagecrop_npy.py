@@ -35,7 +35,9 @@ print(x_data.shape)    # (48090, 200, 200, 3)
 y_data = np.load('../data/LPD_competition/npy/data_y_train5.npy', allow_pickle=True)
 print(y_data.shape)    # (48090,)
 
-    
+# y_data = to_categorical(y_data)
+# print(y_data.shape) # (48090, 1000)
+
 sharpen = np.array([[0,-1,0],
                     [-1,5,-1],
                     [0,-1,0]])
