@@ -32,8 +32,8 @@ start_now = datetime.datetime.now()
 x_data = np.load('../data/LPD_competition/npy/data_x_train5.npy', allow_pickle=True)
 print(x_data.shape)    # (48090, 200, 200, 3)
 
-y_data = np.load('../data/LPD_competition/npy/data_y_train5.npy', allow_pickle=True)
-print(y_data.shape)    # (48090,)
+# y_data = np.load('../data/LPD_competition/npy/data_y_train5.npy', allow_pickle=True)
+# print(y_data.shape)    # (48090,)
 
 # y_data = to_categorical(y_data)
 # print(y_data.shape) # (48090, 1000)
@@ -54,39 +54,38 @@ label = []
 for i in range(48090) :
     print(i)
     one_img = x_data[i] 
-    blur_img = cv.GaussianBlur(one_img, (3,3),0)        # 블러처리
-    blur_img = cv.filter2D(blur_img, -1, sharpen)       # 경계선 강조
-
-    cv.grabCut(blur_img, mask, rectangle, bgdModel, fgdModel, 20, cv.GC_INIT_WITH_RECT) # 배경 제거
+    # blur_img = cv.GaussianBlur(one_img, (3,3),0)        # 블러처리
+    temp = cv.filter2D(one_img, -1, sharpen)       # 경계선 강조
+    # plt.imshow(temp); plt.show()
+    cv.grabCut(temp, mask, rectangle, bgdModel, fgdModel, 18, cv.GC_INIT_WITH_RECT) # 배경 제거
     mask2 = np.where((mask==2) | (mask==0), 0, 1).astype('uint8')
-    img_rgb_nobg = blur_img * mask2[:,:,np.newaxis]
+    img_rgb_nobg = temp * mask2[:,:,np.newaxis]
+    # plt.imshow(img_rgb_nobg); plt.show()
 
-    crop_img = img_rgb_nobg[20:-20, 30:-30].copy()     # 이미지 크롭
-    crop_img = cv.resize(crop_img, (100,100), interpolation=cv.INTER_AREA)   # 이미지 작게 리사이즈
+    crop_img = img_rgb_nobg[5:-15, 30:-30].copy()     # 이미지 크롭
+    crop_img = cv.resize(crop_img, (100,120), interpolation=cv.INTER_AREA)   # 이미지 작게 리사이즈
+    # plt.imshow(crop_img); plt.show()
 
     # print(one_img.shape)    # (200, 200, 3)
     # print(blur_img.shape)   # (200, 200, 3)
-    # print(crop_img.shape)   # (100, 100, 3)
+    # print(crop_img.shape)   # (120, 100, 3)
 
     # plt.imshow(crop_img)
     # plt.show()
-
+    crop_img = np.array(crop_img)
     data.append(crop_img)
-    label.append(i)
-    
+    # label.append(i)
+
 data = np.array(data)
-label = np.array(label)
+# label = np.array(label)
 
 print(data.shape)   # 
-print(label.shape)  # 
+# print(label.shape)  # 
 
-
-np.save('../data/LPD_competition/npy/crop_x_train1.npy', arr=data, allow_pickle=True)
+np.save('../data/LPD_competition/npy/crop_x_train2.npy', arr=data, allow_pickle=True)
 print('x save')
-np.save('../data/LPD_competition/npy/crop_y_train1.npy', arr=label, allow_pickle=True)
-print('y save')
-
-
+# np.save('../data/LPD_competition/npy/crop_y_train2.npy', arr=label, allow_pickle=True)
+# print('y save')
 
 '''
 ### test data

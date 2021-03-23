@@ -6,7 +6,7 @@ import cv2 as cv
 from glob import glob
 import matplotlib.pyplot as plt
 import os
-from tensorflow.keras.applications import EfficientNetB0, InceptionV3, MobileNet, ResNet50, ResNet101
+from tensorflow.keras.applications import EfficientNetB0, InceptionV3, MobileNet, ResNet50, ResNet101, Xception
 # from tensorflow.keras.applications.efficientnet import preprocess_input
 # from tensorflow.keras.applications.mobilenet import preprocess_input
 from tensorflow.keras.applications.resnet import preprocess_input
@@ -41,8 +41,8 @@ x_pred = preprocess_input(x_pred)
 # y_data = to_categorical(y_data)
 # print(y_data.shape) # (48090, 48090)
 
-n_split = 8
-kf = KFold(n_splits=n_split, shuffle=True, random_state=42)
+# n_split = 8
+# kf = KFold(n_splits=n_split, shuffle=True, random_state=42)
 
 train_datagen = ImageDataGenerator(
     width_shift_range=0.1,
@@ -53,7 +53,7 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator()
 
 def my_model () :
-    transfer = ResNet101(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
+    transfer = Xception(weights="imagenet", include_top=False, input_shape=(120, 100, 3))
     for layer in transfer.layers:
             layer.trainable = True
     top_model = transfer.output

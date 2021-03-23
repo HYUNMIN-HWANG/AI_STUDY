@@ -18,6 +18,7 @@ from tensorflow.keras.optimizers import Adam, RMSprop, SGD
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 import datetime 
+from tqdm.notebook import tqdm
 
 submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
 # print(submission.shape) # (72000, 2)
@@ -50,7 +51,10 @@ train_datagen = ImageDataGenerator(
     fill_mode='nearest'
 )
 
-test_datagen = ImageDataGenerator()
+test_datagen = ImageDataGenerator(
+    width_shift_range= 0.05,
+    height_shift_range= 0.05
+)
 
 def my_model () :
     transfer = ResNet101(weights="imagenet", include_top=False, input_shape=(100, 100, 3))
@@ -82,42 +86,53 @@ for train_index, valid_index in kf.split(x_data) :
 
     train_generator = train_datagen.flow(x_train, y_train, batch_size=batch)
     valid_generator = test_datagen.flow(x_valid, y_valid, batch_size=batch)
-    pred_generator = test_datagen.flow(x_pred, shuffle=False)
+    pred_generator = x_pred
     
     model = my_model()
     # model.summary()
 
     #3. Compile, Train, Evaluate
     model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=1e-5), metrics=['accuracy'])
-    """
+
+    """   
     hist = model.fit_generator(train_generator, epochs=200, steps_per_epoch = len(x_train) // batch ,
         validation_data=valid_generator, callbacks=[es, lr, cp])
 
-    model.save_weights(f'../data/LPD_competition/cp/cp_0323_1_resnet_kf_weights_{i}.h5')
+    model.save_weights(f'../data/LPD_competition/cp/cp_0323_2_resnet_kf_weights_{i}.h5')
 
     result = model.evaluate(valid_generator, batch_size=batch)
     print("loss ", result[0])
     print("acc ", result[1])
-    """
+    """ 
     #4. Predict
     model = load_model('../data/LPD_competition/cp/cp_0323_1_resnet_kf.hdf5')
     # model.load_weights('../data/LPD_competition/cp/cp_0320_1_resnet_kf_weights_4.h5')
 
     print(">>>>>>>>>>>>>>>> predict >>>>>>>>>>>>>> ")
 
-    result = model.predict_generator(pred_generator, verbose=True)
-    
-    # semi save
-    print(result.shape) # (72000, 1000)
-    print(np.argmax(result, axis = 1))
-    result_arg = np.argmax(result, axis = 1)
+    cumsum = np.zeros([72000, 1000])
+    count_result = []
+    for tta in tqdm(range(5)) :
+        print(f"<<<<<<<<<<< {tta} 진행 중 >>>>>>> ")
+        result = model.predict(pred_generator, verbose=1, steps = len(x_pred))
+        result = np.array(result)
+        cumsum = np.add(cumsum, result)
+        temp = cumsum / (tta+1)
+        temp_sub = np.argmax(temp, 1)
+    # pred = np.mean(count_result, axis=0)
+    # np.mean(np.equal(np.argmax(y_val, axis=-1), np.argmax(pred, axis=-1)))
 
-    submission['prediction'] = result_arg
-    submission.to_csv(f'../data/LPD_competition/sub_0323_1_{i}.csv', index=True)
+    # semi save
+    # print(pred.shape) # (72000, 1000)
+    # print(np.argmax(result, axis = 1))
+    # result_arg = np.argmax(pred, axis = 1)
+
+        submission['prediction'] = temp_sub
+        submission.to_csv(f'../data/LPD_competition/sub_0323_2_{tta}.csv', index=True)
     # score 
 
 
-    result_list.append(result_arg)
+    # result_list.append(result_arg)
 
     i += 1
 
@@ -125,11 +140,11 @@ mean = sum(result_list) / n_split
 print(mean.shape)
 
 submission['prediction'] = mean
-submission.to_csv('../data/LPD_competition/sub_0323_1_mean.csv',index=True)
+submission.to_csv('../data/LPD_competition/sub_0323_2_mean.csv',index=True)
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
 print("time >> " , time)    # time >
 
 # score 
-# kf 1 >> 65.763
+# tta 터진다
