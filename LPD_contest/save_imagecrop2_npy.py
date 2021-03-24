@@ -63,7 +63,7 @@ for i in range(48090) :
     # plt.imshow(img_rgb_nobg); plt.show()
 
     crop_img = img_rgb_nobg[5:-15, 30:-30].copy()     # 이미지 크롭
-    crop_img = cv.resize(crop_img, (100,120), interpolation=cv.INTER_AREA)   # 이미지 작게 리사이즈
+    crop_img = cv.resize(crop_img, (100,100), interpolation=cv.INTER_AREA)   # 이미지 작게 리사이즈
     # plt.imshow(crop_img); plt.show()
 
     # print(one_img.shape)    # (200, 200, 3)
@@ -79,7 +79,7 @@ for i in range(48090) :
 data = np.array(data)
 # label = np.array(label)
 
-print(data.shape)   # 
+print(data.shape)   # (48090, 120, 100, 3)
 # print(label.shape)  # 
 
 np.save('../data/LPD_competition/npy/crop_x_train2.npy', arr=data, allow_pickle=True)
@@ -87,38 +87,3 @@ print('x save')
 # np.save('../data/LPD_competition/npy/crop_y_train2.npy', arr=label, allow_pickle=True)
 # print('y save')
 
-'''
-### test data
-
-x_pred = np.load('../data/LPD_competition/data_x_pred5.npy', allow_pickle=True)
-print(x_pred.shape)     # (72000, 12288)
-
-pred = []
-for m in range(72000) : 
-    file = f'../data/LPD_competition/test_test/test/{m}.jpg'
-    print(file)
-    one_img = cv.imread(file, cv.IMREAD_COLOR)          # 이미지 불러오기 
-    one_img = cv.cvtColor(one_img,cv.COLOR_BGR2RGB)     # RGB로 바꾸기
-    crop_img = one_img[10:-10, 50:-50].copy()           # 이미지 크롭
-    crop_img = cv.GaussianBlur(crop_img, (3,3),0)       # 블러처리
-    crop_img = cv.filter2D(crop_img, -1, sharpen)       # 경계선 강조
-
-    cv.grabCut(crop_img, mask, rectangle, bgdModel, fgdModel, 20, cv.GC_INIT_WITH_RECT) # 배경 제거
-    mask2 = np.where((mask==2) | (mask==0), 0, 1).astype('uint8')
-    img_rgb_nobg = crop_img * mask2[:,:,np.newaxis]
-
-    crop_img = img_rgb_nobg[10:-10, 20:-20].copy()     # 이미지 크롭
-    crop_img = cv.resize(crop_img, (100, 120), interpolation=cv.INTER_AREA)   # 이미지 작게 리사이즈
-    print(crop_img.shape)
-    pred.append(crop_img)
-
-    plt.imshow(crop_img)
-    plt.show()
-
-pred = np.array(pred)
-print(pred.shape)
-
-np.save('../data/LPD_competition/npy/crop_x_pred1.npy', arr=pred, allow_pickle=True)
-print('predict save')
-
-'''
