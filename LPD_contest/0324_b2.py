@@ -91,8 +91,10 @@ model.save_weights('../data/LPD_competition/cp//cp_0324_3_b2_weights.h5')
 
 result = model.evaluate(valid_generator, batch_size=batch)
 print("loss ", result[0])   
-print("acc ", result[1])    
-
+print("acc ", result[1])  
+#earlyStopping 54  
+# loss  0.010364769026637077
+# acc  0.9965624809265137
 
 #4. Predict
 model = load_model('../data/LPD_competition/cp//cp_0324_3_b2.hdf5')
@@ -113,6 +115,7 @@ submission.to_csv('../data/LPD_competition/sub_0324_4.csv', index=True)
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
-print("time >> " , time)    # time >>
+print("time >> " , time)    # time >>  1:56:22.116163
 
 
+# score 75.754  ***

@@ -72,7 +72,7 @@ for i in range(48090) :
     # plt.show()
 
     data.append(crop_img)
-    label.append(i)
+    # label.append(i)
     
 data = np.array(data)
 label = np.array(label)

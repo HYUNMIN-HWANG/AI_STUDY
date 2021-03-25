@@ -118,7 +118,7 @@ for train_index, valid_index in kf.split(x_data) :
     # 1 > 67.949
     # 2 > 67.136
     # 3 > 67.192
-    # 4 > 68.479
+    # 4 > 68.479 ***
     # split 4에서 멈춤 =======
 
     result_list.append(result_arg)
