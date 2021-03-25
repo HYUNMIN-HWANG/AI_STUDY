@@ -25,9 +25,9 @@ submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
 start_now = datetime.datetime.now()
 
 ### npy load
-x_data = np.load('../data/LPD_competition/npy/data_x_train130.npy', allow_pickle=True)
-print(x_data.shape)    # (48090, 130, 130, 3)
-y_data = np.load('../data/LPD_competition/npy/data_y_train130.npy', allow_pickle=True)
+x_data = np.load('../data/LPD_competition/npy/data_x_train140.npy', allow_pickle=True)
+print(x_data.shape)    # (48090, 140, 140, 3)
+y_data = np.load('../data/LPD_competition/npy/data_y_train140.npy', allow_pickle=True)
 print(y_data.shape)    # (48090,)
 
 
@@ -47,7 +47,7 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator()
 
 x_train, x_valid, y_train, y_valid = train_test_split(x_data, y_data, train_size=0.9, shuffle=True, random_state=45)
-print(x_train.shape, x_valid.shape)  # (43281, 130, 130, 3) (4809, 130, 130, 3)
+print(x_train.shape, x_valid.shape)  # (43281, 140, 140, 3) (4809, 140, 140, 3)
 print(y_train.shape, y_valid.shape)  # (43281, 1000) (4809, 1000)
 
 def my_model () :
@@ -65,7 +65,7 @@ def my_model () :
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.06)
-path = '../data/LPD_competition/cp/cp_0325_2_b2.hdf5'
+path = '../data/LPD_competition/cp/cp_0325_3_b2.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
 
 batch = 16
@@ -81,24 +81,22 @@ model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.1), metrics=['
 hist = model.fit_generator(train_generator, epochs=200, steps_per_epoch = len(x_train) // batch ,
     validation_data=valid_generator, validation_steps=10 , callbacks=[es, lr, cp])
 
-model.save_weights('../data/LPD_competition/cp//cp_0325_2_b2_weights.h5')
+model.save_weights('../data/LPD_competition/cp//cp_0325_3_b2_weights.h5')
 
 result = model.evaluate(valid_generator, batch_size=batch)
 print("loss ", result[0])   
 print("acc ", result[1])  
 
-# EarlyStopping 70
-# loss  0.006445127539336681
-# acc  0.9975046515464783
+# EarlyStopping 
 
 #4. Predict
-model = load_model('../data/LPD_competition/cp//cp_0325_2_b2.hdf5')
+model = load_model('../data/LPD_competition/cp//cp_0325_3_b2.hdf5')
 # model.load_weights('../data/LPD_competition/cp//cp_0324_3_b2_weights.h5')
 
 print(">>>>>>>>>>>>>>>> predict >>>>>>>>>>>>>> ")
 
-x_pred = np.load('../data/LPD_competition/npy/data_x_pred130.npy', allow_pickle=True)
-print(x_pred.shape)     # (72000, 130, 130, 3)
+x_pred = np.load('../data/LPD_competition/npy/data_x_pred140.npy', allow_pickle=True)
+print(x_pred.shape)     # (72000, 140, 140, 3)
 x_pred = preprocess_input(x_pred)
 pred_generator = x_pred
 
@@ -110,10 +108,10 @@ print(np.argmax(result, axis = 1))
 result_arg = np.argmax(result, axis = 1)
 
 submission['prediction'] = result_arg
-submission.to_csv('../data/LPD_competition/sub_0325_2.csv', index=True)
+submission.to_csv('../data/LPD_competition/sub_0325_3.csv', index=True)
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
-print("time >> " , time)    # time >>   3:58:38.501524
+print("time >> " , time)    # time >>  
 
-# score 77.638
+# score 
