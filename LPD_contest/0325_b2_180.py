@@ -26,10 +26,10 @@ submission = pd.read_csv('../data/LPD_competition/sample.csv', index_col=0)
 start_now = datetime.datetime.now()
 
 ### npy load
-x_data = np.load('../data/LPD_competition/npy/data_x_train5.npy', allow_pickle=True)
-print(x_data.shape)    # (48090, 200, 200, 3)
-y_data = np.load('../data/LPD_competition/npy/data_y_train5.npy', allow_pickle=True)
-print(y_data.shape)    # (48090,)
+x_data = np.load('../data/LPD_competition/npy/data_x_train180.npy', allow_pickle=True)
+print(x_data.shape)    # (48000, 180, 180, 3)
+y_data = np.load('../data/LPD_competition/npy/data_y_train180.npy', allow_pickle=True)
+print(y_data.shape)    # (48000,)
 
 
 #1. DATA
@@ -38,8 +38,8 @@ x_data = preprocess_input(x_data)
 y_data = to_categorical(y_data)
 
 x_train, x_valid, y_train, y_valid = train_test_split(x_data, y_data, train_size=0.8, shuffle=True, random_state=42)
-print(x_train.shape, x_valid.shape)  # (38472, 200, 200, 3) (9618, 200, 200, 3)
-print(y_train.shape, y_valid.shape)  # (38472, 1000) (9618, 1000)
+print(x_train.shape, x_valid.shape)  # (38400, 180, 180, 3) (9600, 180, 180, 3)
+print(y_train.shape, y_valid.shape)  # (38400, 1000) (9600, 1000)
 
 
 train_datagen = ImageDataGenerator(
@@ -71,7 +71,7 @@ def my_model () :
  
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.5, mode='min')
-path = '../data/LPD_competition/cp/cp_0324_b2.hdf5'
+path = '../data/LPD_competition/cp/cp_0325_b2.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
 
 
@@ -80,24 +80,24 @@ model = my_model()
 
 #3. Compile, Train, Evaluate
 model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.1), metrics=['accuracy'])
-'''
+
 hist = model.fit_generator(train_generator, epochs=200, steps_per_epoch = len(x_train) // batch ,
     validation_data=valid_generator, validation_steps=10 ,callbacks=[es, lr, cp])
 
-model.save_weights('../data/LPD_competition/cp/cp_0324_b2_weights.h5')
+model.save_weights('../data/LPD_competition/cp/cp_0325_b2_weights.h5')
 
 result = model.evaluate(valid_generator, batch_size=batch)
 print("loss ", result[0])
 print("acc ", result[1])
-'''
+
 #4. Predict
-model = load_model('../data/LPD_competition/cp/cp_0324_b2.hdf5')
+model = load_model('../data/LPD_competition/cp/cp_0325_b2.hdf5')
 # model.load_weights('../data/LPD_competition/cp/cp_0324_resnet_weights.h5')
 
 print(">>>>>>>>>>>>>>>> predict >>>>>>>>>>>>>> ")
 
-x_pred = np.load('../data/LPD_competition/npy/data_x_pred5.npy', allow_pickle=True)
-print(x_pred.shape)     # (72000, 200, 200, 3)
+x_pred = np.load('../data/LPD_competition/npy/data_x_pred180.npy', allow_pickle=True)
+print(x_pred.shape)     # (72000, 180, 180, 3)
 x_pred = preprocess_input(x_pred)
 
 pred_generator = x_pred
@@ -109,7 +109,7 @@ print(np.argmax(result, axis = 1))
 result_arg = np.argmax(result, axis = 1)
 
 submission['prediction'] = result_arg
-submission.to_csv('../data/LPD_competition/home_0324_2.csv', index=True)
+submission.to_csv('../data/LPD_competition/home_0325_1.csv', index=True)
 
 # score 
 
@@ -118,5 +118,4 @@ end_now = datetime.datetime.now()
 time = end_now - start_now
 print("time >> " , time)    # time >
 
-# epoch 25에서 멈춤, 그때의 웨이트 값으로 predict한 결과
-# /home_0324_2.csv >> score 80.092
+
