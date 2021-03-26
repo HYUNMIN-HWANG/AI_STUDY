@@ -46,7 +46,7 @@ train_datagen = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator()
 
-x_train, x_valid, y_train, y_valid = train_test_split(x_data, y_data, train_size=0.9, shuffle=True, random_state=45)
+x_train, x_valid, y_train, y_valid = train_test_split(x_data, y_data, train_size=0.9, shuffle=True, random_state=49)
 print(x_train.shape, x_valid.shape)  # (43281, 140, 140, 3) (4809, 140, 140, 3)
 print(y_train.shape, y_valid.shape)  # (43281, 1000) (4809, 1000)
 
@@ -56,7 +56,7 @@ def my_model () :
     top_model = transfer.output
     top_model = GlobalAveragePooling2D()(top_model)
     top_model = Flatten()(top_model)
-    top_model = Dense(2024, activation="swish")(top_model)
+    top_model = Dense(4048, activation="swish")(top_model)
     top_model = Dropout(0.3) (top_model)
     top_model = Dense(1000, activation="softmax")(top_model)
 
@@ -65,7 +65,7 @@ def my_model () :
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min')
 lr = ReduceLROnPlateau(monitor='val_loss', patience=10, factor=0.06)
-path = '../data/LPD_competition/cp/cp_0325_3_b2.hdf5'
+path = '../data/LPD_competition/cp/cp_0326_1_b2.hdf5'
 cp = ModelCheckpoint(path, monitor='val_loss', save_best_only=True, mode='min')
 
 batch = 16
@@ -81,18 +81,15 @@ model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.1), metrics=['
 hist = model.fit_generator(train_generator, epochs=200, steps_per_epoch = len(x_train) // batch ,
     validation_data=valid_generator, validation_steps=10 , callbacks=[es, lr, cp])
 
-model.save_weights('../data/LPD_competition/cp//cp_0325_3_b2_weights.h5')
+model.save_weights('../data/LPD_competition/cp//cp_0326_1_b2_weights.h5')
 
 result = model.evaluate(valid_generator, batch_size=batch)
 print("loss ", result[0])   
 print("acc ", result[1])  
 
-# EarlyStopping 67
-# loss  0.007292268797755241
-# acc  0.9983364343643188
 
 #4. Predict
-model = load_model('../data/LPD_competition/cp//cp_0325_3_b2.hdf5')
+model = load_model('../data/LPD_competition/cp//cp_0326_1_b2.hdf5')
 # model.load_weights('../data/LPD_competition/cp//cp_0324_3_b2_weights.h5')
 
 print(">>>>>>>>>>>>>>>> predict >>>>>>>>>>>>>> ")
@@ -110,10 +107,10 @@ print(np.argmax(result, axis = 1))
 result_arg = np.argmax(result, axis = 1)
 
 submission['prediction'] = result_arg
-submission.to_csv('../data/LPD_competition/sub_0325_3.csv', index=True)
+submission.to_csv('../data/LPD_competition/sub_0326_1.csv', index=True)
 
 end_now = datetime.datetime.now()
 time = end_now - start_now
-print("time >> " , time)    # time >>  4:02:05.267230 
+print("time >> " , time)    # time >>  
 
-# score 78.161
+# score 
