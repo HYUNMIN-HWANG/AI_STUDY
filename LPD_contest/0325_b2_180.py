@@ -80,7 +80,7 @@ model = my_model()
 
 #3. Compile, Train, Evaluate
 model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.1), metrics=['accuracy'])
-
+"""
 hist = model.fit_generator(train_generator, epochs=200, steps_per_epoch = len(x_train) // batch ,
     validation_data=valid_generator, validation_steps=10 ,callbacks=[es, lr, cp])
 
@@ -89,7 +89,7 @@ model.save_weights('../data/LPD_competition/cp/cp_0325_b2_weights.h5')
 result = model.evaluate(valid_generator, batch_size=batch)
 print("loss ", result[0])
 print("acc ", result[1])
-
+"""
 #4. Predict
 model = load_model('../data/LPD_competition/cp/cp_0325_b2.hdf5')
 # model.load_weights('../data/LPD_competition/cp/cp_0324_resnet_weights.h5')
@@ -111,7 +111,7 @@ result_arg = np.argmax(result, axis = 1)
 submission['prediction'] = result_arg
 submission.to_csv('../data/LPD_competition/home_0325_1.csv', index=True)
 
-# score 
+# score 80.081
 
 
 end_now = datetime.datetime.now()
