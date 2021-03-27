@@ -17,9 +17,9 @@ from tensorflow.keras.optimizers import Adam
 from PIL import Image
 from tensorflow.keras.utils import to_categorical
 
-'''
-### train data
 
+### train data
+'''
 data = []
 label = []
 
@@ -29,7 +29,7 @@ for i in range(1000) :
         print(j)
         one_img = Image.open(j)
         one_img = one_img.convert("RGB")
-        one_img = one_img.resize((200,200))
+        one_img = one_img.resize((180,180))
         one_img = np.asarray(one_img)
         data.append(one_img)
         label.append(i)
@@ -37,29 +37,29 @@ for i in range(1000) :
 data = np.array(data)
 label = np.array(label)
 
-print(data.shape)   # (48090, 200, 200, 3)
-print(label.shape)  # (48090,)
+print(data.shape)   # (48000, 180, 180, 3)
+print(label.shape)  # (48000,)
 
-np.save('../data/LPD_competition/npy/data_x_train5.npy', arr=data, allow_pickle=True)
+np.save('../data/LPD_competition/npy/data_x_train180.npy', arr=data, allow_pickle=True)
 print('x save')
-np.save('../data/LPD_competition/npy/data_y_train5.npy', arr=label, allow_pickle=True)
+np.save('../data/LPD_competition/npy/data_y_train180.npy', arr=label, allow_pickle=True)
 print('y save')
 
-'''
-### test data
 
+### test data
+'''
 pred = []
 for i in range (72000) : 
     file = f'../data/LPD_competition//test/{i}.jpg'
     print(file)
     one_img = Image.open(file)
     one_img = one_img.convert("RGB")
-    one_img = one_img.resize((200,200))
+    one_img = one_img.resize((180,180))
     one_img = np.asarray(one_img)
     pred.append(one_img)
 
 pred = np.array(pred)
-print(pred.shape)   # (72000, 200, 200, 3)
+print(pred.shape)   # (72000, 180, 180, 3)
 
-np.save('../data/LPD_competition/npy/data_x_pred5.npy', arr=pred, allow_pickle=True)
+np.save('../data/LPD_competition/npy/data_x_pred180.npy', arr=pred, allow_pickle=True)
 print('x save')
