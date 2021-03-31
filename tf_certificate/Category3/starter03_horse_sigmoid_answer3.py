@@ -27,7 +27,7 @@ import zipfile
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 def solution_model():
-    '''
+
     _TRAIN_URL = "https://storage.googleapis.com/download.tensorflow.org/data/horse-or-human.zip"
     _TEST_URL = "https://storage.googleapis.com/download.tensorflow.org/data/validation-horse-or-human.zip"
     urllib.request.urlretrieve(_TRAIN_URL, 'horse-or-human.zip')
@@ -40,7 +40,7 @@ def solution_model():
     zip_ref = zipfile.ZipFile(local_zip, 'r')
     zip_ref.extractall('tmp/testdata/')
     zip_ref.close()
-    '''
+
 
     train_datagen = ImageDataGenerator(
         #Your code here. Should at least have a rescale. Other parameters can help with overfitting.
@@ -56,8 +56,8 @@ def solution_model():
         rescale=1./255
     )
 
-    TRAIN_DIR = './tf_certificate/Category3/tmp/horse-or-human/'
-    VALID_DIR = './tf_certificate/Category3/tmp/testdata/'
+    TRAIN_DIR = 'tmp/horse-or-human/'
+    VALID_DIR = 'tmp/testdata/'
     batch = 16
 
     train_generator = train_datagen.flow_from_directory(
@@ -93,7 +93,7 @@ def solution_model():
     )
 
     model.fit(#Your Code Here#
-        train_generator, epochs=100, validation_data=validation_generator, callbacks=[es,rl]
+        train_generator, epochs=5, validation_data=validation_generator, callbacks=[es,rl]
     )
 
     results = model.evaluate(validation_generator)
