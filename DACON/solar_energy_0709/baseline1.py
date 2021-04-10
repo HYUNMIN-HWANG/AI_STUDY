@@ -50,5 +50,10 @@ submission[column] = list(predict_1['yhat1']) + list(predict_2['yhat1'])
 
 print(submission.head())
 
-submission.to_csv('../../../data/solar_energy2/submission_0410_1.csv', index=False)
-submission.to_csv('../../../data/solar_energy2/submission_0410_2.csv', index=True)
+submission.to_csv('../../../data/solar_energy2/submission_0410_2.csv', index=False)
+# submission.to_csv('../../../data/solar_energy2/submission_0410_2.csv', index=True)
+
+
+# 계정 xian0105 (학원)
+# 파일명 : submission_0410_2.csv
+# score : 29.8381048543

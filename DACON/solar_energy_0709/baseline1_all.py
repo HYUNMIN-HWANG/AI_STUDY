@@ -65,3 +65,24 @@ for name in energy_list :
 # 계정 xian0105 (학원)
 # 파일명 : submission_0410_1.csv
 # score : 13.8069400531	
+
+'''
+2021-04-10 21:35:59,313; INFO; NP.forecaster; _handle_missing_data; dropped 24 NAN row in 'y'
+2021-04-10 21:35:59,335; INFO; NP.config; set_auto_batch_epoch; Auto-set batch_size to 64
+2021-04-10 21:35:59,335; INFO; NP.config; set_auto_batch_epoch; Auto-set epochs to 61
+2021-04-10 21:36:03,021; INFO; NP.utils_torch; lr_range_test; lr-range-test results: steep: 2.47E-02, min: 3.13E-01
+2021-04-10 21:36:03,021; INFO; NP.utils_torch; lr_range_test; learning rate range test selected lr: 1.34E-01
+2021-04-10 21:36:45,386; INFO; NP.forecaster; _handle_missing_data; dropped 48 NAN row in 'y'
+2021-04-10 21:36:45,398; INFO; NP.config; set_auto_batch_epoch; Auto-set batch_size to 64
+2021-04-10 21:36:45,398; INFO; NP.config; set_auto_batch_epoch; Auto-set epochs to 61
+2021-04-10 21:36:48,842; INFO; NP.utils_torch; lr_range_test; lr-range-test results: steep: 2.93E-02, min: 4.42E-01
+2021-04-10 21:36:48,842; INFO; NP.utils_torch; lr_range_test; learning rate range test selected lr: 1.79E-01
+2021-04-10 21:37:30,914; INFO; NP.config; set_auto_batch_epoch; Auto-set batch_size to 64
+2021-04-10 21:37:30,915; INFO; NP.config; set_auto_batch_epoch; Auto-set epochs to 61
+2021-04-10 21:37:34,340; INFO; NP.utils_torch; lr_range_test; lr-range-test results: steep: 2.77E-02, min: 3.13E-01
+2021-04-10 21:37:34,340; INFO; NP.utils_torch; lr_range_test; learning rate range test selected lr: 1.39E-01
+2021-04-10 21:38:16,421; INFO; NP.config; set_auto_batch_epoch; Auto-set batch_size to 64
+2021-04-10 21:38:16,422; INFO; NP.config; set_auto_batch_epoch; Auto-set epochs to 61
+2021-04-10 21:38:19,839; INFO; NP.utils_torch; lr_range_test; lr-range-test results: steep: 2.61E-02, min: 3.13E-01
+2021-04-10 21:38:19,839; INFO; NP.utils_torch; lr_range_test; learning rate range test selected lr: 1.37E-01
+'''
