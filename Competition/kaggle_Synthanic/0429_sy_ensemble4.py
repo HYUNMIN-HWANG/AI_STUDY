@@ -23,6 +23,10 @@ warnings.simplefilter('ignore')
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 
+from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
+from sklearn.linear_model import SGDClassifier
+
 TARGET = 'Survived'
 
 N_ESTIMATORS = 1000
@@ -223,16 +227,26 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
 acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(ctb_oof>0.5, 1, 0))
 print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
 
-# [3] XGBClassifier
-print(" XGBClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-# Tuning the XGBClassifier by the GridSearchCV
-parameters = {'eval_metric':"error",
-              'objective':'binary:logistic',
-              'booster' : 'gbtree',
-              'n_estimators': N_ESTIMATORS,
-              'tree_method':'gpu_hist',
-              'gpu_id': 0,
-              'seed': SEED}
+# [3] DecisionTreeClassifier
+print(" DecisionTreeClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+# Tuning the DecisionTreeClassifier by the GridSearchCV
+parameters = {
+    'max_depth': np.arange(2, 5, dtype=int),
+    'min_samples_leaf':  np.arange(2, 5, dtype=int)
+}
+
+classifier = DecisionTreeClassifier(random_state=2021)
+
+model = GridSearchCV(
+    estimator=classifier,
+    param_grid=parameters,
+    scoring='accuracy',
+    cv=10,
+    n_jobs=-1)
+model.fit(X_train, y_train)
+
+best_parameters = model.best_params_
+print(best_parameters)
 
 dtm_oof = np.zeros(train_df.shape[0])
 dtm_preds = np.zeros(test_df.shape[0])
@@ -249,7 +263,11 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
     X_valid, y_valid = all_df.iloc[oof_idx].drop(TARGET, axis=1), all_df.iloc[oof_idx][TARGET]
     X_test = all_df.iloc[preds_idx].drop(TARGET, axis=1)
     
-    model = xgb.XGBClassifier(**parameters)
+    model = DecisionTreeClassifier(
+        max_depth=best_parameters['max_depth'],
+        min_samples_leaf=best_parameters['min_samples_leaf'],
+        random_state=SEED
+    )
     model.fit(X_train, y_train)
     
     dtm_oof[oof_idx] = model.predict(X_valid)
@@ -261,25 +279,77 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
 acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(dtm_oof>0.5, 1, 0))
 print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
 
+# [4] XGBoost Classifier
+print(" XGBoost Classifier >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+# Tuning the XGBoost Classifier by the GridSearchCV
+parameters = {
+    'max_depth': np.arange(2, 5, dtype=int),
+    # 'min_samples_leaf':  np.arange(2, 5, dtype=int)
+}
+
+classifier = XGBClassifier(n_estimators=1000) 
+
+model = GridSearchCV(
+    estimator=classifier,
+    param_grid=parameters,
+    scoring='accuracy',
+    cv=10,
+    n_jobs=-1)
+model.fit(X_train, y_train)
+
+best_parameters = model.best_params_
+print(best_parameters)
+
+svc_oof = np.zeros(train_df.shape[0])
+svc_preds = np.zeros(test_df.shape[0])
+feature_importances = pd.DataFrame()
+
+mod = ('XGBoost Classifier',XGBClassifier(random_state=SEED,
+    cv=5,n_estimator=1000,verbosity=0, n_jobs=-1,learning_rate=.1, max_depth=best_parameters['max_depth']))
+
+skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=SEED)
+
+for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET])):
+    print(f"===== FOLD {fold} =====")
+    oof_idx = np.array([idx for idx in valid_idx if idx < train_df.shape[0]])
+    preds_idx = np.array([idx for idx in valid_idx if idx >= train_df.shape[0]])
+
+    X_train, y_train = all_df.iloc[train_idx].drop(TARGET, axis=1), all_df.iloc[train_idx][TARGET]
+    X_valid, y_valid = all_df.iloc[oof_idx].drop(TARGET, axis=1), all_df.iloc[oof_idx][TARGET]
+    X_test = all_df.iloc[preds_idx].drop(TARGET, axis=1)
+    
+    model = mod[1]
+    model.fit(X_train, y_train)
+    
+    svc_oof[oof_idx] = model.predict(X_valid)
+    svc_preds[preds_idx-train_df.shape[0]] = model.predict(X_test)
+    
+    acc_score = accuracy_score(y_valid, np.where(svc_oof[oof_idx]>0.5, 1, 0))
+    print(f"===== ACCURACY SCORE {acc_score:.6f} =====\n")
+    
+acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(svc_oof>0.5, 1, 0))
+print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
+
 # Submission
 submission['submit_lgb'] = np.where(lgb_preds>0.5, 1, 0)
 submission['submit_ctb'] = np.where(ctb_preds>0.5, 1, 0)
 submission['submit_dtm'] = np.where(dtm_preds>0.5, 1, 0)
+submission['submit_svc'] = np.where(svc_preds>0.5, 1, 0)
 
 submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis = 1).value_counts()
 
-submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 2).astype(int)
+submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 3).astype(int)
 submission.drop([col for col in submission.columns if col.startswith('submit_')], axis=1, inplace=True)
 
 submission['submit_1'] = submission[TARGET].copy()
-submission['submit_2'] = pd.read_csv("E:\\data\\kaggle_tabular\\dae.csv")[TARGET]
+submission['submit_2'] = pd.read_csv("E:\\data\\kaggle_tabular\\submission\\submission_0429_voting6.csv")[TARGET]
 submission['submit_3'] = pd.read_csv("E:\\data\\kaggle_tabular\\pseudo_label.csv")[TARGET]
 
 submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis = 1).value_counts()
 
 submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 2).astype(int)
 
-submission[['PassengerId', TARGET]].to_csv("E:\\data\\kaggle_tabular\\submission_0429_voting1.csv", index = False)
+submission[['PassengerId', TARGET]].to_csv("E:\\data\\kaggle_tabular\\submission_0429_voting7.csv", index = False)
 
-# submission_0429_voting1.csv
-# score : 0.81706
+# submission_0429_voting7.csv -> hhm2816 학원컴
+# score : 0.81726

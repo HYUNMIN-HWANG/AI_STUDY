@@ -13,6 +13,7 @@ import catboost as ctb
 import xgboost as xgb
 from sklearn.model_selection import GridSearchCV
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
+from sklearn.ensemble import RandomForestClassifier
 
 import graphviz
 import matplotlib.pyplot as plt
@@ -223,16 +224,26 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
 acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(ctb_oof>0.5, 1, 0))
 print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
 
-# [3] XGBClassifier
-print(" XGBClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-# Tuning the XGBClassifier by the GridSearchCV
-parameters = {'eval_metric':"error",
-              'objective':'binary:logistic',
-              'booster' : 'gbtree',
-              'n_estimators': N_ESTIMATORS,
-              'tree_method':'gpu_hist',
-              'gpu_id': 0,
-              'seed': SEED}
+# [3] DecisionTreeClassifier
+print(" DecisionTreeClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+# Tuning the DecisionTreeClassifier by the GridSearchCV
+parameters = {
+    'max_depth': np.arange(2, 5, dtype=int),
+    'min_samples_leaf':  np.arange(2, 5, dtype=int)
+}
+
+classifier = DecisionTreeClassifier(random_state=2021)
+
+model = GridSearchCV(
+    estimator=classifier,
+    param_grid=parameters,
+    scoring='accuracy',
+    cv=10,
+    n_jobs=-1)
+model.fit(X_train, y_train)
+
+best_parameters = model.best_params_
+print(best_parameters)
 
 dtm_oof = np.zeros(train_df.shape[0])
 dtm_preds = np.zeros(test_df.shape[0])
@@ -249,7 +260,11 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
     X_valid, y_valid = all_df.iloc[oof_idx].drop(TARGET, axis=1), all_df.iloc[oof_idx][TARGET]
     X_test = all_df.iloc[preds_idx].drop(TARGET, axis=1)
     
-    model = xgb.XGBClassifier(**parameters)
+    model = DecisionTreeClassifier(
+        max_depth=best_parameters['max_depth'],
+        min_samples_leaf=best_parameters['min_samples_leaf'],
+        random_state=SEED
+    )
     model.fit(X_train, y_train)
     
     dtm_oof[oof_idx] = model.predict(X_valid)
@@ -261,25 +276,111 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
 acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(dtm_oof>0.5, 1, 0))
 print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
 
+
+# [4]  RandomForestClassifier
+print("  RandomForestClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+# Tuning the  RandomForestClassifier 
+rf_params = {
+    'max_depth': np.arange(10, 15, dtype=int),
+    'min_samples_leaf': np.arange(2, 10, dtype=int),
+}
+
+classifier = RandomForestClassifier(**rf_params)
+
+model = GridSearchCV(
+    estimator=classifier,
+    param_grid=rf_params,
+    scoring='accuracy',
+    cv=10,
+    n_jobs=-1)
+model.fit(X_train, y_train)
+
+best_parameters = model.best_params_
+print(best_parameters)
+
+rfc_oof = np.zeros(train_df.shape[0])
+rfc_preds = np.zeros(test_df.shape[0])
+feature_importances = pd.DataFrame()
+
+skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=SEED)
+
+for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET])):
+    print(f"===== FOLD {fold} =====")
+    oof_idx = np.array([idx for idx in valid_idx if idx < train_df.shape[0]])
+    preds_idx = np.array([idx for idx in valid_idx if idx >= train_df.shape[0]])
+
+    X_train, y_train = all_df.iloc[train_idx].drop(TARGET, axis=1), all_df.iloc[train_idx][TARGET]
+    X_valid, y_valid = all_df.iloc[oof_idx].drop(TARGET, axis=1), all_df.iloc[oof_idx][TARGET]
+    X_test = all_df.iloc[preds_idx].drop(TARGET, axis=1)
+    
+    model = RandomForestClassifier(
+        max_depth=best_parameters['max_depth'],
+        min_samples_leaf=best_parameters['min_samples_leaf'],
+        random_state=SEED
+    )
+    model.fit(X_train, y_train)
+    
+    rfc_oof[oof_idx] = model.predict(X_valid)
+    rfc_preds[preds_idx-train_df.shape[0]] = model.predict(X_test)
+    
+    acc_score = accuracy_score(y_valid, np.where(rfc_oof[oof_idx]>0.5, 1, 0))
+    print(f"===== ACCURACY SCORE {acc_score:.6f} =====\n")
+    
+acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(dtm_oof>0.5, 1, 0))
+print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
+
+
 # Submission
 submission['submit_lgb'] = np.where(lgb_preds>0.5, 1, 0)
 submission['submit_ctb'] = np.where(ctb_preds>0.5, 1, 0)
 submission['submit_dtm'] = np.where(dtm_preds>0.5, 1, 0)
+submission['submit_rfc'] = np.where(rfc_preds>0.5, 1, 0)
+
+print(submission.head())
+#    PassengerId  Survived  submit_lgb  submit_ctb  submit_dtm  submit_rfc
+# 0       100000         1           0           0           0           0
+# 1       100001         1           1           1           1           1
+# 2       100002         1           1           1           1           1
+# 3       100003         1           0           0           0           0
+# 4       100004         1           1           1           1           1
 
 submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis = 1).value_counts()
+print(submission.head())
+#    PassengerId  Survived  submit_lgb  submit_ctb  submit_dtm  submit_rfc
+# 0       100000         1           0           0           0           0
+# 1       100001         1           1           1           1           1
+# 2       100002         1           1           1           1           1
+# 3       100003         1           0           0           0           0
+# 4       100004         1           1           1           1           1
 
 submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 2).astype(int)
+print(submission.head())
+#    PassengerId  Survived  submit_lgb  submit_ctb  submit_dtm  submit_rfc
+# 0       100000         0           0           0           0           0
+# 1       100001         1           1           1           1           1
+# 2       100002         1           1           1           1           1
+# 3       100003         0           0           0           0           0
+# 4       100004         1           1           1           1           1
+
 submission.drop([col for col in submission.columns if col.startswith('submit_')], axis=1, inplace=True)
+print(submission.head())
+#    PassengerId  Survived
+# 0       100000         0
+# 1       100001         1
+# 2       100002         1
+# 3       100003         0
+# 4       100004         1
 
 submission['submit_1'] = submission[TARGET].copy()
 submission['submit_2'] = pd.read_csv("E:\\data\\kaggle_tabular\\dae.csv")[TARGET]
 submission['submit_3'] = pd.read_csv("E:\\data\\kaggle_tabular\\pseudo_label.csv")[TARGET]
+submission['submit_4'] = pd.read_csv("E:\\data\\kaggle_tabular\\dae2.csv")[TARGET]
 
-submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis = 1).value_counts()
+submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1).value_counts()
 
 submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 2).astype(int)
 
-submission[['PassengerId', TARGET]].to_csv("E:\\data\\kaggle_tabular\\submission_0429_voting1.csv", index = False)
+submission[['PassengerId', TARGET]].to_csv("E:\\data\\kaggle_tabular\\submission_0429_voting4.csv", index = False)
 
-# submission_0429_voting1.csv
-# score : 0.81706
+# submission_0429_voting4.csv
+# score : 0.81545

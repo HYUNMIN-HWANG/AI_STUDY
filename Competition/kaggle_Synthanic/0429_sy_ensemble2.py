@@ -223,16 +223,26 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
 acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(ctb_oof>0.5, 1, 0))
 print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
 
-# [3] XGBClassifier
-print(" XGBClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-# Tuning the XGBClassifier by the GridSearchCV
-parameters = {'eval_metric':"error",
-              'objective':'binary:logistic',
-              'booster' : 'gbtree',
-              'n_estimators': N_ESTIMATORS,
-              'tree_method':'gpu_hist',
-              'gpu_id': 0,
-              'seed': SEED}
+# [3] DecisionTreeClassifier
+print(" DecisionTreeClassifier>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+# Tuning the DecisionTreeClassifier by the GridSearchCV
+parameters = {
+    'max_depth': np.arange(2, 5, dtype=int),
+    'min_samples_leaf':  np.arange(2, 5, dtype=int)
+}
+
+classifier = DecisionTreeClassifier(random_state=2021)
+
+model = GridSearchCV(
+    estimator=classifier,
+    param_grid=parameters,
+    scoring='accuracy',
+    cv=10,
+    n_jobs=-1)
+model.fit(X_train, y_train)
+
+best_parameters = model.best_params_
+print(best_parameters)
 
 dtm_oof = np.zeros(train_df.shape[0])
 dtm_preds = np.zeros(test_df.shape[0])
@@ -249,7 +259,11 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
     X_valid, y_valid = all_df.iloc[oof_idx].drop(TARGET, axis=1), all_df.iloc[oof_idx][TARGET]
     X_test = all_df.iloc[preds_idx].drop(TARGET, axis=1)
     
-    model = xgb.XGBClassifier(**parameters)
+    model = DecisionTreeClassifier(
+        max_depth=best_parameters['max_depth'],
+        min_samples_leaf=best_parameters['min_samples_leaf'],
+        random_state=SEED
+    )
     model.fit(X_train, y_train)
     
     dtm_oof[oof_idx] = model.predict(X_valid)
@@ -260,6 +274,7 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(all_df, all_df[TARGET]))
     
 acc_score = accuracy_score(all_df[:train_df.shape[0]][TARGET], np.where(dtm_oof>0.5, 1, 0))
 print(f"===== ACCURACY SCORE {acc_score:.6f} =====")
+
 
 # Submission
 submission['submit_lgb'] = np.where(lgb_preds>0.5, 1, 0)
@@ -279,7 +294,7 @@ submission[[col for col in submission.columns if col.startswith('submit_')]].sum
 
 submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 2).astype(int)
 
-submission[['PassengerId', TARGET]].to_csv("E:\\data\\kaggle_tabular\\submission_0429_voting1.csv", index = False)
+submission[['PassengerId', TARGET]].to_csv("E:\\data\\kaggle_tabular\\submission_0429_voting2.csv", index = False)
 
-# submission_0429_voting1.csv
-# score : 0.81706
+# submission_0429_voting2.csv
+# score : 0.81722
