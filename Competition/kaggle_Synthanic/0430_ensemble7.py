@@ -57,7 +57,6 @@ all_df = pd.concat([train_df, test_df]).reset_index(drop=True)
 # print(all_df.shape) # (200000, 12)
 # print(all_df.head()) 
 
-
 submission['submit_1'] = pd.read_csv("E:\\data\\kaggle_tabular\\submission\\submission_0430_5.csv")[TARGET]
 submission['submit_2'] = pd.read_csv("E:\\data\\kaggle_tabular\\submission\\submission_0429_voting6.csv")[TARGET]
 submission['submit_2'] = pd.read_csv("E:\\data\\kaggle_tabular\\submission\\submission_0430_3.csv")[TARGET]
