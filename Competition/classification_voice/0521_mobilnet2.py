@@ -312,6 +312,6 @@ time = end_now - start_now
 print("time >> " , time) 
 
 # 집컴
-# time >>  
+# time >>  4:20:04.131010
 # mobilenet_0521_mean2.csv
-# score 
+# score 2.3295521425
